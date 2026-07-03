@@ -1,10 +1,12 @@
 # mesoLTM
 
-> _Placeholder: one-line description of what mesoLTM does — to be filled in._
+A **mesoscopic traffic flow model** — a Python package (`mesoltm`) modelling traffic between the microscopic (per-vehicle) and macroscopic (continuum) scales.
+
+> _Early development: the package is being scaffolded and is not yet installable from PyPI._
 
 ## Requirements
 
-- Python **3.13**
+- Python **3.11+**
 
 ## Setup
 
@@ -14,8 +16,8 @@ Clone the repository and create an isolated virtual environment:
 git clone <repository-url>
 cd mesoLTM
 
-# Create the virtual environment (Python 3.13)
-python3.13 -m venv venv
+# Create the virtual environment (Python 3.11)
+python3.11 -m venv venv
 
 # Activate it
 source venv/bin/activate        # macOS / Linux

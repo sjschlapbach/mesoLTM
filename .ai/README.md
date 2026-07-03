@@ -1,21 +1,16 @@
-# .ai — AI tracking system
+# .ai — decision & progress logs
 
-Persistent, agent-maintained context for this repository, optimized for quick lookup by coding agents (especially Claude Code). The **operating protocol** lives in the repo-root `CLAUDE.md`; this directory holds the content it points to.
+This directory holds only the parts of the project's agent-facing knowledge that are **not** stored as serena memories: the append-only logs.
 
-> Note: this is **agent tracking**, distinct from `docs/` (reserved for user-facing documentation).
+- `DECISIONS.md` — decision log (newest first): systematic/non-obvious choices + rationale.
+- `PROGRESS.md` — dated progress/changelog: what changed each task and why.
 
-## Files
+## What's NOT here — it lives in serena memory
 
-| File | Purpose | Read when | Update when |
-|------|---------|-----------|-------------|
-| `ARCHITECTURE.md` | Repository structure and how components fit together — the map. | Starting any task. | Files/modules added, moved, removed, or reorganized. |
-| `CONVENTIONS.md` | Coding style, patterns, tooling standards. | Writing or changing code. | A standard is set or changed. |
-| `DECISIONS.md` | Append-only log of systematic/non-obvious decisions + rationale. | Before making a structural choice. | You make such a choice (or deviate from a convention). |
-| `PROGRESS.md` | Dated log of what changed each task and why. | Checking recent/in-flight work. | **Every task** (append an entry). |
+Reference knowledge — project overview, codebase structure, code style/conventions, suggested commands, tools & skills, task-completion checklist — lives in **serena memories** (`.serena/memories/`, committed to git). Read them via serena's `read_memory` / `list_memories`, or directly as `.serena/memories/*.md` files if serena is unavailable. This split avoids maintaining the same facts in two places. See the `ai_tracking_system` memory for the full picture.
 
 ## Rules
 
-1. Read the relevant files **before** starting a task.
-2. Update them **before** finishing (see the "definition of done" in `CLAUDE.md`).
-3. Keep entries short and factual — this is a quick-lookup index, not prose.
-4. These files are the source of truth for agent context. If one contradicts the code, reconcile it in the same task; **a stale file is a bug**.
+1. **Before a task:** read the relevant serena memories + these logs (see `CLAUDE.md`).
+2. **Before finishing:** append to `PROGRESS.md` (always); add to `DECISIONS.md` for notable choices; update the relevant serena memory if reference facts changed.
+3. Keep entries short and factual. A stale entry (here or in a memory) is a bug — fix it in the same task.

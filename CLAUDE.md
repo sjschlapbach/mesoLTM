@@ -2,50 +2,41 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project
+
+**mesoLTM** is a **mesoscopic traffic flow model**, distributed as a **pip-installable Python package** (`mesoltm`). Mesoscopic models sit between microscopic (individual vehicles) and macroscopic (continuum density/flow) — typically modelling vehicle groups/packets or gas-kinetic distributions over a road network.
+
+Status: **early development** — the package is being scaffolded; core model code does not exist yet.
+
 ## Working protocol (read first, every session)
 
-This repository maintains an **AI tracking system** under `.ai/`. Those files are the persistent, shared memory for coding agents — the fast path to understanding the repo without re-reading everything. Treat them as authoritative and keep them current. Maintaining them is part of every task, not optional bookkeeping. (`.ai/` is agent context; `docs/` is reserved for user-facing documentation.)
+Project knowledge is split to avoid duplication, and keeping it current is part of every task:
+
+- **serena memories** (`.serena/memories/`, committed) — the reference knowledge: project overview, codebase structure, code style & conventions, suggested commands, tools & skills, task-completion checklist. **Primary source of truth.**
+- **`.ai/`** — only the append-only logs: `DECISIONS.md` (decision log) and `PROGRESS.md` (dated changelog). See `.ai/README.md`.
+- **This file** — the protocol and pointers only; it deliberately does **not** restate the content above.
 
 **Before starting a task**
-1. Read `.ai/ARCHITECTURE.md` — current structure and how things fit together.
-2. Read `.ai/CONVENTIONS.md` — coding style and patterns to follow.
-3. Skim `.ai/DECISIONS.md` — decisions/constraints that bind your work.
-4. Check `.ai/PROGRESS.md` — in-flight work and recent changes.
+1. Read the relevant **serena memories** — use serena's `list_memories` / `read_memory` (or read `.serena/memories/*.md` directly if serena is unavailable). Start with `project_overview`, then `codebase_structure`, `code_style_and_conventions`, `suggested_commands`, `tools_and_skills`.
+2. Read `.ai/DECISIONS.md` — decisions/constraints that bind your work.
+3. Check `.ai/PROGRESS.md` — in-flight work and recent changes.
 
-**While working** — follow the conventions. If you must deviate, record why in `DECISIONS.md`.
+**While working** — follow the `code_style_and_conventions` memory; use the tools in `tools_and_skills` (context7 for library docs, serena for code navigation/editing). If you deviate, record why in `.ai/DECISIONS.md`.
 
 **Before finishing a task (definition of done)** — update whichever apply:
-- `ARCHITECTURE.md` — you added/moved/removed files or modules, or changed how components relate.
-- `DECISIONS.md` — you made a non-obvious or systematic choice (library, pattern, structure, trade-off).
-- `CONVENTIONS.md` — you established or changed a coding standard.
-- `PROGRESS.md` — **always** append a dated entry summarizing what changed and why.
+- **serena memory** — update `codebase_structure`, `code_style_and_conventions`, or `suggested_commands` (via serena's `write_memory`) if structure, conventions, or commands changed.
+- `.ai/DECISIONS.md` — you made a non-obvious or systematic choice.
+- `.ai/PROGRESS.md` — **always** append a dated entry summarizing what changed and why.
+- Run the `task_completion_checklist` memory (tests, ruff, mypy).
 
-Keep entries short and factual. **A stale tracking file is a bug** — if a change makes one of these files wrong, fix it in the same task.
+**A stale tracking file is a bug** — fix it in the same task. A `Stop` hook reminds you if work changed but tracking (`.ai/` **or** `.serena/memories/`) wasn't updated.
 
-## Current state
+## Environment (quick reference — full commands in the `suggested_commands` memory)
 
-This repository is a brand-new, essentially empty Python project. It currently contains:
-
-- `CLAUDE.md` — this operating manual.
-- `.ai/` — the AI tracking system (see `.ai/README.md`).
-- `README.md` — a single-line title (`# mesoLTM`).
-- `LICENSE` — MIT, © 2026 Julius Schlapbach.
-- `.gitignore` — the stock GitHub Python template, plus `.DS_Store`.
-- `venv/` — a local virtual environment (git-ignored).
-
-There is no application/library source, no tests, and no dependency/build configuration yet. When adding the first real code, also add the corresponding tooling (dependency manifest, test runner, lint/format config), record the actual build/test/run commands here, and reflect it in `.ai/`.
-
-## Environment
-
-- Python **3.13** (the checked-out `venv/` was created with 3.13.9 via Homebrew).
-- Only `pip` is installed in the venv — no project dependencies yet.
+- Local dev: Python **3.11** venv (currently 3.11.15 via Homebrew). The package targets **3.11+**, so dev and floor match.
 - `venv/` is git-ignored; do not commit it.
 
 ```bash
-python3.13 -m venv venv       # if venv/ is missing
-source venv/bin/activate
+python3.11 -m venv venv && source venv/bin/activate
+pip install -e ".[dev]"       # once pyproject.toml exists
 ```
-
-## Notes
-
-- No dependency manager is chosen yet (no `requirements.txt`, `pyproject.toml`, `Pipfile`, `uv.lock`, etc.). Pick one when introducing dependencies, then record the install command here and in `.ai/CONVENTIONS.md`.
