@@ -3,7 +3,7 @@
 When finishing a coding task:
 
 1. **Tests:** `pytest` (add/adjust tests for new behaviour).
-2. **Lint + format:** `ruff check .` and `ruff format --check .`.
+2. **Lint + format:** `pylint src/mesoltm examples` and `black --check src examples`.
 3. **Types:** `mypy src`.
 4. **Update tracking:**
    - Update the relevant **serena memory** if reference facts changed: `mem:codebase_structure` (structure), `mem:code_style_and_conventions` (style/tooling), `mem:suggested_commands` (commands).

@@ -1,0 +1,31 @@
+mesoLTM (mesoltm)
+Copyright (C) 2026 Julius Schlapbach
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version. See the LICENSE file for the full text.
+
+---
+
+## Attribution
+
+mesoLTM is a re-implementation of the mesoscopic (individual-vehicle) Link
+Transmission Model and reuses/adapts the core model logic of the `abmmeso`
+package by Felipe de Souza (licensed under AGPL-3.0):
+
+    https://github.com/felasouza/abmmeso
+
+The model is described in:
+
+    F. de Souza, O. Verbas, J. Auld, C. M. J. Tampère,
+    "A mesoscopic link-transmission-model able to track individual vehicles",
+    Simulation Modelling Practice and Theory, Vol. 140 (2025), Article 103088.
+    DOI: 10.1016/j.simpat.2025.103088
+
+The core link demand/supply dynamics, the integer capacity discretization, and
+the node flow-resolution algorithms (one-to-one, diverge, merge, and general
+node models) follow that work. Because mesoLTM adapts AGPL-3.0 source, it is
+distributed under the same license (AGPL-3.0).
+
+If you use mesoLTM in academic work, please cite this repository and the paper above.

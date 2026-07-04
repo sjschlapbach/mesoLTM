@@ -1,0 +1,120 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mesoltm"
+version = "0.1.0"
+description = "Mesoscopic (individual-vehicle) Link Transmission Model for traffic flow on general networks"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Julius Schlapbach", email = "juliussc@ethz.ch" }]
+keywords = [
+    "traffic",
+    "mesoscopic",
+    "link-transmission-model",
+    "ltm",
+    "simulation",
+    "transportation",
+    "agent-based",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=1.24",
+    "networkx>=3.0",
+]
+
+[project.optional-dependencies]
+plot = ["matplotlib>=3.7"]
+ui = ["netgraph>=4.13"]
+calib = ["scipy>=1.10"]
+dev = [
+    "pytest>=7.4",
+    "pylint>=3.0",
+    "black>=24.0",
+    "mypy>=1.8",
+    "build>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/sjschlapbach/mesoLTM"
+Repository = "https://github.com/sjschlapbach/mesoLTM"
+Issues = "https://github.com/sjschlapbach/mesoLTM/issues"
+
+[project.scripts]
+mesoltm = "mesoltm.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mesoltm"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.pylint.main]
+py-version = "3.11"
+# Let pylint resolve the example scripts' local `_common` helper (added to
+# sys.path at runtime) so linting the examples does not report import-error.
+init-hook = "import sys; sys.path.insert(0, 'examples')"
+
+[tool.pylint.format]
+# Formatting (incl. line length) is owned by black; keep the ceiling in sync.
+max-line-length = 88
+
+[tool.pylint.basic]
+# Allow the short, standard traffic-engineering identifiers (v_f, w, rho, q, dt,
+# t, and the paper's g0/d1-style locals) that black-formatted code uses; T1/T2
+# are the paper's forward/backward wave-lag symbols.
+good-names = ["T1", "T2"]
+good-names-rgxs = "^[a-z][a-z0-9_]?$"
+
+[tool.pylint."messages control"]
+# Disable checks that fight the faithful port's intentional shape: the node
+# models are deliberately long/branchy (verbatim from the paper), small policy
+# and node classes have few methods, and the examples import after a sys.path
+# tweak. black owns formatting.
+disable = [
+    # design: the ported node models are intentionally long/branchy, and the
+    # policy/controller/node classes are small by design.
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-positional-arguments",
+    "too-many-locals",
+    "too-many-branches",
+    "too-many-statements",
+    "too-many-instance-attributes",
+    "too-many-return-statements",
+    "duplicate-code",
+    # the ported node control flow mirrors the reference (if/break then elif ...).
+    "no-else-break",
+    "no-else-continue",
+    "no-else-return",
+    # routing-policy and controller callbacks take context args they may not use.
+    "unused-argument",
+    # dict(key=value) reads well for kwargs-style FD/param maps; keep it.
+    "use-dict-literal",
+    # example scripts import after a runtime sys.path tweak for the shared helper.
+    "wrong-import-position",
+]
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["mesoltm"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+[tool.pytest.ini_options]
+testpaths = ["src/mesoltm/tests"]
+python_files = ["test_*.py"]

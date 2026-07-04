@@ -27,7 +27,7 @@ Project knowledge is split to avoid duplication, and keeping it current is part 
 - **serena memory** — update `codebase_structure`, `code_style_and_conventions`, or `suggested_commands` (via serena's `write_memory`) if structure, conventions, or commands changed.
 - `.ai/DECISIONS.md` — you made a non-obvious or systematic choice.
 - `.ai/PROGRESS.md` — **always** append a dated entry summarizing what changed and why.
-- Run the `task_completion_checklist` memory (tests, ruff, mypy).
+- Run the `task_completion_checklist` memory (tests, pylint, black, mypy).
 
 **A stale tracking file is a bug** — fix it in the same task. A `Stop` hook reminds you if work changed but tracking (`.ai/` **or** `.serena/memories/`) wasn't updated.
 
