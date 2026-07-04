@@ -26,7 +26,7 @@
       "Bash(pip list*)",
       "Bash(pip freeze*)"
     ],
-    "deny": ["Bash(git worktree *)"]
+    "deny": ["Bash(git worktree *)", "Bash(git commit*)", "Bash(git commit:*)"]
   },
   "hooks": {
     "Stop": [

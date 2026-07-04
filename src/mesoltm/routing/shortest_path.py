@@ -101,10 +101,10 @@ class ShortestPathPolicy:
         try:
             path = nx.shortest_path(graph, from_node, to_node, weight="cost")
 
-        except (nx.NetworkXNoPath, nx.NodeNotFound):
+        except (nx.NetworkXNoPath, nx.NodeNotFound) as exc:
             raise ValueError(
                 f"No path from {from_node} to {to_node} in the routing graph."
-            )
+            ) from exc
 
         return [graph[a][b]["link_id"] for a, b in zip(path, path[1:])]
 
@@ -134,10 +134,10 @@ class ShortestPathPolicy:
         graph = self._graph_for(net_state)
         try:
             path = nx.shortest_path(graph, arriving_node, destination, weight="cost")
-        except (nx.NetworkXNoPath, nx.NodeNotFound):
+        except (nx.NetworkXNoPath, nx.NodeNotFound) as exc:
             raise ValueError(
                 f"No path from {arriving_node} to {destination} in the routing graph."
-            )
+            ) from exc
 
         if len(path) < 2:
             return None
