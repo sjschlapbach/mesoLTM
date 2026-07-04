@@ -1,14 +1,17 @@
 # Code Style & Conventions
 
-- **Python 3.11+** for the published package (`requires-python = ">=3.11"`); dev in the 3.11 venv.
-- **Packaging:** PEP 621 `pyproject.toml`, **hatchling** backend, **`src/` layout** (`src/mesoltm/`). Distribution + import name: `mesoltm`.
-- **Runtime deps:** `numpy`, `scipy`. `matplotlib` is an **optional extra** (`mesoltm[plot]`) — never import it at the top level of core modules; import it lazily inside plotting functions.
-- **Dev deps** via `[dev]` extra: `pytest`, `ruff`, `mypy`, `build`.
-- **Type hints:** required on public functions/classes/module boundaries; keep `mypy`-clean.
-- **Numerics:** prefer vectorized NumPy over Python loops on hot paths; explicit dtypes/shapes. Reach for `scipy` (integration, optimization, sparse) before hand-rolling.
-- Keep `import mesoltm` cheap — no heavy imports at import time.
-- Export the intended public API explicitly from `src/mesoltm/__init__.py`.
-- **Docstrings:** NumPy-style on public API; comments explain *why*, not *what*.
-- **Lint + format:** `ruff` (both). **Types:** `mypy` on `src/`.
-
-Refine module-boundary/naming specifics in `mem:codebase_structure` as the package grows.
+- **Python 3.11+** (`requires-python = ">=3.11"`); dev in the 3.11 venv.
+- **Packaging:** PEP 621 `pyproject.toml`, **hatchling** backend, **`src/` layout** (`src/mesoltm/`). Import/distribution name `mesoltm`. **Tests live inside the package** (`src/mesoltm/tests/`, relative imports); **examples live outside** `src/` and import the installed package.
+- **Runtime deps:** `numpy`, `networkx` (graphs/grids/shortest-path). `matplotlib` is the optional `[plot]` extra. Other extras: `ui` (network editor), `calib` (`scipy`), `dev`.
+- **Imports: always at module top level. Never inline (inside functions) and never wrapped in try/except.** `TYPE_CHECKING`-guarded type-only imports are the one allowed conditional form (they avoid circular imports and carry no runtime cost). `matplotlib` is imported at the **top** of `visualizations/plots.py`; `import mesoltm` stays cheap because the package `__init__` does not import `visualizations` (only code that plots pulls in matplotlib). Example scripts import `matplotlib`/`matplotlib.pyplot` at the top and call `matplotlib.use("Agg")` before plotting.
+- **Dev deps** (`[dev]`): `pytest`, `pylint`, `black`, `mypy`, `build`.
+- **Formatting:** **black** (line length 88). **Lint:** `pylint src/mesoltm examples` (black owns formatting; pylint config in `pyproject.toml` allows the short traffic-engineering names T1/T2/v_f/w/… and disables checks that fight the faithful port). **Types:** `mypy src`, kept clean.
+- **Type hints:** on public functions/classes/boundaries. Two-phase-init objects (links/nodes) use concrete zero/empty defaults, not `Optional`, and reset transient per-step scalars to `0` (not `None`) — this keeps mypy clean and is behaviour-identical (see `docs/MODEL_CHANGES.md`). **No `# type: ignore[assignment]` in the package** — use a concrete default instead of `None`.
+- **Time lives only in the `Simulation` loop.** The `Link` stores **no** time state (no `time_step`/`total_time`/`total_steps`/current-step attributes); the loop owns the clock and passes it through arguments (`update_state_variables(t, time_step)`, `get_output_records(sample_time, sim_time_step, total_time)`, `set_inflow/set_outflow(..., step)` with the node forwarding its step index). `start()` uses the step/horizon locally without storing them. Do not re-add time attributes to links (see `docs/MODEL_CHANGES.md` A8). **Nodes store only the time they actually read at step time:** `OriginNode` keeps `time_step` (departure test); every other node keeps none — one-to-one/diverge/merge/general have no `start()` override (they inherit the `BaseNode` no-op), and `DestinationNode.start` sizes its arrival array with a local `total_steps`. `Plugin` (user hook) keeps `time_step`/`total_time` as part of its API.
+- **Docstrings:** required on every function/class — concise: purpose, `Args`, `Returns`. Inline comments explain *why*, sparingly (not every line).
+- **Faithfulness rule:** the ported LTM core (`core/link.py`, node models, 4-phase loop) keeps the reference arithmetic **exactly** — it is intentionally scalar/integer Python, **not** vectorized NumPy (overrides the generic "vectorize hot paths" preference). NumPy is for analysis/output only. `test_regression.py` locks exact equality with `abmmeso`.
+- **Variable naming = standard traffic-engineering notation** (not the paper's spellings), values unchanged: `v_f` (free-flow speed), `w` (backward wave speed), `rho_jam` (jam density), `capacity` (= `rho_jam·v_f·w/(v_f+w)`), `density` (ρ), `occupancy` (o). These are the public kwargs (`Link(v_f=…, w=…, rho_jam=…)`) and JSON scenario keys (`"v_f"`, `"rho_jam"`). Map + rationale in `docs/MODEL_CHANGES.md` (A5).
+- **Merge priorities = shares `alpha_1, alpha_2, …`** (fractions of outbound supply per inbound link, summing to 1). `MergeNode`/`GeneralNodeModel` accept `alpha=` and expose `.alpha`; the discrete nodes still consume the equivalent integer `priority_vector` internally (`core/priorities.py` interconverts). `Network` defaults `alpha` to capacity-proportional; override per node via `Network.set_merge_priorities(node_id, {inbound_link_id: share})`. Behaviour-preserving — see `docs/MODEL_CHANGES.md` (B2).
+- **License headers:** every source file carries an AGPL-3.0 notice; files with logic ported from `abmmeso`/the paper additionally cite the publication (DOI 10.1016/j.simpat.2025.103088). Keep these headers when adding files.
+- Keep `import mesoltm` cheap; export the public API explicitly from `src/mesoltm/__init__.py`.
+- File names `snake_case`; classes `PascalCase`.

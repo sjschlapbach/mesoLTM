@@ -1,55 +1,138 @@
 # mesoLTM
 
-A **mesoscopic traffic flow model** — a Python package (`mesoltm`) modelling traffic between the microscopic (per-vehicle) and macroscopic (continuum) scales.
+A **mesoscopic (individual-vehicle) Link Transmission Model** for traffic flow on
+general road networks, distributed as the pip package `mesoltm`.
 
-> _Early development: the package is being scaffolded and is not yet installable from PyPI._
+`mesoltm` implements the discrete LTM of de Souza, Verbas, Auld & Tampère — a
+computationally efficient macroscopic-style model that nonetheless **tracks every
+vehicle individually**, so each vehicle carries its own (re-routable) path. It runs
+on arbitrary graphs and grids, supports parallel links (fast/slow lanes and
+detours), and exposes clean interfaces for external routing and per-step
+simulation plugins.
+
+> Early development (v0.1). Installable locally; not yet published to PyPI.
 
 ## Requirements
 
 - Python **3.11+**
 
-## Setup
-
-Clone the repository and create an isolated virtual environment:
+## Install (local, editable)
 
 ```bash
-git clone <repository-url>
-cd mesoLTM
-
-# Create the virtual environment (Python 3.11)
-python3.11 -m venv venv
-
-# Activate it
-source venv/bin/activate        # macOS / Linux
-# .\venv\Scripts\activate       # Windows (PowerShell)
+python3.11 -m venv venv && source venv/bin/activate
+pip install -e ".[dev,plot]"     # core + dev tooling + plotting
 ```
 
-Once dependencies are introduced, install them here:
+Extras: `plot` (matplotlib visualisations), `ui` (network editor, optional),
+`calib` (scipy, for calibration examples), `dev` (pytest, pylint, black, mypy, build).
+
+## Quick start
+
+```python
+from mesoltm import Vehicle, grid_network, ShortestPathPolicy
+
+# A 4x4 grid where every node can be an origin or a destination.
+net = grid_network(4, 4, link_length=200.0, all_nodes_od=True)
+net.set_origin((0, 0), vehicles=[
+    Vehicle(vehicle_id=k, start=float(k), origin=(0, 0), destination=(3, 3))
+    for k in range(50)
+])
+
+sim = net.compile(time_step=1.0, total_time=400.0,
+                  routing_policy=ShortestPathPolicy(dynamic=True))
+sim.run()
+print(sum(len(n.get_arrived_trips()) for n in sim.nodes), "vehicles arrived")
+```
+
+Or run a JSON scenario from the command line:
 
 ```bash
-# pip install -r requirements.txt   # placeholder — no dependencies yet
+python -m mesoltm examples/scenario.json     # writes link/trip CSVs
 ```
 
-To leave the environment:
+## Examples
 
-```bash
-deactivate
-```
+Executable scripts under [`examples/`](examples) (run with `python examples/<name>.py`).
+Each writes its figures (and any CSVs) to its own subdirectory
+`examples/output/<script_name>/`, so results are easy to tell apart.
 
-## Usage
+- `freeway_onramp.py` — a freeway on-ramp merge on a calibrated topology with a
+  synthetic demand profile.
+- `grid_demo.py` — a partial grid with shortest-path routing.
+- `rerouting_demo.py` — manual per-vehicle rerouting: dynamic routing is off
+  (static route-following), and a plugin hand-picks specific vehicles and rewrites
+  their routes onto a detour mid-run (no closed links, no shortest-path search).
+- `adaptive_rerouting_intersection.py` — the most basic 2-in/2-out uncontrolled
+  ("no-way-stop") intersection (a general node); agents are re-checked every step
+  against the live shortest path from their current link onward (no U-turns),
+  reroutes are versioned, and a few agents' initial-vs-final plans are plotted.
+- `parallel_links_demo.py` — fast lane, slow lane and an inflated-length detour,
+  run twice: free-flow routing (everyone piles on the fast lane until it closes)
+  vs congestion-aware routing (a cost that grows with each link's load spreads
+  traffic onto the slow lane and detour).
+- `vehicle_metrics_demo.py` — collect per-vehicle travel times (overall and per
+  link) with `mesoltm.metrics` and plot the travel-time distribution, per-link
+  means, and a per-link travel-time time series showing congestion building up.
+- `ride_hail_dispatch.py` — an external dispatcher driving the model with
+  `Simulation.start`/`step`/`inject`: drivers are dispatched toward a goal via a
+  fast **bottleneck**, and a `ReroutingPlugin` tosses a coin as each one approaches
+  to admit it or divert it onto a slower parallel path (one toss per access). Plots
+  each of four drivers' route before the toss, after it, and as actually driven.
+- `congestion_aware_routing.py` — a `ReroutingPlugin` that balances a burst of
+  traffic across a short and a long route using a shortest-path cost that combines
+  link length (free-flow time) with current load (`state.occupancy`).
 
-> _Placeholder: how to run the project — to be filled in once there is code._
+## Key concepts
 
-```bash
-# python -m mesoltm ...          # placeholder
-```
+- **Network** builder (`mesoltm.Network`, `grid_network`, `corridor_network`):
+  add nodes/links, mark any node an origin/destination, `compile()` to a simulation.
+- **Routing** (`RoutingPolicy`): per-vehicle, mutable mid-run; `StaticRoutePolicy`
+  (follow `vehicle.route`) or `ShortestPathPolicy`, or your own.
+- **Plugins** (`Plugin`): per-step loop hooks that run first each step to inspect
+  `NetworkState` and change the simulation — reroute vehicles (each vehicle carries
+  its own `route`, which the network merely propagates), gate/close links, run
+  dispatchers or local auctions. `ReroutingPlugin` is the minimal rerouting form.
+- **Visualisations** (`mesoltm.visualizations`, needs `[plot]`): cumulative curves,
+  flow over time (`plot_link_flow` sums links into a cut; `plot_link_flows` draws
+  one labelled line per link), per-link travel time over time
+  (`plot_link_time_series`, to see congestion build up), and network maps
+  (`plot_network`, colour links by flow/occupancy/…, optionally label each link and
+  fan out parallel links).
 
 ## Development
 
-- The `venv/` directory is git-ignored — do not commit it.
-- Contributor and agent guidance lives in [`CLAUDE.md`](CLAUDE.md); internal project tracking is maintained under [`.ai/`](.ai/).
-- User-facing documentation will live under `docs/` (not present yet).
+```bash
+pytest                        # tests (includes a numeric regression vs. the reference)
+pylint src/mesoltm examples   # lint
+black --check src examples    # format check
+mypy src                      # types
+python -m build               # sdist + wheel
+```
+
+`venv/` and build artefacts are git-ignored.
+
+## Attribution and citation
+
+**If you use `mesoltm` in academic or other work, please cite this repository.**
+A machine-readable entry is provided in [`CITATION.cff`](CITATION.cff):
+
+> J. Schlapbach, _mesoLTM: a mesoscopic (individual-vehicle) Link Transmission Model_.
+> Software, https://github.com/sjschlapbach/mesoLTM
+
+As a **secondary reference**, please also cite the paper whose model `mesoltm`
+implements, and whose `abmmeso` package (by Felipe de Souza, AGPL-3.0) it adapts
+(see [`NOTICE`](NOTICE)):
+
+> F. de Souza, O. Verbas, J. Auld, C. M. J. Tampère,
+> _"A mesoscopic link-transmission-model able to track individual vehicles"_,
+> Simulation Modelling Practice and Theory **140** (2025) 103088.
+> DOI: [10.1016/j.simpat.2025.103088](https://doi.org/10.1016/j.simpat.2025.103088)
+
+Deviations from the paper's formulation are documented in
+[`docs/MODEL_CHANGES.md`](docs/MODEL_CHANGES.md).
 
 ## License
 
-[MIT](LICENSE) © 2026 Julius Schlapbach
+Because it adapts AGPL-3.0 source, `mesoltm` is distributed under the
+**GNU Affero General Public License v3.0 or later** — see [`LICENSE`](LICENSE) and
+[`NOTICE`](NOTICE).

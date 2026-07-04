@@ -1,0 +1,44 @@
+name: Examples
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  run-examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # plot extra is installed so the scripts' matplotlib imports resolve; the
+      # scripts select the headless Agg backend themselves.
+      - name: Install package (dev + plot)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,plot]"
+
+      # Run every example script and fail if any of them errors, so a broken
+      # example is caught during development rather than at a random later point.
+      - name: Run example scripts
+        run: |
+          status=0
+          for script in examples/*.py; do
+            case "$(basename "$script")" in
+              _*) continue ;;  # skip shared helpers (e.g. _common.py)
+            esac
+            echo "::group::$script"
+            if python "$script"; then
+              echo "OK: $script"
+            else
+              echo "::error file=$script::example script failed"
+              status=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $status

@@ -6,17 +6,27 @@ Dev environment: **macOS (darwin)**, zsh, BSD userland (not GNU). Local venv is 
 ```bash
 python3.11 -m venv venv
 source venv/bin/activate
-pip install -e ".[dev]"          # once pyproject.toml exists
+pip install -e ".[dev,plot]"      # core + dev tooling + plotting
 ```
 
-## Test / lint / type / build
+## Test / lint / format / type / build
 ```bash
-pytest                            # all tests
-pytest tests/test_x.py::test_y    # single test
-ruff check .                      # lint
-ruff format .                     # format (use --check in CI)
-mypy src                          # type-check
+pytest                            # all tests (discovered under src/mesoltm/tests)
+pytest -k regression              # e.g. the abmmeso fidelity regression
+pylint src/mesoltm examples       # lint (black owns formatting)
+black src examples                # format;  black --check src examples  in CI
+mypy src                          # type-check (clean)
 python -m build                   # sdist + wheel
 ```
+
+## Run
+```bash
+python -m mesoltm examples/scenario.json   # run a JSON scenario -> CSV outputs
+python examples/paper_lane_drop.py         # any example script
+for f in examples/*.py; do case $(basename "$f") in _*) ;; *) python "$f";; esac; done  # run all (as CI does)
+```
+
+## CI
+Each gate is its own workflow in `.github/workflows/`: `test.yml` (pytest, 3.11/3.12), `lint.yml` (pylint), `format.yml` (black --check), `typecheck.yml` (mypy), `examples.yml` (runs every `examples/*.py`, skipping `_*`, and fails if any errors), `release.yml` (build; publish disabled).
 
 Read-only serena/context7 tools and the Python dev commands above are pre-approved in `.claude/settings.json`, so they run without permission prompts. Note: `git worktree` is denied there.
