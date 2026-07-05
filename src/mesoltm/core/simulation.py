@@ -18,8 +18,11 @@ from __future__ import annotations
 import csv
 from typing import TYPE_CHECKING
 
+from ..recording import SimulationHistory, capture_frame
+
 if TYPE_CHECKING:
     from ..network.state import NetworkState
+    from ..recording import ClassifyFn
     from .vehicle import Vehicle
 
 
@@ -40,7 +43,7 @@ class Simulation:
       batch entry point and is kept byte-for-byte identical to the reference.
     * :meth:`start` + :meth:`step` — advance the simulation one step at a time so
       external code can observe state and :meth:`inject` new vehicles between
-      steps (e.g. a ride-hail dispatcher assigning idle drivers to trips and
+      steps (e.g. an external controller releasing vehicles on demand and
       re-injecting them at their current node into the next step's demand).
 
     Attributes:
@@ -77,6 +80,14 @@ class Simulation:
         # to run and also the step new injections default into.
         self.current_step: int = 0
         self._started: bool = False
+        # Per-step history logging for animation/video (off by default: it costs
+        # memory and, if ``history_path`` is set, disk). When enabled, a frame is
+        # captured after every step into ``history``; ``history_classify`` maps a
+        # vehicle to a colour category. See mesoltm.recording.
+        self.record_history: bool = False
+        self.history_path: str | None = None
+        self.history_classify: ClassifyFn | None = None
+        self.history: SimulationHistory | None = None
 
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -113,6 +124,14 @@ class Simulation:
         # start it at 0 so state inspected before the first step reads correctly.
         if self.network_state is not None:
             self.network_state.step = 0
+
+        # When history logging is on, open the history with the network geometry
+        # and capture the initial (empty) frame, so frame 0 is the start state.
+        if self.record_history and self.network_state is not None:
+            self.history = SimulationHistory.from_state(self.network_state)
+            self.history.frames.append(
+                capture_frame(self.network_state, self.history_classify)
+            )
 
         self._started = True
         return self
@@ -179,6 +198,12 @@ class Simulation:
         if self.network_state is not None:
             self.network_state.step = t + 1
 
+        # Capture the post-step state (state.step is now t+1) for the animation.
+        if self.history is not None and self.network_state is not None:
+            self.history.frames.append(
+                capture_frame(self.network_state, self.history_classify)
+            )
+
     def run(self) -> Simulation:
         """Initialise all objects, run the time loop, and write any outputs.
 
@@ -244,8 +269,33 @@ class Simulation:
             for i in range(int(self.total_time / self.time_step) + added_step)
         ]
 
+    def save_history(self, path: str | None = None) -> str:
+        """Write the recorded history to ``path`` (defaults to ``history_path``).
+
+        Args:
+            path: Destination JSON file; falls back to ``self.history_path``.
+
+        Returns:
+            The path written to.
+
+        Raises:
+            RuntimeError: If nothing was recorded (``record_history`` was off) or
+                no path is available.
+        """
+        if self.history is None:
+            raise RuntimeError(
+                "no history to save: compile/run with record_history=True"
+            )
+        target = path if path is not None else self.history_path
+        if target is None:
+            raise RuntimeError("no path given and Simulation.history_path is not set")
+        return self.history.save(target)
+
     def write_outputs(self) -> None:
-        """Write per-link and per-trip CSV outputs if output paths were set."""
+        """Write per-link and per-trip CSV outputs (and the history if enabled)."""
+        if self.history is not None and self.history_path:
+            self.history.save(self.history_path)
+
         if self.output_link_file:
             all_records: list[dict] = []
             if self.link_output_sample_time is None:

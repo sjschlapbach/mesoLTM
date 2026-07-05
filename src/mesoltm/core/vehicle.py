@@ -38,6 +38,14 @@ class Vehicle:
         position: Index of the vehicle's current link within ``route``. Used by
             the routing layer to resolve the next link robustly even when a route
             revisits a link (as can happen on grids).
+        props: Free-form per-vehicle metadata (a plain ``dict``) set at creation
+            and freely read/updated at any time — e.g. a vehicle class, an operator
+            id, a value of time, or any state a plugin wants to carry on the
+            vehicle. The core model never touches it; it exists so downstream logic
+            (routing plugins, the animation's ``color_by`` callable, custom
+            metrics) can attach and evolve information now that every vehicle's
+            location is tracked. Must be JSON-serialisable to survive the animation
+            history round-trip.
         end: Arrival time step, set by the destination node when the vehicle
             exits the network (``None`` while still travelling).
         trajectory: Ordered per-link travel log, one entry per link the vehicle
@@ -54,6 +62,7 @@ class Vehicle:
         destination: object = 0,
         start: float = 0.0,
         route: Sequence[int] | None = None,
+        props: dict | None = None,
         **kwargs: object,
     ) -> None:
         """Create a vehicle.
@@ -64,6 +73,8 @@ class Vehicle:
             destination: Destination identifier (bookkeeping).
             start: Departure time in seconds.
             route: Ordered ``link_id`` sequence; copied into a mutable list.
+            props: Optional free-form metadata dict (copied into a mutable dict);
+                see :attr:`props`. Updatable at any time after creation.
             **kwargs: Extra attributes set directly on the instance (kept for
                 compatibility with the reference implementation's keyword style).
         """
@@ -75,6 +86,7 @@ class Vehicle:
         self.position = 0
         self.end: int | None = None
         self.trajectory: list[dict] = []
+        self.props: dict = dict(props) if props else {}
         # Destination node cached by the network compiler for connector splicing.
         self._dest_node: object = None
 

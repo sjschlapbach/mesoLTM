@@ -34,7 +34,7 @@ class VehicleView(NamedTuple):
     destination: object
 
 
-class NetworkState:
+class NetworkState:  # pylint: disable=too-many-public-methods
     """A read-only accessor over the links and topology of a compiled network.
 
     Instances are created by :meth:`~mesoltm.network.network.Network.compile` and
@@ -157,6 +157,18 @@ class NetworkState:
 
         return len(node.vehicles)
 
+    def waiting_vehicles(self, node_id: object) -> list:
+        """Return the vehicles waiting in an origin's vertical entry queue (live).
+
+        These are vehicles whose departure time has passed but that the first
+        link has not yet admitted (see :class:`~mesoltm.core.nodes.origin_node`).
+        Unlike :meth:`entry_queue` (a count), this returns the vehicles
+        themselves so callers (e.g. the animation recorder) can read each one's
+        id, next link and category. Empty for non-origin nodes.
+        """
+        node = self._origin_nodes.get(node_id)
+        return list(node.vehicles) if node is not None else []
+
     # -- dynamic demand --------------------------------------------------------
 
     def inject(
@@ -242,18 +254,27 @@ class NetworkState:
                     VehicleView(
                         vehicle=vehicle,
                         link_id=link_id,
-                        route=self._remaining_real_route(vehicle, link_id),
+                        route=self.remaining_real_route(vehicle, link_id),
                         destination=vehicle.destination,
                     )
                 )
         return views
 
-    def _remaining_real_route(
-        self, vehicle: Vehicle, current_link_id: int
+    def remaining_real_route(
+        self, vehicle: Vehicle, current_link_id: int | None = None
     ) -> list[int]:
-        """Return the real links of ``vehicle.route`` from ``current_link_id`` on."""
+        """Return the real (non-connector) links of ``vehicle.route``, forward-only.
+
+        This reads ``vehicle.route`` (the plan the vehicle already carries) and
+        never recomputes a route: the recorder and rerouting logic use it so the
+        logged/replaced plan always matches what actually ran. When
+        ``current_link_id`` lies on the route the tail from there onward is
+        returned (starting with the current link); otherwise — e.g. a vehicle
+        still queued at its origin, not yet on a real link — the full real route
+        is returned.
+        """
         real = [lid for lid in vehicle.route if self._endpoints.get(lid) is not None]
-        if current_link_id in real:
+        if current_link_id is not None and current_link_id in real:
             return real[real.index(current_link_id) :]
 
         return real

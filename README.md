@@ -73,14 +73,28 @@ Each writes its figures (and any CSVs) to its own subdirectory
 - `vehicle_metrics_demo.py` — collect per-vehicle travel times (overall and per
   link) with `mesoltm.metrics` and plot the travel-time distribution, per-link
   means, and a per-link travel-time time series showing congestion building up.
-- `ride_hail_dispatch.py` — an external dispatcher driving the model with
-  `Simulation.start`/`step`/`inject`: drivers are dispatched toward a goal via a
-  fast **bottleneck**, and a `ReroutingPlugin` tosses a coin as each one approaches
-  to admit it or divert it onto a slower parallel path (one toss per access). Plots
-  each of four drivers' route before the toss, after it, and as actually driven.
+- `bottleneck_access_policy.py` — a **random bottleneck access policy** driven with
+  `Simulation.start`/`step`/`inject`: vehicles are released toward a goal via a fast
+  **bottleneck**, and a `ReroutingPlugin` tosses a coin as each one approaches to
+  admit it or divert it onto a slower parallel path (one toss per access). Plots each
+  of four vehicles' route before the toss, after it, and as actually driven, and
+  records the run as a **video** (plus per-step frames) of the vehicles moving
+  link-to-link — blue while planning the bottleneck, then green (admitted) or orange
+  (diverted).
 - `congestion_aware_routing.py` — a `ReroutingPlugin` that balances a burst of
   traffic across a short and a long route using a shortest-path cost that combines
   link length (free-flow time) with current load (`state.occupancy`).
+- `grid_visualization.py` — grids under congestion-aware **route-based** rerouting: a
+  `DensityRerouter` plugin re-plans each vehicle (shortest path on free-flow time + a
+  linear density penalty) at every node and writes the plan onto `vehicle.route`, so
+  the recorded log is exactly the route that ran. Two scenarios: a tiny **2x2 grid**
+  (few vehicles, short horizon) whose per-step PNGs + JSON log can be checked by hand,
+  and a dense **7x7 grid** (with holes) carrying many vehicles between random OD pairs.
+  Each records a **video** of the agents moving, coloured by the link each takes next —
+  showing the animation stays readable on a dense scenario (sizes scale to the network,
+  per-agent detail auto-drops but is available on request). One still is coloured by a
+  **custom function of each vehicle's `props` metadata** (a vehicle class) to show
+  `color_by` is fully overridable.
 
 ## Key concepts
 
@@ -98,6 +112,19 @@ Each writes its figures (and any CSVs) to its own subdirectory
   (`plot_link_time_series`, to see congestion build up), and network maps
   (`plot_network`, colour links by flow/occupancy/…, optionally label each link and
   fan out parallel links).
+- **Movement video** (`mesoltm.visualizations` + `record_history=True`): capture a
+  per-step history (`Network.compile(record_history=True[, history_path=…])`, off by
+  default; exposed as `Simulation.history`, JSON-serialisable) and render it to an
+  MP4/GIF (`save_animation`, default 25 fps, `subsample` sets playback speed) and/or
+  per-step PNGs (`save_frames`) of agents moving link-to-link — with next-link cues
+  and a count badge on each node for agents waiting to enter. `color_by` chooses what
+  a dot's colour means: `"category"`, `"next_link"`, `None` (uniform), or a **custom
+  callable** `fn(snapshot) -> str` colouring by anything on the snapshot — most usefully
+  each vehicle's free-form `Vehicle(props=…)` metadata, which travels with the vehicle
+  and round-trips through the log. The log records each agent's remaining route straight
+  from `vehicle.route` (never recomputed), so it always matches the simulation. The
+  saved JSON log is self-describing (each agent/waiting entry is a keyed object). Scales
+  from a small bottleneck to a dense grid.
 
 ## Development
 

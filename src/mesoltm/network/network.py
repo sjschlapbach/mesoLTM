@@ -200,6 +200,9 @@ class Network:
         routing_policy: RoutingPolicy | None = None,
         plugins: list | None = None,
         injection_budget: int = 0,
+        record_history: bool = False,
+        history_path: str | None = None,
+        history_classify=None,
     ) -> Simulation:
         """Build links, nodes and connectors and return a runnable simulation.
 
@@ -219,6 +222,17 @@ class Network:
                 demand is not throttled by the connector. A larger value only makes
                 connectors more transparent (never more binding), so an over-estimate
                 is safe; it does not affect purely static runs.
+            record_history: If ``True``, capture a per-step snapshot of every
+                vehicle's position for animation/video (see
+                :mod:`mesoltm.recording`). Off by default — it costs memory and,
+                with ``history_path``, disk. The recorded run exposes the frames
+                on ``Simulation.history``.
+            history_path: Optional JSON file the history is written to (on
+                ``run()``/``write_outputs()``), so the video can be generated in a
+                separate step.
+            history_classify: Optional ``classify(vehicle, state) -> str`` giving
+                each vehicle a colour category in the animation (e.g. a coin-toss
+                outcome); ``None`` colours every vehicle the same.
 
         Returns:
             A configured :class:`~mesoltm.core.simulation.Simulation`.
@@ -362,6 +376,9 @@ class Network:
             time_step=time_step,
             total_time=total_time,
             plugins=all_plugins,
+            record_history=record_history,
+            history_path=history_path,
+            history_classify=history_classify,
         )
         sim.network_state = state
 

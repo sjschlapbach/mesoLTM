@@ -53,6 +53,14 @@ from .network import (
     network_from_dict,
     network_to_dict,
 )
+from .recording import (
+    AgentSnapshot,
+    Frame,
+    SimulationHistory,
+    WaitingSnapshot,
+    capture_frame,
+    record_run,
+)
 from .routing import RoutingPolicy, ShortestPathPolicy, StaticRoutePolicy
 
 __version__ = "0.1.0"
@@ -93,6 +101,13 @@ __all__ = [
     "grid_network",
     "network_from_dict",
     "network_to_dict",
+    # history recording (for animation/video; matplotlib-free)
+    "SimulationHistory",
+    "Frame",
+    "AgentSnapshot",
+    "WaitingSnapshot",
+    "capture_frame",
+    "record_run",
     # plugins (per-step loop hooks)
     "Plugin",
     "FunctionPlugin",

@@ -6,7 +6,7 @@
 
 """Tests for step-driven execution and dynamic vehicle injection.
 
-These cover the framework hooks a ride-hail dispatcher relies on: advancing the
+These cover the framework hooks an external control loop relies on: advancing the
 simulation one step at a time (``start`` / ``step``) and injecting vehicles into a
 node's demand mid-run (``Simulation.inject``), with the origin/destination
 connectors spliced on automatically.

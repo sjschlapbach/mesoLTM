@@ -240,8 +240,9 @@ exactly the paper's model.
   arithmetic.
 
 ### B5. Step-driven execution and dynamic vehicle injection
-- **Motivation:** drive an external control loop (e.g. a ride-hail dispatcher) that
-  observes the network between steps and injects vehicles at a node during the run.
+- **Motivation:** drive an external control loop (e.g. an admission/access policy or
+  dispatcher) that observes the network between steps and injects vehicles at a node
+  during the run.
 - `Simulation` gains `start()` + `step()` (advance one step) alongside `run()`, plus
   `current_step` / `total_steps`. `run()` is now literally `start()` + a loop of
   `step()` + `write_outputs()`, so its behaviour is unchanged (the exact regression
