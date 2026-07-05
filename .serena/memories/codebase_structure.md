@@ -7,7 +7,7 @@ See `docs/MODEL_CHANGES.md` for the (small) deviations from the reference model.
 ## Top-level
 - `pyproject.toml` — hatchling, PyPI-ready, `requires-python>=3.11`, deps `numpy`+`networkx`; extras `plot`/`ui`/`calib`/`dev`; `mesoltm` console script.
 - `LICENSE` — **AGPL-3.0** (was MIT); `NOTICE` — attribution to de Souza et al. + paper DOI.
-- `src/mesoltm/` — the package; `examples/` — runnable scripts (outside src); `docs/` — `MODEL_CHANGES.md`.
+- `src/mesoltm/` — the package; `examples/` — runnable scripts (outside src); `docs/` — `MODEL_CHANGES.md`. `examples/paper_validation.py` is the canonical **paper-validation** script: one file reproducing the paper's Section 4 figures (Fig 5 lane-drop, 6 W=7 proposed-only, 7 diverge, 8 diverge-random, 9 merge) through the shipped discrete pipeline, with the deliberate divergences (discrete-only/no continuous ref, CFL rejection of Fig 5 dt=6 s, omitted `floor(C·dt)` ablation, out-of-scope signal/real-world Figs 11/12) surfaced on the figures — use it to sanity-check pipeline fidelity after core changes.
 - `.github/workflows/` — one workflow per gate: `lint.yml` (pylint), `format.yml` (black --check), `typecheck.yml` (mypy), `test.yml` (pytest, 3.11/3.12 matrix), `release.yml` (build + a commented-out PyPI publish; on default-branch push).
 - `CLAUDE.md`, `.ai/` (logs), `.serena/` (config + memories), `.claude/`, `README.md`, `abmmeso/` (temporary reference, to be deleted), `venv/` (git-ignored, 3.11.15).
 

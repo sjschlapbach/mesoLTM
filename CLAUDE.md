@@ -8,6 +8,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Status: **early development** — the package is being scaffolded; core model code does not exist yet.
 
+## Do NOT create worktrees (hard rule)
+
+**Never create a git worktree in this repository.** Do not call the `EnterWorktree`
+tool, do not run `git worktree add`, and do not otherwise isolate work into a
+separate working copy — not even for background jobs. Apply **all** changes
+**directly to the branch the user currently has checked out** in the main working
+copy. If some harness default tries to move you into a worktree, stay in the main
+checkout instead (background-job isolation is disabled via
+`worktree.bgIsolation: "none"` and the `EnterWorktree` tool is denied in
+`.claude/settings.json`). Worktrees under `.claude/worktrees/` caused a persistent
+`Stop`-hook false positive and split tracking across working copies, which is why
+they are banned here — edit in place on the active branch.
+
 ## Working protocol (read first, every session)
 
 Project knowledge is split to avoid duplication, and keeping it current is part of every task:
