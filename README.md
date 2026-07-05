@@ -10,13 +10,23 @@ on arbitrary graphs and grids, supports parallel links (fast/slow lanes and
 detours), and exposes clean interfaces for external routing and per-step
 simulation plugins.
 
-> Early development (v0.1). Installable locally; not yet published to PyPI.
-
 ## Requirements
 
 - Python **3.11+**
 
-## Install (local, editable)
+## Install
+
+```bash
+pip install mesoltm
+```
+
+For plotting support, install the `plot` extra:
+
+```bash
+pip install "mesoltm[plot]"
+```
+
+### From source (editable, for development)
 
 ```bash
 python3.11 -m venv venv && source venv/bin/activate
@@ -137,6 +147,67 @@ python -m build               # sdist + wheel
 ```
 
 `venv/` and build artefacts are git-ignored.
+
+## Release
+
+Releases are automated. Pushing a `v*.*.*` tag triggers the
+[`release`](.github/workflows/release.yml) workflow, which validates versions,
+generates the changelog with [git-cliff](https://git-cliff.org/) (config in
+[`cliff.toml`](cliff.toml)), builds the distribution, publishes to PyPI, and creates
+a GitHub Release. The changelog is derived from
+[conventional commit](https://www.conventionalcommits.org) messages, so nothing in
+`CHANGELOG.md` needs to be edited by hand. Make sure all tests and builds are passing,
+then follow these steps.
+
+#### 0. Prerequisites (important!)
+
+Switch to `master` and make sure it has all the changes that should be in the release:
+
+```bash
+git checkout master
+git pull origin master
+```
+
+You also need permission to push tags, and a `PYPI_TOKEN` repository secret must be
+configured (a PyPI API token) for the publish step.
+
+#### 1. Update the version in `pyproject.toml`
+
+Set the `version` in `pyproject.toml` to the next release version according to the
+conventional-commit history. To see what git-cliff computes as the next version, run:
+
+```bash
+git-cliff --bump --unreleased
+```
+
+⚠️ **Do not commit any `CHANGELOG.md` changes** — the release workflow regenerates and
+commits the changelog automatically. Commit **only** the version bump in
+`pyproject.toml`. If the `pyproject.toml` version and the git-cliff-computed version
+disagree, the release workflow fails.
+
+#### 2. Commit the version change
+
+```bash
+git checkout master                     # safeguard: ensure you are on master
+git commit -am "chore(release): v0.1.0"  # replace v0.1.0 with the release version
+git push origin master
+```
+
+#### 3. Create and push the tag (this triggers the workflow)
+
+```bash
+git checkout master                                   # safeguard: ensure you are on master
+git tag -a v0.1.0 -m "chore(release): version 0.1.0"  # replace v0.1.0 with the release version
+git push origin v0.1.0                                # push the tag to trigger the release workflow
+```
+
+#### 4. GitHub Actions then automatically
+
+- Validates that the tag, `pyproject.toml`, changelog, and built wheel all agree on the version
+- Generates `CHANGELOG.md` with git-cliff and commits it back to `master`
+- Builds the sdist and wheel
+- Publishes to PyPI
+- Creates a GitHub Release with the changelog notes
 
 ## Attribution and citation
 

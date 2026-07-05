@@ -45,6 +45,7 @@ dev = [
     "black>=24.0",
     "mypy>=1.8",
     "build>=1.0",
+    "git-cliff>=2.0",
 ]
 
 [project.urls]
