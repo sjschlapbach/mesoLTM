@@ -1,0 +1,50 @@
+cff-version: 1.2.0
+message: >-
+  If you use mesoLTM in academic or other work, please cite this repository. As a
+  secondary reference, please also cite the paper whose model it implements (see
+  the references section below).
+title: "mesoLTM: a mesoscopic (individual-vehicle) Link Transmission Model"
+abstract: >-
+  A pip-installable (mesoltm) mesoscopic, individual-vehicle Link Transmission
+  Model for traffic flow on general road networks, with pluggable per-vehicle
+  routing, per-step simulation plugins, dynamic vehicle injection, metrics, and
+  visualisations. A faithful re-implementation of the discrete LTM of de Souza,
+  Verbas, Auld & Tampere (SIMPAT 140 (2025) 103088).
+type: software
+authors:
+  - family-names: Schlapbach
+    given-names: Julius
+version: 0.1.0
+license: AGPL-3.0-or-later
+repository-code: "https://github.com/sjschlapbach/mesoLTM"
+url: "https://github.com/sjschlapbach/mesoLTM"
+keywords:
+  - traffic
+  - mesoscopic
+  - link-transmission-model
+  - ltm
+  - simulation
+  - transportation
+  - agent-based
+# TODO: a DOI has not yet been registered for this repository. Once a DOI is
+# minted (e.g. via Zenodo by enabling the GitHub-Zenodo integration and cutting a
+# release), uncomment and fill in the line below, and update the citation pages in
+# README.md and docs/about/citation.md.
+# doi: 10.5281/zenodo.XXXXXXX
+references:
+  - type: article
+    title: "A mesoscopic link-transmission-model able to track individual vehicles"
+    authors:
+      - family-names: de Souza
+        given-names: Felipe
+      - family-names: Verbas
+        given-names: Omer
+      - family-names: Auld
+        given-names: Joshua
+      - family-names: Tampère
+        given-names: Chris M. J.
+    journal: "Simulation Modelling Practice and Theory"
+    volume: 140
+    year: 2025
+    notes: "Article 103088"
+    doi: 10.1016/j.simpat.2025.103088

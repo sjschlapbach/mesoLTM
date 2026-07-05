@@ -38,11 +38,16 @@ Project knowledge is split to avoid duplication, and keeping it current is part 
 
 **Before finishing a task (definition of done)** — update whichever apply:
 - **serena memory** — update `codebase_structure`, `code_style_and_conventions`, or `suggested_commands` (via serena's `write_memory`) if structure, conventions, or commands changed.
+- **Documentation — keep BOTH doc sets in sync (always, when a change touches them).** Any change to the public API, model/behaviour, interfaces, CLI, or scenario schema **must** be reflected in **both** the user docs (`docs/`, the MkDocs Material site) **and** the AI-agent docs (`ai-docs/`, indexed by `context7.json`). The docstring-driven API-reference pages update themselves, but the **narrative** pages and the `ai-docs/` files (incl. the `ai-docs/api-reference.md` cheat-sheet) do **not** — edit them by hand. Verify with `mkdocs build --strict` (see the `suggested_commands` memory). Treat out-of-date docs as a stale tracking file (a bug).
 - `.ai/DECISIONS.md` — you made a non-obvious or systematic choice.
 - `.ai/PROGRESS.md` — **always** append a dated entry summarizing what changed and why.
-- Run the `task_completion_checklist` memory (tests, pylint, black, mypy).
+- Run the `task_completion_checklist` memory (tests, pylint, black, mypy, docs).
 
 **A stale tracking file is a bug** — fix it in the same task. A `Stop` hook reminds you if work changed but tracking (`.ai/` **or** `.serena/memories/`) wasn't updated.
+
+## Pending follow-ups (do not forget)
+
+- **Zenodo DOI** — a DOI is **not yet registered** for `mesoltm`. When one is minted for a release, update **every** placeholder location. The authoritative, enumerated checklist of those locations lives in the **`pending_zenodo_doi` serena memory** — read and follow it at DOI-registration time, then delete the memory once done.
 
 ## Environment (quick reference — full commands in the `suggested_commands` memory)
 

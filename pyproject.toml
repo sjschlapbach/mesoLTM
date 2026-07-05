@@ -47,6 +47,11 @@ dev = [
     "build>=1.0",
     "git-cliff>=2.0",
 ]
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.25",
+    "griffe>=0.45",
+]
 
 [project.urls]
 Homepage = "https://github.com/sjschlapbach/mesoLTM"
