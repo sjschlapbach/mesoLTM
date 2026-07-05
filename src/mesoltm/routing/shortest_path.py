@@ -87,6 +87,16 @@ class ShortestPathPolicy:
 
         return self._graph
 
+    def refresh(self, state: NetworkState) -> None:
+        """Rebuild the cached routing graph from the live state, once.
+
+        Lets a caller that needs many route lookups against the *same* live state
+        (e.g. a rerouting plugin re-planning every vehicle in one step) build the
+        dynamic graph a single time, then temporarily set ``dynamic = False`` so
+        the lookups reuse it instead of rebuilding it per call.
+        """
+        self._graph = self._build_graph(state)
+
     def route(
         self, state: NetworkState, from_node: object, to_node: object
     ) -> list[int]:

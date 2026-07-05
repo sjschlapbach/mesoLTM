@@ -64,6 +64,20 @@ def test_vehicle_next_link_follows_route():
     assert v.next_link(3) is None
 
 
+def test_vehicle_props_default_and_mutable():
+    """props default to an empty dict, are copied at init, and can be updated."""
+    v = Vehicle(vehicle_id=0)
+    assert isinstance(v.props, dict) and not v.props  # default empty, never None
+
+    source = {"cls": "van"}
+    v2 = Vehicle(vehicle_id=1, props=source)
+    assert v2.props == {"cls": "van"}
+    v2.props["cls"] = "truck"  # freely updatable later / in a different context
+    v2.props["value_of_time"] = 12.5
+    assert v2.props == {"cls": "truck", "value_of_time": 12.5}
+    assert source == {"cls": "van"}  # init copied, so the caller's dict is untouched
+
+
 def test_demand_profile_vehicle_count_and_routes():
     """Demand expansion yields the expected number of vehicles and route split."""
     trips = vehicles_from_demand_profile(

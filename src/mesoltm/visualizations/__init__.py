@@ -8,6 +8,17 @@
 
 """Visualisation helpers (require the [plot] extra)."""
 
+from .animation import (
+    NetworkLayout,
+    animate_from_history_file,
+    animate_history,
+    animate_simulation,
+    expand_frame_indices,
+    render_frame,
+    resolve_palette,
+    save_animation,
+    save_frames,
+)
 from .plots import (
     plot_cumulative_curves,
     plot_link_flow,
@@ -22,4 +33,14 @@ __all__ = [
     "plot_link_flows",
     "plot_link_time_series",
     "plot_network",
+    # agent-movement animation / video
+    "NetworkLayout",
+    "render_frame",
+    "resolve_palette",
+    "expand_frame_indices",
+    "save_frames",
+    "save_animation",
+    "animate_history",
+    "animate_from_history_file",
+    "animate_simulation",
 ]
