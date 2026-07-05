@@ -27,6 +27,6 @@ for f in examples/*.py; do case $(basename "$f") in _*) ;; *) python "$f";; esac
 ```
 
 ## CI
-Each gate is its own workflow in `.github/workflows/`: `test.yml` (pytest, 3.11/3.12), `lint.yml` (pylint), `format.yml` (black --check), `typecheck.yml` (mypy), `examples.yml` (runs every `examples/*.py`, skipping `_*`, and fails if any errors), `release.yml` (build; publish disabled).
+Each gate is its own workflow in `.github/workflows/`: `test.yml` (pytest, 3.11), `lint.yml` (pylint), `format.yml` (black --check), `typecheck.yml` (mypy), `examples.yml` (runs every `examples/*.py`, skipping `_*`, and fails if any errors), `build.yml` (build sdist+wheel on push to master / PR). `release.yml` is the **automated release**: push a `v<MAJOR>.<MINOR>.<PATCH>` tag whose version matches `pyproject.toml` → git-cliff regenerates `CHANGELOG.md` (config `cliff.toml`, conventional commits), the package is built and published to PyPI (`PYPI_TOKEN` secret), the changelog commit is pushed to `master`, and a GitHub Release is created. Preview the next changelog locally with `git-cliff --bump --output CHANGELOG.md` (and `git-cliff --bumped-version`).
 
 Read-only serena/context7 tools and the Python dev commands above are pre-approved in `.claude/settings.json`, so they run without permission prompts. Note: `git worktree` is denied there.
