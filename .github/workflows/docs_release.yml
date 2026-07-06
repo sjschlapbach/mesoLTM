@@ -2,10 +2,8 @@ name: Docs Release
 
 on:
     push:
-        branches:
-            - master
-        # tags:
-        #     - "v*.*.*"
+        tags:
+            - "v*.*.*"
 
 permissions:
     contents: write
