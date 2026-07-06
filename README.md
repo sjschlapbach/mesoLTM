@@ -1,5 +1,11 @@
 # mesoLTM
 
+[![PyPI Version](https://img.shields.io/pypi/v/mesoltm)](https://pypi.org/project/mesoltm/)
+[![Package Build](https://github.com/sjschlapbach/mesoLTM/actions/workflows/build.yml/badge.svg)](https://github.com/sjschlapbach/mesoLTM/actions/workflows/build.yml)
+[![Python Types](https://github.com/sjschlapbach/mesoLTM/actions/workflows/typecheck.yml/badge.svg)](https://github.com/sjschlapbach/mesoLTM/actions/workflows/typecheck.yml)
+[![Python Tests](https://github.com/sjschlapbach/mesoLTM/actions/workflows/test.yml/badge.svg)](https://github.com/sjschlapbach/mesoLTM/actions/workflows/test.yml)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
+
 A **mesoscopic (individual-vehicle) Link Transmission Model** for traffic flow on
 general road networks, distributed as the pip package `mesoltm`.
 
@@ -9,6 +15,9 @@ vehicle individually**, so each vehicle carries its own (re-routable) path. It r
 on arbitrary graphs and grids, supports parallel links (fast/slow lanes and
 detours), and exposes clean interfaces for external routing and per-step
 simulation plugins.
+
+**Full documentation:** [https://sjschlapbach.github.io/mesoLTM](https://sjschlapbach.github.io/mesoLTM/) \
+**Python Package:** [https://pypi.org/project/mesoltm](https://pypi.org/project/mesoltm/)
 
 ## Requirements
 
@@ -36,7 +45,7 @@ pip install -e ".[dev,plot]"     # core + dev tooling + plotting
 Extras: `plot` (matplotlib visualisations), `ui` (network editor, optional),
 `calib` (scipy, for calibration examples), `dev` (pytest, pylint, black, mypy, build).
 
-## Quick start
+## Quick Start
 
 ```python
 from mesoltm import Vehicle, grid_network, ShortestPathPolicy
@@ -106,7 +115,7 @@ Each writes its figures (and any CSVs) to its own subdirectory
   **custom function of each vehicle's `props` metadata** (a vehicle class) to show
   `color_by` is fully overridable.
 
-## Key concepts
+## Key Concepts
 
 - **Network** builder (`mesoltm.Network`, `grid_network`, `corridor_network`):
   add nodes/links, mark any node an origin/destination, `compile()` to a simulation.
@@ -209,7 +218,7 @@ git push origin v0.1.0                                # push the tag to trigger 
 - Publishes to PyPI
 - Creates a GitHub Release with the changelog notes
 
-## Attribution and citation
+## Attribution and Citation
 
 **If you use `mesoltm` in academic or other work, please cite this repository.**
 A machine-readable entry is provided in [`CITATION.cff`](CITATION.cff):
