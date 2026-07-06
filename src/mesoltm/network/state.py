@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, NamedTuple
 
 if TYPE_CHECKING:
@@ -85,6 +86,12 @@ class NetworkState:  # pylint: disable=too-many-public-methods
         self.downstream_node: dict = {}
         self.sink_connectors: dict = {}
         self.source_connectors: dict = {}
+
+        # Dynamic-injection budget the connectors were sized for (set by
+        # Network.compile) and a running count of injected vehicles, used to warn
+        # when more vehicles are injected than the buffers can be guaranteed to hold.
+        self.injection_budget: int = 0
+        self._injected_count: int = 0
 
     # -- topology --------------------------------------------------------------
 
@@ -182,6 +189,13 @@ class NetworkState:  # pylint: disable=too-many-public-methods
         real links. The vehicle then joins the origin's departure queue in
         departure-time order and is released like any other vehicle.
 
+        If the number of injected vehicles exceeds the ``injection_budget`` the
+        connectors were sized for (see
+        :meth:`~mesoltm.network.network.Network.compile`), a :class:`RuntimeWarning`
+        is emitted: the connector buffer may then be too small to admit the vehicle
+        promptly, so it waits in the origin queue (and may not enter within the
+        horizon) rather than being silently discarded.
+
         Args:
             node_id: An origin node (marked via ``Network.set_origin``).
             vehicle: The vehicle to inject; ``start``, ``route`` and ``position``
@@ -201,6 +215,24 @@ class NetworkState:  # pylint: disable=too-many-public-methods
         self._splice_injection_route(node_id, vehicle)
         vehicle.start = self.step * self.time_step if at_time is None else at_time
         origin.add_trip(vehicle)
+
+        # Warn if more vehicles are injected than the connectors were sized for: the
+        # access buffers may then be too small to admit this vehicle promptly.
+        self._injected_count += 1
+        if self._injected_count > self.injection_budget:
+            warnings.warn(
+                f"Injected {self._injected_count} vehicle(s), exceeding the "
+                f"injection_budget of {self.injection_budget} the connectors were "
+                f"sized for. Vehicle {vehicle.vehicle_id!r} was added to the "
+                f"departure queue of origin {node_id!r}, but the access (connector) "
+                f"buffer may be full, in which case the vehicle waits in that queue "
+                f"and enters the network only once space frees up — it may be "
+                f"delayed and, if space never frees within the horizon, may not "
+                f"enter at all. It is never silently discarded. Re-run with "
+                f"injection_budget >= the number of vehicles you inject.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
 
     def _splice_injection_route(self, node_id: object, vehicle: Vehicle) -> None:
         """Wrap a real-link route with its origin/destination connector links.

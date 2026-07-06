@@ -199,7 +199,7 @@ class Network:
         total_time: float,
         routing_policy: RoutingPolicy | None = None,
         plugins: list | None = None,
-        injection_budget: int = 0,
+        injection_budget: int = 100,
         record_history: bool = False,
         history_path: str | None = None,
         history_classify=None,
@@ -216,12 +216,18 @@ class Network:
                 hooks, e.g. rerouting logic, link gating, or auctions).
             injection_budget: Upper bound on the number of vehicles that will be
                 added dynamically via :meth:`~mesoltm.core.simulation.Simulation.inject`
-                during the run. Origin/destination connectors are sized to stay
-                transparent for the static demand *plus* this many injections, so a
-                dispatcher that injects into an origin carrying little or no static
-                demand is not throttled by the connector. A larger value only makes
-                connectors more transparent (never more binding), so an over-estimate
-                is safe; it does not affect purely static runs.
+                during the run (default ``100``). Origin/destination connectors are
+                sized to stay transparent for the static demand *plus* this many
+                injections, so a dispatcher that injects into an origin carrying
+                little or no static demand is not throttled by the connector. A
+                larger value only makes connectors more transparent (never more
+                binding), so an over-estimate is safe; it does not affect purely
+                static runs. **It is still recommended to set this explicitly** to
+                the number of vehicles you expect to inject: if more vehicles are
+                injected than the budget, the connectors may be too small and a
+                :class:`RuntimeWarning` is emitted (the affected vehicle is held in
+                its origin's queue rather than silently discarded — see
+                :meth:`~mesoltm.core.simulation.Simulation.inject`).
             record_history: If ``True``, capture a per-step snapshot of every
                 vehicle's position for animation/video (see
                 :mod:`mesoltm.recording`). Off by default — it costs memory and,
@@ -358,6 +364,9 @@ class Network:
         state.sink_connectors = sink_connectors
         state.source_connectors = source_connectors
         state.time_step = time_step
+        # The connectors above were sized for this many injections; the state warns
+        # if more than this are injected at run time (see NetworkState.inject).
+        state.injection_budget = max(0, int(injection_budget))
 
         for node in nodes:
             if isinstance(node, (DivergeNode, GeneralNodeModel)):

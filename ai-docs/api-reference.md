@@ -63,7 +63,7 @@ Network.set_origin(node_id, vehicles=None) -> None
 Network.set_destination(node_id) -> None
 Network.set_merge_priorities(node_id, alpha: dict) -> None
 Network.compile(time_step, total_time, routing_policy=None, plugins=None,
-                injection_budget=0, record_history=False, history_path=None,
+                injection_budget=100, record_history=False, history_path=None,
                 history_classify=None) -> Simulation
 
 link_capacity(v_f, w, rho_jam) -> float

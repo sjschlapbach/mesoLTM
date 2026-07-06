@@ -29,7 +29,7 @@ net.set_origin(node_id, vehicles=None) -> None               # repeated calls ap
 net.set_destination(node_id) -> None
 net.set_merge_priorities(node_id, {inbound_link_id: share}) -> None
 net.compile(time_step, total_time, routing_policy=None, plugins=None,
-            injection_budget=0, record_history=False, history_path=None,
+            injection_budget=100, record_history=False, history_path=None,
             history_classify=None) -> Simulation
 ```
 
@@ -41,11 +41,12 @@ routes). Rebuild with fresh `Vehicle` objects to run again.
 - `routing_policy`: overrides per-vehicle next-link at branching nodes; default =
   follow each vehicle's own route (`StaticRoutePolicy`).
 - `plugins`: list of per-step loop hooks (see [plugins.md](plugins.md)).
-- `injection_budget`: **REQUIRED if the run uses dynamic injection** — set it to at
-  least the number of vehicles that will be added via `Simulation.inject`. It sizes
-  the connectors to hold the injected vehicles; leaving the default `0` while
-  injecting means injected vehicles can be blocked or dropped. Over-estimate is
-  safe; purely static runs are unaffected.
+- `injection_budget`: number of vehicles that will be added via `Simulation.inject`;
+  sizes the connectors to hold them. **Defaults to `100`**; set it explicitly to at
+  least the number you inject. Injecting more than the budget emits a
+  `RuntimeWarning` (the over-budget vehicle is queued at its origin, may not enter
+  within the horizon, never silently dropped). Over-estimate is safe; purely static
+  runs are unaffected.
 - `record_history`, `history_path`, `history_classify`: animation history capture
   (see [visualization.md](visualization.md)).
 

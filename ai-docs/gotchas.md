@@ -59,15 +59,18 @@ step (a supply-limited wait to enter/leave the network) is KEPT, reported as
 `access_time`. `network_time` = time on real links only (connector-free).
 `travel_time = access_time + network_time`.
 
-## Dynamic injection REQUIRES `injection_budget`
+## Set `injection_budget` for dynamic injection
 
-If a run uses dynamic demand injection (`Simulation.inject`), you MUST compile with
-`injection_budget=N`, where `N` is at least the number of vehicles you will inject:
+If a run uses dynamic demand injection (`Simulation.inject`), compile with
+`injection_budget=N` set to at least the number of vehicles you will inject:
 `net.compile(..., injection_budget=N)`. It sizes the origin/destination connector
-links so they can hold the injected vehicles and stay transparent. With the default
-`injection_budget=0` the connectors are sized for the static demand only, so
-injected vehicles can be blocked or dropped and the injection silently has no
-effect. Over-estimating `N` is safe; purely static runs are unaffected.
+links so they can hold the injected vehicles and stay transparent. **It defaults to
+`100`** (light injection works out of the box), but setting it explicitly is
+strongly recommended. If more vehicles are injected than the budget, a
+`RuntimeWarning` is emitted: the over-budget vehicle is added to its origin's queue
+but the connector buffer may be full, so it waits there and enters only once space
+frees up (and may not enter within the horizon) — it is never silently discarded.
+Over-estimating `N` is safe; purely static runs are unaffected.
 
 ## Imports are always module-top-level
 

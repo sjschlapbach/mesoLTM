@@ -42,12 +42,22 @@ sim.inject("a", Vehicle(vehicle_id=999, origin="a", destination="c", route=[l1, 
 ```
 
 !!! tip "Size the connectors for injection"
-    Compile with `injection_budget=N` so the origin/destination connectors stay
-    transparent for the static demand *plus* `N` dynamic injections. An origin that
-    carries little or no static demand would otherwise get a connector sized to
-    pass only one vehicle per step. Over-estimating is safe — a larger budget only
-    makes connectors *more* transparent, never more binding, and purely static runs
-    are unaffected.
+    The origin/destination connectors are sized to stay transparent for the static
+    demand *plus* `injection_budget` dynamic injections. It **defaults to `100`**,
+    so light injection works out of the box, but it is **still recommended to set it
+    explicitly** to the number of vehicles you expect to inject:
+
+    ```python
+    sim = net.compile(time_step=1.0, total_time=600.0, injection_budget=N)
+    ```
+
+    Over-estimating is safe — a larger budget only makes connectors *more*
+    transparent, never more binding, and purely static runs are unaffected. If you
+    inject **more** vehicles than the budget, a `RuntimeWarning` is printed naming
+    the vehicle: it is added to its origin's queue but the connector buffer may be
+    full, so it waits there and enters once space frees up (and, if space never
+    frees within the horizon, it may not enter at all). It is **never silently
+    discarded** — raise `injection_budget` and re-run.
 
 Injection only appends to a node's demand list, exactly as static demand does — it
 never perturbs the per-step arithmetic. See [Deviations §B5](../model/deviations-from-the-paper.md).

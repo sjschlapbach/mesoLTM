@@ -232,6 +232,13 @@ class Simulation:
         origin's departure queue and are released once their departure time is
         reached and the first link has supply.
 
+        Compile with ``injection_budget`` set to at least the number of vehicles you
+        intend to inject: the origin/destination connectors are sized for it. If more
+        vehicles are injected than that budget, a :class:`RuntimeWarning` is emitted
+        because the connector buffer may be too small — the affected vehicle then
+        waits in the origin queue (possibly not entering within the horizon) instead
+        of being silently discarded.
+
         Args:
             node_id: An origin node (must have been marked via
                 ``Network.set_origin``) to release the vehicle from.

@@ -14,6 +14,8 @@ connectors spliced on automatically.
 
 from __future__ import annotations
 
+import warnings
+
 import pytest
 
 from ..core.vehicle import Vehicle
@@ -74,6 +76,23 @@ def test_inject_vehicle_reaches_destination_empty_connector_no_access():
     assert rec["access_time"] == 0.0
     assert rec["network_time"] == 20.0  # 300 m at 15 m/s
     assert rec["travel_time"] == pytest.approx(rec["access_time"] + rec["network_time"])
+
+
+def test_injection_over_budget_warns():
+    """Injecting more vehicles than injection_budget emits a RuntimeWarning that
+    explains the over-budget vehicle is queued at its origin, not discarded."""
+    net, _l1, l2 = _corridor()
+    sim = net.compile(time_step=1.0, total_time=200.0, injection_budget=1)
+    sim.start()
+
+    # First injection is within the budget of 1: it must not warn.
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")  # promote any warning to an error
+        sim.inject("M", Vehicle(vehicle_id=10, route=[l2]))
+
+    # Second injection exceeds the budget: it must warn (and still be enqueued).
+    with pytest.warns(RuntimeWarning, match="injection_budget"):
+        sim.inject("M", Vehicle(vehicle_id=11, route=[l2]))
 
 
 def test_inject_departure_time_can_be_scheduled():
