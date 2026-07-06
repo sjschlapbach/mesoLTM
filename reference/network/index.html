@@ -3139,7 +3139,7 @@ origin connector — fall back to their capacity-proportional weight.</p>
 
 
 <a href="#mesoltm.network.network.Network.compile" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">compile</span><span class="p">(</span><span class="n">time_step</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">total_time</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">routing_policy</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RoutingPolicy (mesoltm.routing.policy.RoutingPolicy)" href="../routing/#mesoltm.routing.policy.RoutingPolicy">RoutingPolicy</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">plugins</span><span class="p">:</span> <span class="n"><span title="list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">injection_budget</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">record_history</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">history_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">history_classify</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">compile</span><span class="p">(</span><span class="n">time_step</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">total_time</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">routing_policy</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RoutingPolicy (mesoltm.routing.policy.RoutingPolicy)" href="../routing/#mesoltm.routing.policy.RoutingPolicy">RoutingPolicy</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">plugins</span><span class="p">:</span> <span class="n"><span title="list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">injection_budget</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">record_history</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">history_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">history_classify</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3236,16 +3236,22 @@ hooks, e.g. rerouting logic, link gating, or auctions).</p>
               <div class="doc-md-description">
                 <p>Upper bound on the number of vehicles that will be
 added dynamically via :meth:<code>~mesoltm.core.simulation.Simulation.inject</code>
-during the run. Origin/destination connectors are sized to stay
-transparent for the static demand <em>plus</em> this many injections, so a
-dispatcher that injects into an origin carrying little or no static
-demand is not throttled by the connector. A larger value only makes
-connectors more transparent (never more binding), so an over-estimate
-is safe; it does not affect purely static runs.</p>
+during the run (default <code>100</code>). Origin/destination connectors are
+sized to stay transparent for the static demand <em>plus</em> this many
+injections, so a dispatcher that injects into an origin carrying
+little or no static demand is not throttled by the connector. A
+larger value only makes connectors more transparent (never more
+binding), so an over-estimate is safe; it does not affect purely
+static runs. <strong>It is still recommended to set this explicitly</strong> to
+the number of vehicles you expect to inject: if more vehicles are
+injected than the budget, the connectors may be too small and a
+:class:<code>RuntimeWarning</code> is emitted (the affected vehicle is held in
+its origin's queue rather than silently discarded — see
+:meth:<code>~mesoltm.core.simulation.Simulation.inject</code>).</p>
               </div>
             </td>
             <td>
-                  <code>0</code>
+                  <code>100</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -3882,6 +3888,12 @@ origin/destination connector links are spliced on automatically (matching
 how static demand is compiled), so external callers only ever reason about
 real links. The vehicle then joins the origin's departure queue in
 departure-time order and is released like any other vehicle.</p>
+<p>If the number of injected vehicles exceeds the <code>injection_budget</code> the
+connectors were sized for (see
+:meth:<code>~mesoltm.network.network.Network.compile</code>), a :class:<code>RuntimeWarning</code>
+is emitted: the connector buffer may then be too small to admit the vehicle
+promptly, so it waits in the origin queue (and may not enter within the
+horizon) rather than being silently discarded.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

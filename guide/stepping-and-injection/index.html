@@ -1872,22 +1872,29 @@ in time order.</p>
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Size the connectors for injection</p>
-<p>Compile with <code>injection_budget=N</code> so the origin/destination connectors stay
-transparent for the static demand <em>plus</em> <code>N</code> dynamic injections. An origin that
-carries little or no static demand would otherwise get a connector sized to
-pass only one vehicle per step. Over-estimating is safe — a larger budget only
-makes connectors <em>more</em> transparent, never more binding, and purely static runs
-are unaffected.</p>
+<p>The origin/destination connectors are sized to stay transparent for the static
+demand <em>plus</em> <code>injection_budget</code> dynamic injections. It <strong>defaults to <code>100</code></strong>,
+so light injection works out of the box, but it is <strong>still recommended to set it
+explicitly</strong> to the number of vehicles you expect to inject:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">sim</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">total_time</span><span class="o">=</span><span class="mf">600.0</span><span class="p">,</span> <span class="n">injection_budget</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+</code></pre></div>
+<p>Over-estimating is safe — a larger budget only makes connectors <em>more</em>
+transparent, never more binding, and purely static runs are unaffected. If you
+inject <strong>more</strong> vehicles than the budget, a <code>RuntimeWarning</code> is printed naming
+the vehicle: it is added to its origin's queue but the connector buffer may be
+full, so it waits there and enters once space frees up (and, if space never
+frees within the horizon, it may not enter at all). It is <strong>never silently
+discarded</strong> — raise <code>injection_budget</code> and re-run.</p>
 </div>
 <p>Injection only appends to a node's demand list, exactly as static demand does — it
 never perturbs the per-step arithmetic. See <a href="../../model/deviations-from-the-paper/">Deviations §B5</a>.</p>
 <h2 id="seeding-an-injected-route-with-shortest-path">Seeding an injected route with shortest path<a class="headerlink" href="#seeding-an-injected-route-with-shortest-path" title="Permanent link">&para;</a></h2>
 <p>To inject toward a destination without hand-writing the route, plan it first with
 a <a href="../routing/"><code>ShortestPathPolicy</code></a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mesoltm</span><span class="w"> </span><span class="kn">import</span> <span class="n">ShortestPathPolicy</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">policy</span> <span class="o">=</span> <span class="n">ShortestPathPolicy</span><span class="p">(</span><span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">route</span> <span class="o">=</span> <span class="n">policy</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">network_state</span><span class="p">,</span> <span class="n">from_node</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">to_node</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">sim</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">Vehicle</span><span class="p">(</span><span class="n">vehicle_id</span><span class="o">=</span><span class="mi">999</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="n">route</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mesoltm</span><span class="w"> </span><span class="kn">import</span> <span class="n">ShortestPathPolicy</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">policy</span> <span class="o">=</span> <span class="n">ShortestPathPolicy</span><span class="p">(</span><span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">route</span> <span class="o">=</span> <span class="n">policy</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">network_state</span><span class="p">,</span> <span class="n">from_node</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">to_node</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">sim</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">Vehicle</span><span class="p">(</span><span class="n">vehicle_id</span><span class="o">=</span><span class="mi">999</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="n">route</span><span class="p">))</span>
 </code></pre></div>
 <p>For a full worked example (a coin-toss bottleneck admission policy driven with
 <code>start</code>/<code>step</code>/<code>inject</code>), see <a href="../examples/"><code>bottleneck_access_policy.py</code></a>.</p>
