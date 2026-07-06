@@ -1,10 +1,11 @@
 # Networks & connector links
 
-The paper attaches an origin or destination directly to a single link. To let
-**any node of a general graph** act as an origin and/or destination — including
-busy junctions with through traffic — the [`Network`](../reference/network.md)
-builder inserts short **connector links** where needed. Understanding them
-explains a few things you will see in outputs.
+`mesoltm` lets **any node of a general graph** act as an origin and/or
+destination — including busy junctions that also carry through traffic. To make
+that possible, the [`Network`](../reference/network.md) builder inserts short
+**connector links** where needed, so an origin or destination is never restricted
+to being a plain single-link endpoint. Understanding these connectors explains a
+few things you will see in outputs.
 
 ## Building on a general graph
 
@@ -42,9 +43,13 @@ binding constraint:
   double-buffer at the origin and on the connector.
 
 Because a connector crosses in one free-flow step, a vehicle entering an empty
-connector enters the network immediately once served. [Metrics](../guide/metrics.md)
-attribute connector/queue time to a vehicle's **access time**, so reported
-in-network travel time is unaffected by connectors.
+connector enters the network immediately once served. The [metrics](../guide/metrics.md)
+**remove that one free-flow step** from a trip's travel time, so an empty,
+unrestricted connector adds nothing. If a vehicle is instead held on a connector
+*longer* than one step — because downstream space is the binding constraint — that
+extra time is a real wait to enter/leave the network and is **kept**, reported as
+the trip's **access time**. Either way, in-network `network_time` stays
+connector-free.
 
 ## Why not zero-length connectors?
 
@@ -54,9 +59,10 @@ link could never hold a vehicle. The connector is therefore the minimal faithful
 approximation — a **one-cell** link that adds at most a one-step free-flow lag at
 entry/exit.
 
-The paper's own validation scenarios are built with **direct attachment** (no
-connectors), so they remain bit-exact; connectors appear only when you use the
-general-graph builder. See [Deviations §B1](deviations-from-the-paper.md).
+Connectors are inserted **only by the general-graph builder, and only where
+needed**: when an origin or destination is already a plain single-link endpoint,
+it is attached directly and no connector is added. See
+[Deviations §B1](deviations-from-the-paper.md).
 
 ## Parallel links
 

@@ -91,14 +91,16 @@ To let any node act as origin/destination, `Network.compile` auto-inserts a
 one-cell `ConnectorLink` (transparent buffer: `T1 = T2 = 1`, storage/capacity sized
 from the total vehicle count so it never binds). A source connector holds an
 origin's whole entry queue. True zero-length links are impossible in the LTM
-(storage = `rho_jam*length`), so connectors are one-cell. The paper's validation
-scenarios use direct attachment and stay bit-exact. Connector/queue time is
-reported as a trip's `access_time`, not in-network `travel_time`.
+(storage = `rho_jam*length`), so connectors are one-cell. Connectors are inserted
+only where needed (a node that is already a plain single-link endpoint is attached
+directly). Metrics remove each connector's one-step free-flow lag from `travel_time`
+(empty connector adds nothing); a supply-limited wait beyond that one step is kept as
+`access_time`, never in-network `travel_time`.
 
 ## Deviations from the paper
 
-All deviations are behaviour-preserving (verified by an exact regression test) or
-additive (routing policies, plugins, step/inject, connectors, metrics, viz). See
+All deviations are behaviour-preserving or additive (routing policies, plugins,
+step/inject, connectors, metrics, viz). See
 the "Deviations from the paper" documentation page
 (`docs/model/deviations-from-the-paper.md`) for the full catalogue (sections
 A1–A8 behaviour-preserving, B1–B5 additive).

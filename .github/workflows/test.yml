@@ -23,3 +23,11 @@ jobs:
 
       - name: Pytest
         run: pytest -q
+
+      # Smoke-test the command-line entry points on the shipped example scenario,
+      # exercising both the installed `mesoltm` console script and `python -m
+      # mesoltm` (the way users actually run a scenario from the command line).
+      - name: CLI smoke test
+        run: |
+          mesoltm examples/scenario.json
+          python -m mesoltm examples/scenario.json

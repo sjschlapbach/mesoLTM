@@ -26,17 +26,21 @@ queued at the horizon's end are omitted.
 | `start_time` | Desired departure (`vehicle.start`) |
 | `network_entry_time` | When it entered the first real link |
 | `arrival_time` | When it was absorbed at the destination |
-| `travel_time` | **Total** time in system, `arrival − start` |
-| `access_time` | Initial wait in the origin queue + access connector, `network_entry − start` |
-| `network_time` | In-network time, `arrival − network_entry` |
+| `travel_time` | Time in system, desired departure → arrival, **less each connector's one-step free-flow lag** |
+| `access_time` | The part of `travel_time` not on real links: origin-queue wait + any supply-limited connector wait, `travel_time − network_time` |
+| `network_time` | Time on real links only (connector-free) |
 | `n_links`, `link_travel_times` | Per-link travel times (`{link_id: seconds}`) |
 
-!!! note "Travel time includes access"
-    The headline `travel_time` is the **total** time from desired departure to
-    arrival, so it *includes* the origin-queue and connector wait. That wait is
-    reported separately as `access_time` (and `travel_time = access_time +
-    network_time`), so connector/queue time is both counted and distinguishable —
-    see [Networks & connectors](../model/networks-and-connectors.md).
+!!! note "How connector time is counted"
+    Each auto-inserted O/D connector is a one-cell link that costs exactly **one
+    free-flow step** to cross. That single step is a modelling artifact — a vehicle
+    incurs it even on an empty connector — so it is **removed** from `travel_time`.
+    But if a vehicle is held on a connector **longer** than one step because
+    downstream space is the binding constraint, that extra time is a genuine wait to
+    enter/leave the network and is **kept** (reported as `access_time`). So
+    `travel_time = access_time + network_time`, `network_time` stays connector-free,
+    and an empty, unrestricted connector adds nothing — see
+    [Networks & connectors](../model/networks-and-connectors.md).
 
 By default connector links are excluded from `route` and `link_travel_times`; pass
 `include_connectors=True` to keep them.

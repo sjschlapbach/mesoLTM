@@ -1,7 +1,7 @@
 # Deviations from the paper
 
-`mesoltm` is a faithful re-implementation of the discrete Link Transmission Model
-of de Souza, Verbas, Auld & Tampère.[^paper] The guiding principle is to **change
+`mesoltm` is a re-implementation of the discrete Link Transmission Model of
+de Souza, Verbas, Auld & Tampère.[^paper] The guiding principle is to **change
 the model only where strictly necessary**: the core traffic-flow mathematics — the
 link sending/receiving flows, the $T_1$/$T_2$ wave lags, the integer
 capacity-token discretisation, and the node flow-resolution algorithms — is ported
@@ -14,14 +14,6 @@ implementation (`abmmeso`). The differences fall into two kinds:
 - **Additive extensions** (§B) — new capabilities that leave the original dynamics
   untouched when they are not used.
 
-!!! success "The fidelity guarantee"
-    A regression test (`test_regression.py`) asserts that `mesoltm` reproduces
-    `abmmeso`'s cumulative in/outflows **exactly** (zero difference) on the
-    reference diverge–merge network. That exact match is the objective proof that
-    none of the changes below alter the model's behaviour: every behaviour-preserving
-    refinement, and every additive extension in its unused (default) state, leaves
-    the regression passing.
-
 The section labels (A1–A8, B1–B5) are stable identifiers referenced from elsewhere
 in this documentation (e.g. "see Deviations §A5").
 
@@ -30,7 +22,6 @@ in this documentation (e.g. "see Deviations §A5").
 ## A. Behaviour-preserving refinements
 
 These change *how* the model is expressed or instrumented, not *what* it computes.
-Each is confirmed by the exact regression test.
 
 ### A1 · Pluggable next-link lookup at branching nodes
 
@@ -59,8 +50,7 @@ At the end of each step the reference resets a link's transient flow scalars
 (demand, supply, inflow, outflow) to `None` as a defensive guard; `mesoltm` resets
 them to `0`. This exists purely so the ported code carries clean, non-`Optional`
 type annotations. The fixed loop order guarantees these values are always recomputed
-before they are next read, so `0` versus `None` is never observed — as the exact
-regression confirms.
+before they are next read, so `0` versus `None` is never observed.
 
 ### A4 · Naming and packaging only
 
@@ -86,8 +76,8 @@ instead of the paper's spellings. **Only the names change — never the values.*
 These are the public keyword names (`Link(v_f=30, w=6, rho_jam=0.2)`) and the JSON
 scenario keys (`"v_f"`, `"rho_jam"`). The underlying relationships are identical —
 `capacity = rho_jam·v_f·w/(v_f + w)`, `T1 = L/(v_f·Δt)`, `T2 = L/(w·Δt)`, jam
-storage `rho_jam·L` — and the exact regression still passes, proving the rename is
-behaviour-preserving. See [Links & the fundamental diagram](links-and-fd.md).
+storage `rho_jam·L`. Only the names change. See
+[Links & the fundamental diagram](links-and-fd.md).
 
 ### A6 · Per-vehicle trajectory recording
 
@@ -96,10 +86,12 @@ vehicle's arrival step. `mesoltm` additionally has each `Vehicle` carry a
 `trajectory` log: the link timestamps the vehicle's entry and exit as it is placed
 on and discharged from the link. From this log the [metrics](../guide/metrics.md)
 module derives, per vehicle, the route actually driven, per-link travel times, and
-three durations — `access_time` (origin-queue and connector wait), `network_time`
-(time on real links), and the headline `travel_time` (total time in system, which
-includes the access wait). The recording only writes to bookkeeping attributes; it
-reads nothing back into the flow arithmetic, so results are unchanged.
+three durations — `access_time` (origin-queue wait plus any supply-limited O/D
+connector wait), `network_time` (time on real links only), and `travel_time`
+(desired departure to arrival, with each connector's one-step free-flow lag
+removed but any supply-limited connector waiting kept). The recording only writes
+to bookkeeping attributes; it reads nothing back into the flow arithmetic, so
+results are unchanged.
 
 ### A7 · The CFL condition is enforced
 
@@ -147,11 +139,12 @@ never queue at the origin *and* on the connector at once.
 
 A true zero-length connector is impossible in the LTM, because a link's storage is
 `rho_jam·length` and a zero-length link could hold no vehicle; the connector is
-therefore the minimal faithful approximation, a **one-cell** link that adds at most
-a one-step free-flow lag at entry and exit. The paper's validation scenarios use
-direct attachment and remain bit-exact; connectors appear only with the
-general-graph builder, and any waiting on an entry connector is attributed to a
-trip's access time, not its in-network travel time. See
+therefore the minimal approximation, a **one-cell** link that adds a one-step
+free-flow lag at entry and exit. Connectors appear only with the general-graph
+builder. The metrics **remove that one free-flow step** from a trip's travel time
+(so an empty connector adds nothing), while any *extra* time a vehicle waits on a
+connector because downstream space is the binding constraint is kept as the trip's
+access time, never as in-network travel time. See
 [Networks & connectors](networks-and-connectors.md).
 
 ### B2 · Merge priorities as shares, defaulting to capacity-proportional
@@ -214,13 +207,6 @@ and ordering:
   locking.
 - The origin's vertical entry queue and the destination's absorption.
 - The four-phase per-step simulation loop and its ordering.
-
-## Verification
-
-Running `pytest` executes `test_regression.py`, which asserts exact equality
-(`diff == 0`) between `mesoltm` and the `abmmeso`-derived golden values on the
-reference network — the concrete guarantee that every deviation on this page is
-behaviour-preserving.
 
 [^paper]: F. de Souza, O. Verbas, J. Auld, C. M. J. Tampère, *"A mesoscopic
     link-transmission-model able to track individual vehicles"*, Simulation

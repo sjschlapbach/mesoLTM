@@ -12,7 +12,9 @@ from __future__ import annotations
 
 from ..core.vehicle import Vehicle
 from ..metrics import collect_trips, summarize_trips
+from ..metrics.trips import trip_record
 from ..network.network import Network
+from ..routing.shortest_path import ShortestPathPolicy
 
 
 def test_free_flow_travel_time_matches_wave_lag():
@@ -74,6 +76,74 @@ def test_link_times_recorded_across_diverge_and_merge():
     assert trips[1]["link_travel_times"] == {l_in: 20.0, l_detour: 40.0, l_out: 20.0}
     # The detour vehicle takes 20 s longer overall than the main-route vehicle.
     assert trips[1]["travel_time"] == trips[0]["travel_time"] + 20.0
+
+
+def test_empty_connector_free_flow_lag_excluded_from_travel_time():
+    """An empty, unrestricted destination connector is pure free-flow (one step);
+    that artificial lag must not inflate travel_time, access_time, or network_time."""
+    net = Network()
+    for nid in ("a", "b", "c"):
+        net.add_node(nid)
+    # b is both a destination and a through node (b->c), so it is not a pure
+    # single-link endpoint and the builder inserts a destination connector.
+    net.add_link("a", "b", length=300.0, v_f=30.0, w=6.0, rho_jam=0.2)
+    net.add_link("b", "c", length=300.0, v_f=30.0, w=6.0, rho_jam=0.2)
+    net.set_origin(
+        "a", vehicles=[Vehicle(vehicle_id=0, origin="a", destination="b", start=0.0)]
+    )
+    net.set_destination("b")
+    sim = net.compile(
+        time_step=1.0, total_time=200.0, routing_policy=ShortestPathPolicy(dynamic=True)
+    ).run()
+
+    trip = collect_trips(sim)[0]
+    # a->b is a 300 m / 30 m/s = 10 s free-flow real link; the destination connector
+    # is empty, so its single free-flow step is removed and adds nothing.
+    assert trip["network_time"] == 10.0  # real link only
+    assert trip["access_time"] == 0.0  # no queue, connector free-flow lag removed
+    assert trip["travel_time"] == 10.0
+    assert trip["travel_time"] == trip["access_time"] + trip["network_time"]
+    assert trip["link_travel_times"] == {1: 10.0}
+
+
+def test_supply_limited_connector_wait_is_kept_but_free_flow_lag_removed():
+    """On a connector, only the one free-flow step is removed; extra time spent
+    waiting because downstream supply was the binding constraint stays in
+    travel_time (as access). Uses a synthetic trajectory for exact control."""
+    dt = 1.0
+    v = Vehicle(vehicle_id=0, start=0.0)
+    # Source connector held for 3 steps (1 free-flow + 2 supply-limited wait),
+    # then a 10-step real link.
+    v.trajectory = [
+        {"link_id": 900, "entry_step": 0, "exit_step": 3, "is_connector": True},
+        {"link_id": 1, "entry_step": 3, "exit_step": 13, "is_connector": False},
+    ]
+    v.end = 13
+
+    rec = trip_record(v, dt)
+    assert rec["network_time"] == 10.0  # the real link only
+    # 3 s on the connector minus the 1 s free-flow lag = 2 s of genuine entry wait.
+    assert rec["access_time"] == 2.0
+    # total 13 s minus the 1 s free-flow lag = 12 s.
+    assert rec["travel_time"] == 12.0
+    assert rec["travel_time"] == rec["access_time"] + rec["network_time"]
+
+
+def test_free_flow_origin_and_destination_connectors_add_nothing():
+    """A trip crossing empty O/D connectors on both ends reports pure network time."""
+    dt = 1.0
+    v = Vehicle(vehicle_id=0, start=0.0)
+    v.trajectory = [
+        {"link_id": 900, "entry_step": 0, "exit_step": 1, "is_connector": True},
+        {"link_id": 1, "entry_step": 1, "exit_step": 11, "is_connector": False},
+        {"link_id": 901, "entry_step": 11, "exit_step": 12, "is_connector": True},
+    ]
+    v.end = 12
+
+    rec = trip_record(v, dt)
+    assert rec["network_time"] == 10.0
+    assert rec["access_time"] == 0.0  # both connectors were free-flow
+    assert rec["travel_time"] == 10.0  # 12 total minus 2 free-flow steps
 
 
 def test_congestion_increases_downstream_travel_time():

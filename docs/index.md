@@ -16,10 +16,11 @@ each vehicle carries a **mutable, per-vehicle route** you can rewrite mid-run
 (for dynamic routing, access control, or reactive rerouting), plus free-form
 metadata and a full trajectory for post-hoc analysis.
 
-`mesoltm` is a faithful re-implementation of the discrete LTM of de Souza,
-Verbas, Auld & Tampère.[^paper] A numeric regression test reproduces the
-reference implementation's cumulative flows **exactly**; every deliberate
-deviation is catalogued in [Deviations from the paper](model/deviations-from-the-paper.md).
+`mesoltm` is a re-implementation of the discrete LTM of de Souza, Verbas, Auld &
+Tampère.[^paper] It builds on their work, keeping the core traffic-flow
+mathematics and adding general-network topologies, per-vehicle routing, plugins,
+and trip metrics on top; every deliberate change is catalogued in
+[Deviations from the paper](model/deviations-from-the-paper.md).
 
 ## Install
 

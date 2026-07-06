@@ -50,16 +50,24 @@ An unprioritised `MergeNode`/`GeneralNodeModel` defaults to **capacity-proportio
 shares (not equal). Set explicitly via `alpha`/`priority_vector` or
 `Network.set_merge_priorities(node_id, {link_id: share})`.
 
-## travel_time includes access time
+## travel_time, access_time, network_time
 
-A trip's `travel_time` is the TOTAL time from desired departure to arrival,
-including origin-queue and connector wait (`access_time`).
+`travel_time` = desired departure -> arrival, MINUS each O/D connector's one-step
+free-flow lag (a one-cell connector always costs 1 free-flow step; that artifact is
+removed, so an empty connector adds nothing). Time spent on a connector BEYOND one
+step (a supply-limited wait to enter/leave the network) is KEPT, reported as
+`access_time`. `network_time` = time on real links only (connector-free).
 `travel_time = access_time + network_time`.
 
-## Injection needs a budget
+## Dynamic injection REQUIRES `injection_budget`
 
-To inject vehicles mid-run into an origin with little/no static demand, compile
-with `injection_budget=N` so connectors stay transparent. Over-estimating is safe.
+If a run uses dynamic demand injection (`Simulation.inject`), you MUST compile with
+`injection_budget=N`, where `N` is at least the number of vehicles you will inject:
+`net.compile(..., injection_budget=N)`. It sizes the origin/destination connector
+links so they can hold the injected vehicles and stay transparent. With the default
+`injection_budget=0` the connectors are sized for the static demand only, so
+injected vehicles can be blocked or dropped and the injection silently has no
+effect. Over-estimating `N` is safe; purely static runs are unaffected.
 
 ## Imports are always module-top-level
 
@@ -70,9 +78,9 @@ Project convention: never inline imports or wrap them in try/except; only
 
 The link demand/supply arithmetic, capacity-token recursion, and node algorithms
 (one-to-one, diverge, merge, general) are ported verbatim from de Souza et al.
-(SIMPAT 140 (2025) 103088) and locked by an exact regression test. Do not alter
-them. All `mesoltm` additions (routing policies, plugins, step/inject, connectors,
-metrics, visualisation) sit around this untouched core.
+(SIMPAT 140 (2025) 103088). Do not alter them. All `mesoltm` additions (routing
+policies, plugins, step/inject, connectors, metrics, visualisation) sit around
+this untouched core.
 
 ## License
 

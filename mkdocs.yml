@@ -83,6 +83,12 @@ markdown_extensions:
   - def_list
   - tables
   - footnotes
+  # Render Material icon shortcodes (e.g. `:material-book-open-variant:`) as SVG
+  # icons instead of leaving them as literal text — used by the "grid cards" on
+  # the home page.
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.details
   - pymdownx.inlinehilite
   - pymdownx.snippets:

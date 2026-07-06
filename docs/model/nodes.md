@@ -13,12 +13,6 @@ A single inbound link feeding a single outbound link. The flow is simply the
 smaller of the inbound demand and the outbound supply (paper Eq. 11). This is the
 node inserted along a corridor.
 
-::: mesoltm.core.nodes.one_to_one_node.OneToOneNode
-    options:
-      show_root_heading: true
-      members: false
-      show_source: false
-
 ### Diverge node
 
 One inbound link splitting to several outbound links. Vehicles are served **FIFO**:
