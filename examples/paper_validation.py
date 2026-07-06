@@ -18,7 +18,8 @@ Reproduced figures (Section 4 of the paper):
   * Fig. 8  -- Section 4.2  diverge with random route draws (replications)
   * Fig. 9  -- Section 4.3  merge, two priority settings, dt = 1 s
 
-Deliberate differences from the paper (see ``docs/MODEL_CHANGES.md``); these are
+Deliberate differences from the paper (see the "Deviations from the paper" docs
+page, ``docs/model/deviations-from-the-paper.md``); these are
 scope choices of ``mesoltm``, not discrepancies in the ported dynamics:
 
   * **No continuous-LTM reference.** ``mesoltm`` ships only the discrete model,
@@ -30,7 +31,7 @@ scope choices of ``mesoltm``, not discrepancies in the ported dynamics:
   * **Fig. 5, dt = 6 s is rejected.** With L = 150 m and V = 30 m/s the CFL
     condition (max(V, W) * dt <= L) is violated at dt = 6 s (180 > 150). ``abmmeso``
     silently floors the wave lag and runs anyway; ``mesoltm`` raises a
-    ``ValueError`` on purpose (MODEL_CHANGES A7). The script catches it and marks
+    ``ValueError`` on purpose (Deviations page, A7). The script catches it and marks
     the curve as rejected rather than plotting a mis-discretised result.
   * **Fig. 6 shows the proposed model only.** The paper also plots a constant
     ``floor(C*dt)`` capacity ablation (``noCapacityStateVarLink``); ``mesoltm``
@@ -193,7 +194,7 @@ def lane_drop_figure(rho_up, rho_down, w, demand, demand_time, dts, title, fname
             runs[dt] = run_lane_drop(
                 rho_up, rho_down, w, demand, demand_time, dt, sim_time
             )
-        except ValueError as exc:  # CFL guard (deliberate; MODEL_CHANGES A7)
+        except ValueError as exc:  # CFL guard (deliberate; Deviations page, A7)
             rejected.append(dt)
             print(f"    dt = {dt} s rejected by CFL guard: {exc}".replace("\n", " "))
     base_up, base_down = runs[1]
@@ -259,7 +260,7 @@ def lane_drop_figure(rho_up, rho_down, w, demand, demand_time, dts, title, fname
             0.005,
             "dt = "
             + ", ".join(f"{r} s" for r in rejected)
-            + " rejected by the CFL guard (deliberate; see MODEL_CHANGES A7)",
+            + " rejected by the CFL guard (deliberate; see Deviations page, A7)",
             ha="center",
             fontsize=9,
             style="italic",

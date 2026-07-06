@@ -99,4 +99,6 @@ reported as a trip's `access_time`, not in-network `travel_time`.
 
 All deviations are behaviour-preserving (verified by an exact regression test) or
 additive (routing policies, plugins, step/inject, connectors, metrics, viz). See
-`docs/MODEL_CHANGES.md` in the repository for the full catalogue.
+the "Deviations from the paper" documentation page
+(`docs/model/deviations-from-the-paper.md`) for the full catalogue (sections
+A1–A8 behaviour-preserving, B1–B5 additive).

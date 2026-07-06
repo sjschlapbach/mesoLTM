@@ -54,12 +54,6 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
-# MODEL_CHANGES.md lives at docs/ (referenced by README + source at that path) and
-# is surfaced inside model/deviations-from-the-paper.md via a snippet include, so
-# it must not also be built as a standalone page.
-exclude_docs: |
-  MODEL_CHANGES.md
-
 plugins:
   - search
   - mkdocstrings:

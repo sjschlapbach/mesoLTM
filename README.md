@@ -226,8 +226,9 @@ implements, and whose `abmmeso` package (by Felipe de Souza, AGPL-3.0) it adapts
 > Simulation Modelling Practice and Theory **140** (2025) 103088.
 > DOI: [10.1016/j.simpat.2025.103088](https://doi.org/10.1016/j.simpat.2025.103088)
 
-Deviations from the paper's formulation are documented in
-[`docs/MODEL_CHANGES.md`](docs/MODEL_CHANGES.md).
+Deviations from the paper's formulation are documented on the
+[Deviations from the paper](docs/model/deviations-from-the-paper.md) page of the
+documentation.
 
 ## License
 

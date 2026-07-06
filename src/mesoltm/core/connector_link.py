@@ -32,7 +32,8 @@ delayed by a separate origin-to-connector hop.
 
 True zero-length connectors are impossible in the LTM because storage capacity is
 ``rho_jam * length`` — a zero-length link could never store or admit a vehicle. A
-one-cell buffer is the faithful approximation; see docs/MODEL_CHANGES.md.
+one-cell buffer is the faithful approximation; see
+docs/model/deviations-from-the-paper.md (B1).
 """
 
 from __future__ import annotations
