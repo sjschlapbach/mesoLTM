@@ -1,0 +1,40 @@
+name: Documentation
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install docs dependencies
+        run: pip install -e ".[docs]"
+      - name: Build documentation (strict)
+        # --strict fails the build on broken links / bad anchors / nav problems
+        # (surfaced as warnings via the `validation:` block). griffe's benign
+        # docstring warnings are silenced by mkdocs_hooks.py so they do not trip it.
+        run: mkdocs build --strict
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install docs dependencies
+        run: pip install -e ".[docs]"
+      - name: Deploy to GitHub Pages (gh-pages branch)
+        run: mkdocs gh-deploy --force

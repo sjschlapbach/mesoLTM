@@ -1,0 +1,18 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "mesoLTM",
+  "description": "Mesoscopic (individual-vehicle) Link Transmission Model for traffic flow on general networks — the pip package mesoltm.",
+  "folders": ["ai-docs"],
+  "excludeFolders": ["abmmeso", "venv", "site", "examples/output"],
+  "excludeFiles": ["CHANGELOG.md"],
+  "rules": [
+    "Import the public API from the top-level package, e.g. `from mesoltm import Network, Vehicle, ShortestPathPolicy`.",
+    "Fundamental-diagram parameters (v_f, w, rho_jam) belong to Link, not Vehicle; Vehicle(vehicle_id, origin, destination, start, route, props).",
+    "matplotlib is an optional [plot] extra; `import mesoltm` stays cheap and `mesoltm.recording` is matplotlib-free.",
+    "All imports are module-top-level; never inline or wrap imports in try/except.",
+    "Build a network with Network/grid_network/corridor_network, then compile(time_step, total_time, ...) to get a Simulation; call run() or start()/step().",
+    "Reroute by rewriting a vehicle's route (via a Plugin/ReroutingPlugin or NetworkState.set_route); the engine only propagates each vehicle's own route.",
+    "Requires Python 3.11+. Runtime deps are numpy and networkx only.",
+    "Node/link flow arithmetic is a verbatim port of de Souza et al. (SIMPAT 140 (2025) 103088); do not alter it."
+  ]
+}

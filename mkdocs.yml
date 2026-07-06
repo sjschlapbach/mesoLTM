@@ -1,0 +1,144 @@
+site_name: mesoLTM
+site_description: >-
+  Mesoscopic (individual-vehicle) Link Transmission Model for traffic flow on
+  general road networks — the pip package mesoltm.
+site_url: https://sjschlapbach.github.io/mesoLTM/
+repo_url: https://github.com/sjschlapbach/mesoLTM
+repo_name: sjschlapbach/mesoLTM
+copyright: Copyright &copy; 2026 Julius Schlapbach — AGPL-3.0-or-later
+
+# Surface broken internal links and bad anchors as warnings so that a
+# `mkdocs build --strict` promotes them to build failures. griffe's benign
+# docstring-style warnings (untyped matplotlib `ax`/`**kwargs` params in the
+# plotting helpers) are silenced separately by mkdocs_hooks.py, so --strict only
+# trips on real link/nav problems.
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  nav:
+    omitted_files: warn
+    not_found: warn
+  links:
+    not_found: warn
+    anchors: warn
+
+# Quiet griffe's harmless docstring warnings before --strict sees them.
+hooks:
+  - mkdocs_hooks.py
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            docstring_section_style: table
+            merge_init_into_class: true
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            filters: ["!^_"]
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - def_list
+  - tables
+  - footnotes
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path: ["."]
+      check_paths: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.arithmatex:
+      generic: true
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - getting-started/installation.md
+      - getting-started/quickstart.md
+      - getting-started/running-a-scenario.md
+  - The Model:
+      - model/overview.md
+      - model/links-and-fd.md
+      - model/nodes.md
+      - model/vehicles-and-routing.md
+      - model/simulation-loop.md
+      - model/networks-and-connectors.md
+      - Deviations from the paper: model/deviations-from-the-paper.md
+  - User Guide:
+      - guide/building-networks.md
+      - guide/routing.md
+      - guide/plugins.md
+      - guide/stepping-and-injection.md
+      - guide/metrics.md
+      - guide/visualizations.md
+      - guide/animations.md
+      - guide/examples.md
+  - API Reference:
+      - reference/index.md
+      - reference/core.md
+      - reference/nodes.md
+      - reference/network.md
+      - reference/routing.md
+      - reference/plugins.md
+      - reference/metrics.md
+      - reference/demand.md
+      - reference/recording.md
+      - reference/visualizations.md
+      - reference/io-cli.md
+  - About:
+      - about/citation.md
+      - about/license.md
+      - about/changelog.md
