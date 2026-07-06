@@ -1,0 +1,30 @@
+name: Docs Build
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+        types: [opened, synchronize]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+
+            - name: Install dependencies
+              run: pip install -e ".[docs]"
+
+            # --strict promotes broken links / bad anchors / nav problems
+            # (surfaced as warnings via mkdocs.yml `validation:`) to failures.
+            # griffe's benign docstring warnings are silenced by mkdocs_hooks.py.
+            - name: Build documentation (strict)
+              run: mkdocs build --strict
