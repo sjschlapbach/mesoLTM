@@ -49,9 +49,10 @@ def test_stepping_to_end_matches_run():
     assert sim_b.current_step == sim_b.total_steps
 
 
-def test_inject_vehicle_reaches_destination_with_access_time():
-    """An injected vehicle is routed to its destination; its connector-access time
-    is included in the total travel time and reported separately."""
+def test_inject_vehicle_reaches_destination_empty_connector_no_access():
+    """An injected vehicle is routed to its destination. It crosses an (empty)
+    source connector, but that connector's one free-flow step is a modelling
+    artifact and is removed, so it contributes no access time here."""
     net, _l1, l2 = _corridor()
     sim = net.compile(time_step=1.0, total_time=200.0, injection_budget=5)
     sim.start()
@@ -68,9 +69,9 @@ def test_inject_vehicle_reaches_destination_with_access_time():
     rec = trips[99]
     assert rec["route"] == [l2]  # connectors excluded from the driven route
     assert rec["start_time"] == 5.0  # departure defaulted to the injection step
-    # M is a through junction, so injection crosses a source connector (~1 step):
-    # that access time is counted in the total and surfaced on its own.
-    assert rec["access_time"] > 0.0
+    # M is a through junction, so injection crosses a source connector, but it is
+    # empty/unrestricted: its single free-flow step is removed, so access is zero.
+    assert rec["access_time"] == 0.0
     assert rec["network_time"] == 20.0  # 300 m at 15 m/s
     assert rec["travel_time"] == pytest.approx(rec["access_time"] + rec["network_time"])
 

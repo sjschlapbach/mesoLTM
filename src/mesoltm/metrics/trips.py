@@ -10,9 +10,10 @@
 
 Each :class:`~mesoltm.core.vehicle.Vehicle` logs, as it moves, which links it
 entered and when (``vehicle.trajectory``). After a run these functions turn that
-log into compact per-vehicle records — the route actually driven, the total
-travel time (which includes the initial origin-queue/connector access wait), that
-access time on its own, and the travel time on each link traversed — keyed by
+log into compact per-vehicle records — the route actually driven, the travel time
+(desired departure to arrival, less each connector's one-step free-flow lag but
+keeping any supply-limited connector wait), that access time on its own, and the
+travel time on each link traversed — keyed by
 ``vehicle_id`` so the data stays associatable with the exact vehicle seen during
 routing (the basis for modelling heterogeneous drivers later). Only the most
 important metrics are included for now; more detailed ones can be layered on the
@@ -34,11 +35,16 @@ if TYPE_CHECKING:
 def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -> dict:
     """Build the travel-time record for a single completed vehicle.
 
-    The reported ``travel_time`` is the **total** time from the vehicle's desired
-    departure to its arrival, so it *includes* the initial time spent waiting in
-    the origin queue and crossing the origin's access (connector) link. That
-    initial waiting portion is also reported separately as ``access_time`` so the
-    two can be distinguished, and the pure in-network time as ``network_time``.
+    The reported ``travel_time`` is the time from the vehicle's desired departure
+    to its arrival, **minus the artificial one-step free-flow lag that each
+    auto-inserted O/D connector imposes** (a one-cell connector always costs one
+    free-flow step to cross, even when empty and unrestricted). Time a vehicle
+    spends on a connector *beyond* that one step is **kept**: it is a genuine
+    supply-limited wait to enter or leave the network (downstream space was the
+    binding constraint). ``travel_time`` splits into ``access_time`` (origin-queue
+    wait plus any supply-limited connector wait) and ``network_time`` (time on real
+    links only), so ``travel_time == access_time + network_time``; ``network_time``
+    reflects only real links and is unaffected by connectors.
 
     Args:
         vehicle: A vehicle that has finished its trip (``vehicle.end`` set).
@@ -55,11 +61,13 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
         * ``start_time`` — desired departure (``vehicle.start``);
         * ``network_entry_time`` — when it entered the first real link;
         * ``arrival_time`` — when it was absorbed at the destination;
-        * ``travel_time`` — total time in system, ``arrival − start`` (includes
-          the initial origin-queue/connector wait);
-        * ``access_time`` — initial waiting time in the origin queue and on the
-          origin's connector link, ``network_entry − start``;
-        * ``network_time`` — in-network time, ``arrival − network_entry``;
+        * ``travel_time`` — time in system from desired departure to arrival, with
+          each connector's one-step free-flow lag removed (supply-limited connector
+          waiting is kept);
+        * ``access_time`` — the part of ``travel_time`` not spent on real links:
+          origin-queue wait plus any supply-limited O/D connector wait,
+          ``travel_time − network_time``;
+        * ``network_time`` — time on real links only (connector-free);
         * ``n_links`` and ``link_travel_times`` (``{link_id: seconds}``).
 
         Time fields are seconds; ``None`` where a value cannot be determined (e.g.
@@ -97,17 +105,42 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
     network_entry_time = None if network_entry_step is None else network_entry_step * dt
     arrival_time = None if arrival_step is None else arrival_step * dt
 
-    # access = origin queue + connector wait; network = time on real links; total
-    # travel time spans desired departure -> arrival and equals access + network.
-    access_time = None
-    if network_entry_time is not None:
-        access_time = max(0.0, network_entry_time - vehicle.start)
-    network_time = None
-    if network_entry_time is not None and arrival_time is not None:
-        network_time = arrival_time - network_entry_time
+    # network = time actually spent on *real* links (connector-free), summed from
+    # the non-connector trajectory segments. Independent of ``include_connectors``,
+    # which only controls what appears in ``route``/``link_travel_times``.
+    network_time: float | None = None
+    for seg in vehicle.trajectory:
+        if seg["is_connector"] or seg["exit_step"] is None:
+            continue
+        network_time = (network_time or 0.0) + (
+            seg["exit_step"] - seg["entry_step"]
+        ) * dt
+
+    # Each O/D connector is a one-cell link with a free-flow crossing lag of exactly
+    # one step (T1 = T2 = 1). That one step is a modelling artifact — a vehicle
+    # incurs it even on an empty, unrestricted connector — so it is removed from the
+    # reported travel time. Time spent on a connector *beyond* that one step is NOT
+    # removed: it is a genuine supply-limited wait (downstream space was the binding
+    # constraint), i.e. time the vehicle really would have waited to enter/leave the
+    # network, so it stays part of travel_time (as access).
+    connector_free_flow_lag = 0.0
+    for seg in vehicle.trajectory:
+        if seg["is_connector"] and seg["exit_step"] is not None:
+            crossing = (seg["exit_step"] - seg["entry_step"]) * dt
+            connector_free_flow_lag += min(crossing, dt)
+
+    # travel_time = desired departure -> arrival, minus each connector's one-step
+    # free-flow lag; access = the part not spent on real links (origin-queue wait +
+    # any supply-limited connector wait), so the identity
+    # ``travel_time == access_time + network_time`` always holds.
     travel_time = None
     if arrival_time is not None:
-        travel_time = arrival_time - vehicle.start
+        travel_time = max(0.0, arrival_time - vehicle.start - connector_free_flow_lag)
+    access_time = None
+    if travel_time is not None and network_time is not None:
+        access_time = max(0.0, travel_time - network_time)
+    elif travel_time is not None:
+        access_time = travel_time
 
     return {
         "vehicle_id": vehicle.vehicle_id,

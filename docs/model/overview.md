@@ -42,8 +42,7 @@ Because one unit of flow is one vehicle, all node flows are **integer**. The mod
 achieves this with an integer *capacity-token* recursion on each link (a token
 bucket that replenishes by `capacity · dt` each step and is debited by the actual
 flow). This is what lets the continuous LTM be advanced vehicle-by-vehicle without
-drift — and it is ported **verbatim** from the reference implementation so results
-match the paper exactly.[^paper]
+drift — and it follows the reference implementation's arithmetic and ordering.
 
 ## What runs each step
 
@@ -51,13 +50,10 @@ The engine repeats a fixed **four-phase loop**: plugins act → nodes prepare �
 links compute demand/supply → nodes move vehicles → links commit. The ordering is
 significant and is covered in [The simulation loop](simulation-loop.md).
 
-## Fidelity to the paper
-
-The core traffic-flow mathematics is a faithful port; a regression test asserts
-`mesoltm` reproduces the reference's cumulative flows exactly. Everything
-`mesoltm` *adds* — general-graph networks with connector links, pluggable routing,
-per-step plugins, step-driven injection, metrics, and visualisation — sits *around*
-that untouched core. Every deviation is listed in
+Everything `mesoltm` *adds* — general-graph networks with connector links,
+pluggable routing, per-step plugins, step-driven injection, metrics, and
+visualisation — sits *around* that core traffic-flow model. Every change relative
+to the reference is listed in
 [Deviations from the paper](deviations-from-the-paper.md).
 
 [^paper]: F. de Souza, O. Verbas, J. Auld, C. M. J. Tampère, *"A mesoscopic

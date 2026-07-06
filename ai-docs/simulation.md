@@ -57,7 +57,10 @@ from mesoltm import Vehicle
 sim.inject("a", Vehicle(vehicle_id=999, origin="a", destination="c", route=[l1, l2]))
 ```
 
-Compile with `injection_budget=N` so connectors stay transparent for N injections.
+REQUIRED for injection: you MUST compile with `injection_budget=N` (N ≥ the number
+of vehicles you will inject) whenever a run uses `inject`. It sizes the O/D
+connectors to hold the injected vehicles; with the default `injection_budget=0`
+injected vehicles can be blocked or dropped. Over-estimating N is safe.
 
 ## NetworkState API
 

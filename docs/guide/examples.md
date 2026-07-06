@@ -20,7 +20,7 @@ covered in the guide pages linked in the last column.
 | `paper_validation.py` | Reproduces the paper's Section 4 figures through the shipped pipeline | [Deviations from the paper](../model/deviations-from-the-paper.md) |
 
 !!! tip "Reproducing the paper"
-    `paper_validation.py` is the canonical fidelity check — it reproduces the
-    paper's lane-drop, diverge, and merge figures and surfaces the deliberate
-    divergences (discrete-only, CFL rejection, out-of-scope scenarios) on the
-    figures themselves.
+    `paper_validation.py` is the canonical paper-reproduction script — it
+    reproduces the paper's lane-drop, diverge, and merge figures and surfaces the
+    deliberate divergences (discrete-only, CFL rejection, out-of-scope scenarios)
+    on the figures themselves.

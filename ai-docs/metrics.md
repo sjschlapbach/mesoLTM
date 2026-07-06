@@ -33,9 +33,9 @@ route                # list[int]: real link ids actually driven
 start_time           # desired departure = vehicle.start
 network_entry_time   # entered first real link
 arrival_time         # absorbed at destination
-travel_time          # TOTAL time in system = arrival - start (includes access wait)
-access_time          # origin-queue + connector wait = network_entry - start
-network_time         # in-network = arrival - network_entry
+travel_time          # arrival - start MINUS each connector's 1-step free-flow lag
+access_time          # travel_time - network_time (origin-queue + supply-limited connector wait)
+network_time         # time on real links only (connector-free)
 n_links
 link_travel_times    # dict {link_id: seconds}
 ```

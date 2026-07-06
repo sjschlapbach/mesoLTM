@@ -41,9 +41,11 @@ routes). Rebuild with fresh `Vehicle` objects to run again.
 - `routing_policy`: overrides per-vehicle next-link at branching nodes; default =
   follow each vehicle's own route (`StaticRoutePolicy`).
 - `plugins`: list of per-step loop hooks (see [plugins.md](plugins.md)).
-- `injection_budget`: number of vehicles that will be added dynamically via
-  `Simulation.inject`; sizes connectors so they stay transparent. Over-estimate is
-  safe; static runs unaffected.
+- `injection_budget`: **REQUIRED if the run uses dynamic injection** — set it to at
+  least the number of vehicles that will be added via `Simulation.inject`. It sizes
+  the connectors to hold the injected vehicles; leaving the default `0` while
+  injecting means injected vehicles can be blocked or dropped. Over-estimate is
+  safe; purely static runs are unaffected.
 - `record_history`, `history_path`, `history_classify`: animation history capture
   (see [visualization.md](visualization.md)).
 
