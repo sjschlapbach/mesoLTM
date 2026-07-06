@@ -1,0 +1,2465 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Mesoscopic (individual-vehicle) Link Transmission Model for traffic flow on general road networks — the pip package mesoltm.">
+      
+      
+      
+        <link rel="canonical" href="https://sjschlapbach.github.io/mesoLTM/model/deviations-from-the-paper/">
+      
+      
+        <link rel="prev" href="../networks-and-connectors/">
+      
+      
+        <link rel="next" href="../../guide/building-networks/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Deviations from the paper - mesoLTM</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#deviations-from-the-paper" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="mesoLTM" class="md-header__button md-logo" aria-label="mesoLTM" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            mesoLTM
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Deviations from the paper
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/sjschlapbach/mesoLTM" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sjschlapbach/mesoLTM
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  The Model
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guide/building-networks/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../about/citation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="mesoLTM" class="md-nav__button md-logo" aria-label="mesoLTM" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    mesoLTM
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/sjschlapbach/mesoLTM" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sjschlapbach/mesoLTM
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/running-a-scenario/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running a scenario
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The Model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../links-and-fd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Links &amp; the fundamental diagram
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nodes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nodes &amp; flow resolution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vehicles-and-routing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vehicles &amp; routing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulation-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The simulation loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../networks-and-connectors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Networks &amp; connector links
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deviations from the paper
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deviations from the paper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#a-behaviour-preserving-refinements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. Behaviour-preserving refinements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A. Behaviour-preserving refinements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a1-pluggable-next-link-lookup-at-branching-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A1 · Pluggable next-link lookup at branching nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a2-per-vehicle-route-position-pointer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A2 · Per-vehicle route position pointer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a3-transient-flow-scalars-reset-to-zero-not-none" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A3 · Transient flow scalars reset to zero, not None
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a4-naming-and-packaging-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A4 · Naming and packaging only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a5-standard-traffic-engineering-notation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A5 · Standard traffic-engineering notation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a6-per-vehicle-trajectory-recording" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A6 · Per-vehicle trajectory recording
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a7-the-cfl-condition-is-enforced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A7 · The CFL condition is enforced
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a8-links-hold-no-time-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A8 · Links hold no time state
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#b-additive-extensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Additive extensions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="B. Additive extensions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#b1-origindestination-connector-links-for-general-graphs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B1 · Origin/destination connector links for general graphs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b2-merge-priorities-as-shares-defaulting-to-capacity-proportional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B2 · Merge priorities as shares, defaulting to capacity-proportional
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b3-plugin-hook-for-external-per-step-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B3 · Plugin hook for external per-step logic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b4-built-in-shortest-path-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B4 · Built-in shortest-path routing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b5-step-driven-execution-and-dynamic-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B5 · Step-driven execution and dynamic injection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-unchanged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is unchanged
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/building-networks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building networks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/routing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Routing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugins
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/stepping-and-injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stepping &amp; dynamic injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics &amp; trip analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/visualizations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/animations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Movement animations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/nodes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nodes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/routing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Routing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugins
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/demand/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demand
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/recording/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recording
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/visualizations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/io-cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scenarios &amp; CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/citation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Citation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License &amp; attribution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#a-behaviour-preserving-refinements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. Behaviour-preserving refinements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A. Behaviour-preserving refinements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a1-pluggable-next-link-lookup-at-branching-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A1 · Pluggable next-link lookup at branching nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a2-per-vehicle-route-position-pointer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A2 · Per-vehicle route position pointer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a3-transient-flow-scalars-reset-to-zero-not-none" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A3 · Transient flow scalars reset to zero, not None
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a4-naming-and-packaging-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A4 · Naming and packaging only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a5-standard-traffic-engineering-notation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A5 · Standard traffic-engineering notation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a6-per-vehicle-trajectory-recording" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A6 · Per-vehicle trajectory recording
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a7-the-cfl-condition-is-enforced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A7 · The CFL condition is enforced
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a8-links-hold-no-time-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A8 · Links hold no time state
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#b-additive-extensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Additive extensions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="B. Additive extensions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#b1-origindestination-connector-links-for-general-graphs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B1 · Origin/destination connector links for general graphs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b2-merge-priorities-as-shares-defaulting-to-capacity-proportional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B2 · Merge priorities as shares, defaulting to capacity-proportional
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b3-plugin-hook-for-external-per-step-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B3 · Plugin hook for external per-step logic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b4-built-in-shortest-path-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B4 · Built-in shortest-path routing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b5-step-driven-execution-and-dynamic-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B5 · Step-driven execution and dynamic injection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-unchanged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is unchanged
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="deviations-from-the-paper">Deviations from the paper<a class="headerlink" href="#deviations-from-the-paper" title="Permanent link">&para;</a></h1>
+<p><code>mesoltm</code> is a faithful re-implementation of the discrete Link Transmission Model
+of de Souza, Verbas, Auld &amp; Tampère.<sup id="fnref:paper"><a class="footnote-ref" href="#fn:paper">1</a></sup> The guiding principle is to <strong>change
+the model only where strictly necessary</strong>: the core traffic-flow mathematics — the
+link sending/receiving flows, the <span class="arithmatex">\(T_1\)</span>/<span class="arithmatex">\(T_2\)</span> wave lags, the integer
+capacity-token discretisation, and the node flow-resolution algorithms — is ported
+<strong>verbatim</strong>, with identical arithmetic and ordering.</p>
+<p>This page catalogues every way <code>mesoltm</code> differs from the paper and its reference
+implementation (<code>abmmeso</code>). The differences fall into two kinds:</p>
+<ul>
+<li><strong>Behaviour-preserving refinements</strong> (§A) — changes that do not affect results.</li>
+<li><strong>Additive extensions</strong> (§B) — new capabilities that leave the original dynamics
+  untouched when they are not used.</li>
+</ul>
+<div class="admonition success">
+<p class="admonition-title">The fidelity guarantee</p>
+<p>A regression test (<code>test_regression.py</code>) asserts that <code>mesoltm</code> reproduces
+<code>abmmeso</code>'s cumulative in/outflows <strong>exactly</strong> (zero difference) on the
+reference diverge–merge network. That exact match is the objective proof that
+none of the changes below alter the model's behaviour: every behaviour-preserving
+refinement, and every additive extension in its unused (default) state, leaves
+the regression passing.</p>
+</div>
+<p>The section labels (A1–A8, B1–B5) are stable identifiers referenced from elsewhere
+in this documentation (e.g. "see Deviations §A5").</p>
+<hr />
+<h2 id="a-behaviour-preserving-refinements">A. Behaviour-preserving refinements<a class="headerlink" href="#a-behaviour-preserving-refinements" title="Permanent link">&para;</a></h2>
+<p>These change <em>how</em> the model is expressed or instrumented, not <em>what</em> it computes.
+Each is confirmed by the exact regression test.</p>
+<h3 id="a1-pluggable-next-link-lookup-at-branching-nodes">A1 · Pluggable next-link lookup at branching nodes<a class="headerlink" href="#a1-pluggable-next-link-lookup-at-branching-nodes" title="Permanent link">&para;</a></h3>
+<p>At a diverge, general, or signalised node the paper reads a vehicle's next link
+directly from its route. <code>mesoltm</code> delegates that single lookup to a
+<a href="../../guide/routing/"><code>RoutingPolicy</code></a>. The default policy, <code>StaticRoutePolicy</code>,
+reads <code>vehicle.route</code> and so reproduces the original behaviour exactly; supplying a
+different policy (shortest path, access rules, auctions) is what enables external,
+per-vehicle routing. The flow-resolution arithmetic — demand, supply, priority
+merging, FIFO diverging, outbound locking — is unchanged; only <em>which</em> outbound
+link a vehicle is assigned to can be overridden, and only when a non-default policy
+is used.</p>
+<h3 id="a2-per-vehicle-route-position-pointer">A2 · Per-vehicle route position pointer<a class="headerlink" href="#a2-per-vehicle-route-position-pointer" title="Permanent link">&para;</a></h3>
+<p>The paper locates a vehicle's current link by the <strong>first</strong> occurrence of the
+inbound link id in its route. <code>mesoltm</code> also tracks a <code>position</code> index that advances
+as the vehicle moves, so routes that revisit a link (possible on general grids)
+resolve to the correct occurrence. For any simple path — including all of the
+paper's scenarios — this is identical to the first-occurrence lookup; for cyclic
+routes on grids it is a strict correctness improvement.</p>
+<h3 id="a3-transient-flow-scalars-reset-to-zero-not-none">A3 · Transient flow scalars reset to zero, not <code>None</code><a class="headerlink" href="#a3-transient-flow-scalars-reset-to-zero-not-none" title="Permanent link">&para;</a></h3>
+<p>At the end of each step the reference resets a link's transient flow scalars
+(demand, supply, inflow, outflow) to <code>None</code> as a defensive guard; <code>mesoltm</code> resets
+them to <code>0</code>. This exists purely so the ported code carries clean, non-<code>Optional</code>
+type annotations. The fixed loop order guarantees these values are always recomputed
+before they are next read, so <code>0</code> versus <code>None</code> is never observed — as the exact
+regression confirms.</p>
+<h3 id="a4-naming-and-packaging-only">A4 · Naming and packaging only<a class="headerlink" href="#a4-naming-and-packaging-only" title="Permanent link">&para;</a></h3>
+<p>Files use <code>snake_case</code> and classes <code>PascalCase</code>; a few reference names were
+modernised (<code>Trip</code> → <code>Vehicle</code>, <code>SimulationRunner</code> → <code>Simulation</code>), duplicate
+definitions were collapsed, and the code was arranged into a proper <code>src/</code> package.
+These are cosmetic and do not touch the dynamics.</p>
+<h3 id="a5-standard-traffic-engineering-notation">A5 · Standard traffic-engineering notation<a class="headerlink" href="#a5-standard-traffic-engineering-notation" title="Permanent link">&para;</a></h3>
+<p>Fundamental-diagram identifiers use conventional traffic-engineering symbols
+instead of the paper's spellings. <strong>Only the names change — never the values.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Paper / <code>abmmeso</code></th>
+<th><code>mesoltm</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Free-flow speed</td>
+<td><code>vf</code></td>
+<td><code>v_f</code></td>
+</tr>
+<tr>
+<td>Backward wave speed</td>
+<td><code>w</code></td>
+<td><code>w</code> (unchanged)</td>
+</tr>
+<tr>
+<td>Jam density</td>
+<td><code>kj</code></td>
+<td><code>rho_jam</code></td>
+</tr>
+<tr>
+<td>Capacity (max flow)</td>
+<td><code>cap</code> / <code>C</code></td>
+<td><code>capacity</code></td>
+</tr>
+<tr>
+<td>Density (accessor)</td>
+<td>—</td>
+<td><code>density</code></td>
+</tr>
+<tr>
+<td>Occupancy (accessor)</td>
+<td>—</td>
+<td><code>occupancy</code></td>
+</tr>
+</tbody>
+</table>
+<p>These are the public keyword names (<code>Link(v_f=30, w=6, rho_jam=0.2)</code>) and the JSON
+scenario keys (<code>"v_f"</code>, <code>"rho_jam"</code>). The underlying relationships are identical —
+<code>capacity = rho_jam·v_f·w/(v_f + w)</code>, <code>T1 = L/(v_f·Δt)</code>, <code>T2 = L/(w·Δt)</code>, jam
+storage <code>rho_jam·L</code> — and the exact regression still passes, proving the rename is
+behaviour-preserving. See <a href="../links-and-fd/">Links &amp; the fundamental diagram</a>.</p>
+<h3 id="a6-per-vehicle-trajectory-recording">A6 · Per-vehicle trajectory recording<a class="headerlink" href="#a6-per-vehicle-trajectory-recording" title="Permanent link">&para;</a></h3>
+<p>The paper exposes only aggregate cumulative in/outflows per link and stamps each
+vehicle's arrival step. <code>mesoltm</code> additionally has each <code>Vehicle</code> carry a
+<code>trajectory</code> log: the link timestamps the vehicle's entry and exit as it is placed
+on and discharged from the link. From this log the <a href="../../guide/metrics/">metrics</a>
+module derives, per vehicle, the route actually driven, per-link travel times, and
+three durations — <code>access_time</code> (origin-queue and connector wait), <code>network_time</code>
+(time on real links), and the headline <code>travel_time</code> (total time in system, which
+includes the access wait). The recording only writes to bookkeeping attributes; it
+reads nothing back into the flow arithmetic, so results are unchanged.</p>
+<h3 id="a7-the-cfl-condition-is-enforced">A7 · The CFL condition is enforced<a class="headerlink" href="#a7-the-cfl-condition-is-enforced" title="Permanent link">&para;</a></h3>
+<p>The paper (Section 3.3) states the Courant–Friedrichs–Lewy condition — the fastest
+wave must not cross a link in less than one step, <code>max(v_f, w)·dt ≤ length</code> — but
+the reference code does not check it: it floors the wave lags, silently accepting a
+too-short link and simulating it with collapsed lags. <code>mesoltm</code> validates the
+condition in <code>Link.start</code> and raises a <code>ValueError</code> (naming the offending values and
+the fix) when it is violated, with a tiny tolerance admitting the exactly-one-step
+boundary so auto-configured connectors pass. For any CFL-satisfying network — all
+paper scenarios — nothing changes; a previously silent mis-discretisation simply
+becomes an explicit error.</p>
+<h3 id="a8-links-hold-no-time-state">A8 · Links hold no time state<a class="headerlink" href="#a8-links-hold-no-time-state" title="Permanent link">&para;</a></h3>
+<p>In the reference, each link stores its own copy of the time step, total time, step
+count, and current step index. In <code>mesoltm</code> the <strong><code>Link</code> stores no time state</strong>:
+<code>start(time_step, total_time)</code> uses those values locally to size arrays and derive
+the fixed <code>T1</code>/<code>T2</code> lags and capacity, then discards them, and the <code>Simulation</code>
+loop owns the clock and passes what each per-step method needs. This keeps time in
+one place so a link can never hold a stale copy. The arithmetic is byte-identical.</p>
+<hr />
+<h2 id="b-additive-extensions">B. Additive extensions<a class="headerlink" href="#b-additive-extensions" title="Permanent link">&para;</a></h2>
+<p>These add capabilities <em>around</em> the model. When they are not used, the model is
+exactly the paper's model.</p>
+<h3 id="b1-origindestination-connector-links-for-general-graphs">B1 · Origin/destination connector links for general graphs<a class="headerlink" href="#b1-origindestination-connector-links-for-general-graphs" title="Permanent link">&para;</a></h3>
+<p>The paper attaches an origin or destination directly to a single link. So that
+<strong>any node of a general graph</strong> can act as an origin and/or destination — including
+junctions with several links and through traffic — the <a href="../../guide/building-networks/"><code>Network</code></a>
+builder auto-inserts a short <strong>connector link</strong> between the origin/destination node
+and the junction (only when the node is not a "pure" single-link endpoint, in which
+case the paper's direct attachment is used unchanged).</p>
+<p>A connector is an ordinary discrete-LTM link with auto-derived parameters (the user
+never configures it): a free-flow travel time of exactly one step and storage and
+capacity sized from the total vehicle count so that <strong>neither ever binds</strong>. It is a
+transparent buffer — the adjacent origin, junction, or destination always governs
+the flow — and a source connector holds an origin's entire entry queue, so vehicles
+never queue at the origin <em>and</em> on the connector at once.</p>
+<p>A true zero-length connector is impossible in the LTM, because a link's storage is
+<code>rho_jam·length</code> and a zero-length link could hold no vehicle; the connector is
+therefore the minimal faithful approximation, a <strong>one-cell</strong> link that adds at most
+a one-step free-flow lag at entry and exit. The paper's validation scenarios use
+direct attachment and remain bit-exact; connectors appear only with the
+general-graph builder, and any waiting on an entry connector is attributed to a
+trip's access time, not its in-network travel time. See
+<a href="../networks-and-connectors/">Networks &amp; connectors</a>.</p>
+<h3 id="b2-merge-priorities-as-shares-defaulting-to-capacity-proportional">B2 · Merge priorities as shares, defaulting to capacity-proportional<a class="headerlink" href="#b2-merge-priorities-as-shares-defaulting-to-capacity-proportional" title="Permanent link">&para;</a></h3>
+<p>The paper supplies a merge/general node's priority as an explicit integer
+<code>priority_vector</code>. <code>mesoltm</code> additionally accepts the priority as <strong>shares</strong>
+<code>alpha</code> — <code>alpha[i]</code> is the fraction of outbound supply inbound link <code>i</code> may claim,
+summing to 1 — and converts it internally to the reference integer vector the node
+arithmetic consumes; the ported node code is untouched. When <strong>neither</strong> a
+<code>priority_vector</code> nor <code>alpha</code> is given, an unprioritised merge defaults to
+<strong>capacity-proportional</strong> shares (each inbound link weighted by its own capacity)
+rather than equal shares, matching the paper's observation that priority vectors are
+used precisely to mimic capacity- or lane-count-proportional merges. Any node with
+an explicit priority — all paper examples — is unaffected. See
+<a href="../nodes/">Nodes &amp; flow resolution</a>.</p>
+<h3 id="b3-plugin-hook-for-external-per-step-logic">B3 · Plugin hook for external per-step logic<a class="headerlink" href="#b3-plugin-hook-for-external-per-step-logic" title="Permanent link">&para;</a></h3>
+<p><code>mesoltm</code> exposes the engine's existing "run first each step" slot — the same hook
+<code>abmmeso</code> used for signal controllers — as a typed <a href="../../guide/plugins/"><code>Plugin</code></a>
+interface for access rules, reactive rerouting, link gating, and dispatchers. The
+four-phase loop ordering is unchanged. Rerouting needs no special hook: because each
+vehicle carries its own <code>route</code> and the network only propagates it, a plugin
+reroutes a vehicle simply by rewriting that route. This is a plugin-layer feature
+and never touches the flow arithmetic.</p>
+<h3 id="b4-built-in-shortest-path-routing">B4 · Built-in shortest-path routing<a class="headerlink" href="#b4-built-in-shortest-path-routing" title="Permanent link">&para;</a></h3>
+<p>An optional <a href="../../guide/routing/"><code>ShortestPathPolicy</code></a> (built on NetworkX) is
+provided as a convenience router, with an optional congestion-aware cost. Being a
+routing policy (§A1), it is entirely opt-in and never affects the flow arithmetic.</p>
+<h3 id="b5-step-driven-execution-and-dynamic-injection">B5 · Step-driven execution and dynamic injection<a class="headerlink" href="#b5-step-driven-execution-and-dynamic-injection" title="Permanent link">&para;</a></h3>
+<p>Alongside batch <code>run()</code>, <code>Simulation</code> offers <code>start()</code> + <code>step()</code> to advance one
+step at a time, plus <code>inject()</code> to add a vehicle to an origin's demand mid-run —
+enough to drive an external control loop that observes the network between steps
+(an admission policy or dispatcher). <code>run()</code> is literally <code>start()</code> followed by a
+loop of <code>step()</code> and output writing, so its behaviour is unchanged, and injection
+only appends to a node's demand list exactly as static demand does. Connectors are
+sized for the static demand plus a declared <code>injection_budget</code>, which only makes
+them <em>more</em> transparent and so cannot perturb dynamics. See
+<a href="../../guide/stepping-and-injection/">Stepping &amp; dynamic injection</a>.</p>
+<hr />
+<h2 id="what-is-unchanged">What is unchanged<a class="headerlink" href="#what-is-unchanged" title="Permanent link">&para;</a></h2>
+<p>The following are carried over verbatim from the paper, with identical arithmetic
+and ordering:</p>
+<ul>
+<li>Link capacity <code>capacity = rho_jam·v_f·w/(v_f + w)</code>, and the step lags
+  <code>T1 = L/(v_f·Δt)</code>, <code>T2 = L/(w·Δt)</code>.</li>
+<li>The discrete sending flow <code>D̄ = min(⌊F(t−T1+1) − G(t)⌋, ⌊q̄_down⌋)</code> and receiving
+  flow <code>S̄ = min(⌊G(t−T2+1) + rho_jam·L − F(t)⌋, ⌊q̄_up⌋)</code>.</li>
+<li>The integer capacity-token recursion
+  <code>q̄(t+1) = min(q̄(t) + capacity·Δt − flow, ⌈capacity·Δt⌉ + 1)</code>.</li>
+<li>The one-to-one node, the FIFO diverge (Algorithm 1), the priority-vector merge
+  (Algorithm 2), and the general node model (Algorithm 3), including outbound
+  locking.</li>
+<li>The origin's vertical entry queue and the destination's absorption.</li>
+<li>The four-phase per-step simulation loop and its ordering.</li>
+</ul>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<p>Running <code>pytest</code> executes <code>test_regression.py</code>, which asserts exact equality
+(<code>diff == 0</code>) between <code>mesoltm</code> and the <code>abmmeso</code>-derived golden values on the
+reference network — the concrete guarantee that every deviation on this page is
+behaviour-preserving.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:paper">
+<p>F. de Souza, O. Verbas, J. Auld, C. M. J. Tampère, <em>"A mesoscopic
+link-transmission-model able to track individual vehicles"</em>, Simulation
+Modelling Practice and Theory <strong>140</strong> (2025) 103088.
+DOI: <a href="https://doi.org/10.1016/j.simpat.2025.103088">10.1016/j.simpat.2025.103088</a>.&#160;<a class="footnote-backref" href="#fnref:paper" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Julius Schlapbach — AGPL-3.0-or-later
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.indexes", "search.highlight", "search.suggest", "content.code.copy", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
