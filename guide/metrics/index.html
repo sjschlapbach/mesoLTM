@@ -1880,15 +1880,15 @@ queued at the horizon's end are omitted.</p>
 </tr>
 <tr>
 <td><code>travel_time</code></td>
-<td><strong>Total</strong> time in system, <code>arrival − start</code></td>
+<td>Time in system, desired departure → arrival, <strong>less each connector's one-step free-flow lag</strong></td>
 </tr>
 <tr>
 <td><code>access_time</code></td>
-<td>Initial wait in the origin queue + access connector, <code>network_entry − start</code></td>
+<td>The part of <code>travel_time</code> not on real links: origin-queue wait + any supply-limited connector wait, <code>travel_time − network_time</code></td>
 </tr>
 <tr>
 <td><code>network_time</code></td>
-<td>In-network time, <code>arrival − network_entry</code></td>
+<td>Time on real links only (connector-free)</td>
 </tr>
 <tr>
 <td><code>n_links</code>, <code>link_travel_times</code></td>
@@ -1897,12 +1897,16 @@ queued at the horizon's end are omitted.</p>
 </tbody>
 </table>
 <div class="admonition note">
-<p class="admonition-title">Travel time includes access</p>
-<p>The headline <code>travel_time</code> is the <strong>total</strong> time from desired departure to
-arrival, so it <em>includes</em> the origin-queue and connector wait. That wait is
-reported separately as <code>access_time</code> (and <code>travel_time = access_time +
-network_time</code>), so connector/queue time is both counted and distinguishable —
-see <a href="../../model/networks-and-connectors/">Networks &amp; connectors</a>.</p>
+<p class="admonition-title">How connector time is counted</p>
+<p>Each auto-inserted O/D connector is a one-cell link that costs exactly <strong>one
+free-flow step</strong> to cross. That single step is a modelling artifact — a vehicle
+incurs it even on an empty connector — so it is <strong>removed</strong> from <code>travel_time</code>.
+But if a vehicle is held on a connector <strong>longer</strong> than one step because
+downstream space is the binding constraint, that extra time is a genuine wait to
+enter/leave the network and is <strong>kept</strong> (reported as <code>access_time</code>). So
+<code>travel_time = access_time + network_time</code>, <code>network_time</code> stays connector-free,
+and an empty, unrestricted connector adds nothing — see
+<a href="../../model/networks-and-connectors/">Networks &amp; connectors</a>.</p>
 </div>
 <p>By default connector links are excluded from <code>route</code> and <code>link_travel_times</code>; pass
 <code>include_connectors=True</code> to keep them.</p>

@@ -1982,11 +1982,16 @@ are not included.</p>
     <div class="doc doc-contents first">
 
         <p>Build the travel-time record for a single completed vehicle.</p>
-<p>The reported <code>travel_time</code> is the <strong>total</strong> time from the vehicle's desired
-departure to its arrival, so it <em>includes</em> the initial time spent waiting in
-the origin queue and crossing the origin's access (connector) link. That
-initial waiting portion is also reported separately as <code>access_time</code> so the
-two can be distinguished, and the pure in-network time as <code>network_time</code>.</p>
+<p>The reported <code>travel_time</code> is the time from the vehicle's desired departure
+to its arrival, <strong>minus the artificial one-step free-flow lag that each
+auto-inserted O/D connector imposes</strong> (a one-cell connector always costs one
+free-flow step to cross, even when empty and unrestricted). Time a vehicle
+spends on a connector <em>beyond</em> that one step is <strong>kept</strong>: it is a genuine
+supply-limited wait to enter or leave the network (downstream space was the
+binding constraint). <code>travel_time</code> splits into <code>access_time</code> (origin-queue
+wait plus any supply-limited connector wait) and <code>network_time</code> (time on real
+links only), so <code>travel_time == access_time + network_time</code>; <code>network_time</code>
+reflects only real links and is unaffected by connectors.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2140,8 +2145,9 @@ reported (connectors are internal access stubs).</p>
             <td>
               <div class="doc-md-description">
                 <ul>
-<li><code>travel_time</code> — total time in system, <code>arrival − start</code> (includes
-the initial origin-queue/connector wait);</li>
+<li><code>travel_time</code> — time in system from desired departure to arrival, with
+each connector's one-step free-flow lag removed (supply-limited connector
+waiting is kept);</li>
 </ul>
               </div>
             </td>
@@ -2153,8 +2159,9 @@ the initial origin-queue/connector wait);</li>
             <td>
               <div class="doc-md-description">
                 <ul>
-<li><code>access_time</code> — initial waiting time in the origin queue and on the
-origin's connector link, <code>network_entry − start</code>;</li>
+<li><code>access_time</code> — the part of <code>travel_time</code> not spent on real links:
+origin-queue wait plus any supply-limited O/D connector wait,
+<code>travel_time − network_time</code>;</li>
 </ul>
               </div>
             </td>
@@ -2166,7 +2173,7 @@ origin's connector link, <code>network_entry − start</code>;</li>
             <td>
               <div class="doc-md-description">
                 <ul>
-<li><code>network_time</code> — in-network time, <code>arrival − network_entry</code>;</li>
+<li><code>network_time</code> — time on real links only (connector-free);</li>
 </ul>
               </div>
             </td>

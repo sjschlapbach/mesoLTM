@@ -758,17 +758,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#fidelity-to-the-paper" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Fidelity to the paper
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1849,17 +1838,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#fidelity-to-the-paper" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Fidelity to the paper
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1945,18 +1923,15 @@ arbitrary many-to-many junctions with outbound locking. See
 achieves this with an integer <em>capacity-token</em> recursion on each link (a token
 bucket that replenishes by <code>capacity · dt</code> each step and is debited by the actual
 flow). This is what lets the continuous LTM be advanced vehicle-by-vehicle without
-drift — and it is ported <strong>verbatim</strong> from the reference implementation so results
-match the paper exactly.<sup id="fnref2:paper"><a class="footnote-ref" href="#fn:paper">1</a></sup></p>
+drift — and it follows the reference implementation's arithmetic and ordering.</p>
 <h2 id="what-runs-each-step">What runs each step<a class="headerlink" href="#what-runs-each-step" title="Permanent link">&para;</a></h2>
 <p>The engine repeats a fixed <strong>four-phase loop</strong>: plugins act → nodes prepare →
 links compute demand/supply → nodes move vehicles → links commit. The ordering is
 significant and is covered in <a href="../simulation-loop/">The simulation loop</a>.</p>
-<h2 id="fidelity-to-the-paper">Fidelity to the paper<a class="headerlink" href="#fidelity-to-the-paper" title="Permanent link">&para;</a></h2>
-<p>The core traffic-flow mathematics is a faithful port; a regression test asserts
-<code>mesoltm</code> reproduces the reference's cumulative flows exactly. Everything
-<code>mesoltm</code> <em>adds</em> — general-graph networks with connector links, pluggable routing,
-per-step plugins, step-driven injection, metrics, and visualisation — sits <em>around</em>
-that untouched core. Every deviation is listed in
+<p>Everything <code>mesoltm</code> <em>adds</em> — general-graph networks with connector links,
+pluggable routing, per-step plugins, step-driven injection, metrics, and
+visualisation — sits <em>around</em> that core traffic-flow model. Every change relative
+to the reference is listed in
 <a href="../deviations-from-the-paper/">Deviations from the paper</a>.</p>
 <div class="footnote">
 <hr />
@@ -1965,7 +1940,7 @@ that untouched core. Every deviation is listed in
 <p>F. de Souza, O. Verbas, J. Auld, C. M. J. Tampère, <em>"A mesoscopic
 link-transmission-model able to track individual vehicles"</em>, Simulation
 Modelling Practice and Theory <strong>140</strong> (2025) 103088.
-DOI: <a href="https://doi.org/10.1016/j.simpat.2025.103088">10.1016/j.simpat.2025.103088</a>.&#160;<a class="footnote-backref" href="#fnref:paper" title="Jump back to footnote 1 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:paper" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+DOI: <a href="https://doi.org/10.1016/j.simpat.2025.103088">10.1016/j.simpat.2025.103088</a>.&#160;<a class="footnote-backref" href="#fnref:paper" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>

@@ -1070,17 +1070,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#verification" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verification
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -2137,17 +2126,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#verification" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verification
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -2169,8 +2147,8 @@
 
 
 <h1 id="deviations-from-the-paper">Deviations from the paper<a class="headerlink" href="#deviations-from-the-paper" title="Permanent link">&para;</a></h1>
-<p><code>mesoltm</code> is a faithful re-implementation of the discrete Link Transmission Model
-of de Souza, Verbas, Auld &amp; Tampère.<sup id="fnref:paper"><a class="footnote-ref" href="#fn:paper">1</a></sup> The guiding principle is to <strong>change
+<p><code>mesoltm</code> is a re-implementation of the discrete Link Transmission Model of
+de Souza, Verbas, Auld &amp; Tampère.<sup id="fnref:paper"><a class="footnote-ref" href="#fn:paper">1</a></sup> The guiding principle is to <strong>change
 the model only where strictly necessary</strong>: the core traffic-flow mathematics — the
 link sending/receiving flows, the <span class="arithmatex">\(T_1\)</span>/<span class="arithmatex">\(T_2\)</span> wave lags, the integer
 capacity-token discretisation, and the node flow-resolution algorithms — is ported
@@ -2182,21 +2160,11 @@ implementation (<code>abmmeso</code>). The differences fall into two kinds:</p>
 <li><strong>Additive extensions</strong> (§B) — new capabilities that leave the original dynamics
   untouched when they are not used.</li>
 </ul>
-<div class="admonition success">
-<p class="admonition-title">The fidelity guarantee</p>
-<p>A regression test (<code>test_regression.py</code>) asserts that <code>mesoltm</code> reproduces
-<code>abmmeso</code>'s cumulative in/outflows <strong>exactly</strong> (zero difference) on the
-reference diverge–merge network. That exact match is the objective proof that
-none of the changes below alter the model's behaviour: every behaviour-preserving
-refinement, and every additive extension in its unused (default) state, leaves
-the regression passing.</p>
-</div>
 <p>The section labels (A1–A8, B1–B5) are stable identifiers referenced from elsewhere
 in this documentation (e.g. "see Deviations §A5").</p>
 <hr />
 <h2 id="a-behaviour-preserving-refinements">A. Behaviour-preserving refinements<a class="headerlink" href="#a-behaviour-preserving-refinements" title="Permanent link">&para;</a></h2>
-<p>These change <em>how</em> the model is expressed or instrumented, not <em>what</em> it computes.
-Each is confirmed by the exact regression test.</p>
+<p>These change <em>how</em> the model is expressed or instrumented, not <em>what</em> it computes.</p>
 <h3 id="a1-pluggable-next-link-lookup-at-branching-nodes">A1 · Pluggable next-link lookup at branching nodes<a class="headerlink" href="#a1-pluggable-next-link-lookup-at-branching-nodes" title="Permanent link">&para;</a></h3>
 <p>At a diverge, general, or signalised node the paper reads a vehicle's next link
 directly from its route. <code>mesoltm</code> delegates that single lookup to a
@@ -2219,8 +2187,7 @@ routes on grids it is a strict correctness improvement.</p>
 (demand, supply, inflow, outflow) to <code>None</code> as a defensive guard; <code>mesoltm</code> resets
 them to <code>0</code>. This exists purely so the ported code carries clean, non-<code>Optional</code>
 type annotations. The fixed loop order guarantees these values are always recomputed
-before they are next read, so <code>0</code> versus <code>None</code> is never observed — as the exact
-regression confirms.</p>
+before they are next read, so <code>0</code> versus <code>None</code> is never observed.</p>
 <h3 id="a4-naming-and-packaging-only">A4 · Naming and packaging only<a class="headerlink" href="#a4-naming-and-packaging-only" title="Permanent link">&para;</a></h3>
 <p>Files use <code>snake_case</code> and classes <code>PascalCase</code>; a few reference names were
 modernised (<code>Trip</code> → <code>Vehicle</code>, <code>SimulationRunner</code> → <code>Simulation</code>), duplicate
@@ -2273,18 +2240,20 @@ instead of the paper's spellings. <strong>Only the names change — never the va
 <p>These are the public keyword names (<code>Link(v_f=30, w=6, rho_jam=0.2)</code>) and the JSON
 scenario keys (<code>"v_f"</code>, <code>"rho_jam"</code>). The underlying relationships are identical —
 <code>capacity = rho_jam·v_f·w/(v_f + w)</code>, <code>T1 = L/(v_f·Δt)</code>, <code>T2 = L/(w·Δt)</code>, jam
-storage <code>rho_jam·L</code> — and the exact regression still passes, proving the rename is
-behaviour-preserving. See <a href="../links-and-fd/">Links &amp; the fundamental diagram</a>.</p>
+storage <code>rho_jam·L</code>. Only the names change. See
+<a href="../links-and-fd/">Links &amp; the fundamental diagram</a>.</p>
 <h3 id="a6-per-vehicle-trajectory-recording">A6 · Per-vehicle trajectory recording<a class="headerlink" href="#a6-per-vehicle-trajectory-recording" title="Permanent link">&para;</a></h3>
 <p>The paper exposes only aggregate cumulative in/outflows per link and stamps each
 vehicle's arrival step. <code>mesoltm</code> additionally has each <code>Vehicle</code> carry a
 <code>trajectory</code> log: the link timestamps the vehicle's entry and exit as it is placed
 on and discharged from the link. From this log the <a href="../../guide/metrics/">metrics</a>
 module derives, per vehicle, the route actually driven, per-link travel times, and
-three durations — <code>access_time</code> (origin-queue and connector wait), <code>network_time</code>
-(time on real links), and the headline <code>travel_time</code> (total time in system, which
-includes the access wait). The recording only writes to bookkeeping attributes; it
-reads nothing back into the flow arithmetic, so results are unchanged.</p>
+three durations — <code>access_time</code> (origin-queue wait plus any supply-limited O/D
+connector wait), <code>network_time</code> (time on real links only), and <code>travel_time</code>
+(desired departure to arrival, with each connector's one-step free-flow lag
+removed but any supply-limited connector waiting kept). The recording only writes
+to bookkeeping attributes; it reads nothing back into the flow arithmetic, so
+results are unchanged.</p>
 <h3 id="a7-the-cfl-condition-is-enforced">A7 · The CFL condition is enforced<a class="headerlink" href="#a7-the-cfl-condition-is-enforced" title="Permanent link">&para;</a></h3>
 <p>The paper (Section 3.3) states the Courant–Friedrichs–Lewy condition — the fastest
 wave must not cross a link in less than one step, <code>max(v_f, w)·dt ≤ length</code> — but
@@ -2321,11 +2290,12 @@ the flow — and a source connector holds an origin's entire entry queue, so veh
 never queue at the origin <em>and</em> on the connector at once.</p>
 <p>A true zero-length connector is impossible in the LTM, because a link's storage is
 <code>rho_jam·length</code> and a zero-length link could hold no vehicle; the connector is
-therefore the minimal faithful approximation, a <strong>one-cell</strong> link that adds at most
-a one-step free-flow lag at entry and exit. The paper's validation scenarios use
-direct attachment and remain bit-exact; connectors appear only with the
-general-graph builder, and any waiting on an entry connector is attributed to a
-trip's access time, not its in-network travel time. See
+therefore the minimal approximation, a <strong>one-cell</strong> link that adds a one-step
+free-flow lag at entry and exit. Connectors appear only with the general-graph
+builder. The metrics <strong>remove that one free-flow step</strong> from a trip's travel time
+(so an empty connector adds nothing), while any <em>extra</em> time a vehicle waits on a
+connector because downstream space is the binding constraint is kept as the trip's
+access time, never as in-network travel time. See
 <a href="../networks-and-connectors/">Networks &amp; connectors</a>.</p>
 <h3 id="b2-merge-priorities-as-shares-defaulting-to-capacity-proportional">B2 · Merge priorities as shares, defaulting to capacity-proportional<a class="headerlink" href="#b2-merge-priorities-as-shares-defaulting-to-capacity-proportional" title="Permanent link">&para;</a></h3>
 <p>The paper supplies a merge/general node's priority as an explicit integer
@@ -2378,11 +2348,6 @@ and ordering:</p>
 <li>The origin's vertical entry queue and the destination's absorption.</li>
 <li>The four-phase per-step simulation loop and its ordering.</li>
 </ul>
-<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
-<p>Running <code>pytest</code> executes <code>test_regression.py</code>, which asserts exact equality
-(<code>diff == 0</code>) between <code>mesoltm</code> and the <code>abmmeso</code>-derived golden values on the
-reference network — the concrete guarantee that every deviation on this page is
-behaviour-preserving.</p>
 <div class="footnote">
 <hr />
 <ol>

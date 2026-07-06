@@ -1859,11 +1859,12 @@
 
 
 <h1 id="networks-connector-links">Networks &amp; connector links<a class="headerlink" href="#networks-connector-links" title="Permanent link">&para;</a></h1>
-<p>The paper attaches an origin or destination directly to a single link. To let
-<strong>any node of a general graph</strong> act as an origin and/or destination — including
-busy junctions with through traffic — the <a href="../../reference/network/"><code>Network</code></a>
-builder inserts short <strong>connector links</strong> where needed. Understanding them
-explains a few things you will see in outputs.</p>
+<p><code>mesoltm</code> lets <strong>any node of a general graph</strong> act as an origin and/or
+destination — including busy junctions that also carry through traffic. To make
+that possible, the <a href="../../reference/network/"><code>Network</code></a> builder inserts short
+<strong>connector links</strong> where needed, so an origin or destination is never restricted
+to being a plain single-link endpoint. Understanding these connectors explains a
+few things you will see in outputs.</p>
 <h2 id="building-on-a-general-graph">Building on a general graph<a class="headerlink" href="#building-on-a-general-graph" title="Permanent link">&para;</a></h2>
 <p><code>Network</code> lets you add arbitrary nodes and links, mark any node as an
 origin/destination, then <code>compile()</code> to a simulation:</p>
@@ -1894,18 +1895,23 @@ binding constraint:</p>
   double-buffer at the origin and on the connector.</li>
 </ul>
 <p>Because a connector crosses in one free-flow step, a vehicle entering an empty
-connector enters the network immediately once served. <a href="../../guide/metrics/">Metrics</a>
-attribute connector/queue time to a vehicle's <strong>access time</strong>, so reported
-in-network travel time is unaffected by connectors.</p>
+connector enters the network immediately once served. The <a href="../../guide/metrics/">metrics</a>
+<strong>remove that one free-flow step</strong> from a trip's travel time, so an empty,
+unrestricted connector adds nothing. If a vehicle is instead held on a connector
+<em>longer</em> than one step — because downstream space is the binding constraint — that
+extra time is a real wait to enter/leave the network and is <strong>kept</strong>, reported as
+the trip's <strong>access time</strong>. Either way, in-network <code>network_time</code> stays
+connector-free.</p>
 <h2 id="why-not-zero-length-connectors">Why not zero-length connectors?<a class="headerlink" href="#why-not-zero-length-connectors" title="Permanent link">&para;</a></h2>
 <p>The design intent was zero-length connectors, but a <strong>true zero-length link is
 impossible in the LTM</strong>: a link's storage is <code>rho_jam · length</code>, so a zero-length
 link could never hold a vehicle. The connector is therefore the minimal faithful
 approximation — a <strong>one-cell</strong> link that adds at most a one-step free-flow lag at
 entry/exit.</p>
-<p>The paper's own validation scenarios are built with <strong>direct attachment</strong> (no
-connectors), so they remain bit-exact; connectors appear only when you use the
-general-graph builder. See <a href="../deviations-from-the-paper/">Deviations §B1</a>.</p>
+<p>Connectors are inserted <strong>only by the general-graph builder, and only where
+needed</strong>: when an origin or destination is already a plain single-link endpoint,
+it is attached directly and no connector is added. See
+<a href="../deviations-from-the-paper/">Deviations §B1</a>.</p>
 <h2 id="parallel-links">Parallel links<a class="headerlink" href="#parallel-links" title="Permanent link">&para;</a></h2>
 <p><code>Network</code> supports <strong>parallel links</strong> — two links sharing the same pair of
 endpoints (a fast and a slow lane, or a detour). Give each a distinct <code>link_id</code>
