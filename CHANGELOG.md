@@ -1,3 +1,11 @@
+## [0.1.1] - 2026-07-09
+
+### Miscellaneous Tasks
+
+- *(release)* Update changelog for version 0.1.0
+- Update README with badges and links to documentation and pypi deployment
+- Add progress bar to simulation execution
+- *(release)* V0.1.1
 ## [0.1.0] - 2026-07-06
 
 ### Features
