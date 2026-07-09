@@ -4998,15 +4998,50 @@ Between steps, external code may read :attr:<code>network_state</code> and call
 
 
 <a href="#mesoltm.core.simulation.Simulation.run" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="#mesoltm.core.simulation.Simulation">Simulation</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="n">progress</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="#mesoltm.core.simulation.Simulation">Simulation</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Initialise all objects, run the time loop, and write any outputs.</p>
 <p>Equivalent to :meth:<code>start</code> followed by :meth:<code>step</code> until the horizon is
-exhausted, then :meth:<code>write_outputs</code>. Kept behaviourally identical to the
-reference batch runner.</p>
+exhausted, then :meth:<code>write_outputs</code>. The traffic-flow computation is kept
+behaviourally identical to the reference batch runner; the optional progress
+bar only draws to <code>sys.stderr</code> and does not touch simulation state.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>progress</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>When <code>True</code>, display a single-line progress bar (steps
+completed, percentage, elapsed/ETA) on <code>sys.stderr</code> while the
+horizon is simulated. Off by default so batch runs stay silent and
+byte-for-byte identical to the reference.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
