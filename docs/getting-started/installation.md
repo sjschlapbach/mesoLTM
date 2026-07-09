@@ -1,7 +1,8 @@
 # Installation
 
 `mesoltm` requires **Python 3.11 or newer**. Its only runtime dependencies are
-[NumPy](https://numpy.org/) and [NetworkX](https://networkx.org/).
+[NumPy](https://numpy.org/), [NetworkX](https://networkx.org/) and
+[tqdm](https://tqdm.github.io/) (for the optional simulation progress bar).
 
 ## From PyPI
 

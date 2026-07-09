@@ -10,6 +10,7 @@ Batch run (initialise, run whole horizon, write outputs):
 ```python
 sim = net.compile(time_step=1.0, total_time=600.0)
 sim.run()                       # -> self
+sim.run(progress=True)          # show a tqdm progress bar on stderr while running
 ```
 
 Step-driven run (observe / inject between steps):
@@ -28,7 +29,7 @@ identical.
 ## Simulation API
 
 ```python
-sim.run() -> Simulation
+sim.run(progress=False) -> Simulation      # progress=True -> tqdm bar on stderr
 sim.start() -> Simulation
 sim.step() -> int                          # runs current_step, returns it
 sim.current_step                           # next step to run

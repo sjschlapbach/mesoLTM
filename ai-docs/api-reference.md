@@ -24,7 +24,7 @@ Vehicle.next_link(current_link_id) -> int | None
 Vehicle.advance_to(link_id) -> None
 
 Simulation(**kwargs)                 # links, nodes, time_step, total_time, plugins, ...
-Simulation.run() -> Simulation
+Simulation.run(progress=False) -> Simulation   # progress=True shows a tqdm bar on stderr
 Simulation.start() -> Simulation
 Simulation.step() -> int
 Simulation.current_step              # next step to run

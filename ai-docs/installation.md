@@ -1,6 +1,6 @@
 # mesoltm installation
 
-Requires **Python 3.11+**. Runtime dependencies: `numpy`, `networkx`.
+Requires **Python 3.11+**. Runtime dependencies: `numpy`, `networkx`, `tqdm`.
 
 ## Install from PyPI
 

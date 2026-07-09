@@ -33,10 +33,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         description="Run a mesoscopic LTM traffic scenario from a JSON file.",
     )
     parser.add_argument("scenario", help="Path to the JSON scenario file")
+    parser.add_argument(
+        "--no-progress",
+        action="store_true",
+        help="Disable the progress bar shown while the simulation runs.",
+    )
     args = parser.parse_args(argv)
 
     sim = load_scenario(args.scenario)
-    sim.run()
+    sim.run(progress=not args.no_progress)
 
     arrived = sum(len(node.get_arrived_trips()) for node in sim.nodes)
     print(f"Simulation complete: {arrived} vehicles reached their destination.")

@@ -18,6 +18,8 @@ from __future__ import annotations
 import csv
 from typing import TYPE_CHECKING
 
+from tqdm import tqdm
+
 from ..recording import SimulationHistory, capture_frame
 
 if TYPE_CHECKING:
@@ -204,19 +206,38 @@ class Simulation:
                 capture_frame(self.network_state, self.history_classify)
             )
 
-    def run(self) -> Simulation:
+    def run(self, progress: bool = True) -> Simulation:
         """Initialise all objects, run the time loop, and write any outputs.
 
         Equivalent to :meth:`start` followed by :meth:`step` until the horizon is
-        exhausted, then :meth:`write_outputs`. Kept behaviourally identical to the
-        reference batch runner.
+        exhausted, then :meth:`write_outputs`. The traffic-flow computation is kept
+        behaviourally identical to the reference batch runner; the optional progress
+        bar only draws to ``sys.stderr`` and does not touch simulation state.
+
+        Args:
+            progress: When ``True``, display a single-line progress bar (steps
+                completed, percentage, elapsed/ETA) on ``sys.stderr`` while the
+                horizon is simulated. Off by default so batch runs stay silent and
+                byte-for-byte identical to the reference.
 
         Returns:
             ``self``, so callers can inspect link/node state after the run.
         """
         self.start()
+
+        progress_bar = (
+            tqdm(total=self.total_steps, desc="mesoltm", unit="step")
+            if progress
+            else None
+        )
+
         while self.current_step < self.total_steps:
             self.step()
+            if progress_bar is not None:
+                progress_bar.update(1)
+
+        if progress_bar is not None:
+            progress_bar.close()
 
         self.write_outputs()
         return self

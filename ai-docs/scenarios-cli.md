@@ -6,10 +6,12 @@ Describe a whole simulation in a JSON file and run it without Python.
 
 ```bash
 python -m mesoltm scenario.json      # runs the scenario, writes configured CSVs
+python -m mesoltm scenario.json --no-progress   # hide the progress bar
 ```
 
-Also available as the `mesoltm` console script: `mesoltm scenario.json`. Prints the
-number of arrived vehicles and any output paths. Exit code 0 on success.
+Also available as the `mesoltm` console script: `mesoltm scenario.json`. Shows a
+tqdm progress bar on stderr while running (disable with `--no-progress`), then prints
+the number of arrived vehicles and any output paths. Exit code 0 on success.
 
 ## Python API
 
@@ -17,7 +19,7 @@ number of arrived vehicles and any output paths. Exit code 0 on success.
 from mesoltm.io.scenario import build_scenario, load_scenario, save_scenario
 
 sim = load_scenario("scenario.json")   # -> Simulation
-sim.run()
+sim.run(progress=True)                 # progress bar; omit progress for a silent run
 # build_scenario(data: dict, base_path=None) -> Simulation
 # save_scenario(data: dict, path) -> None
 ```

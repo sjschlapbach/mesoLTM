@@ -8,6 +8,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Status: **early development** — the package is being scaffolded; core model code does not exist yet.
 
+## Keep the code simple and human-like (guiding principle)
+
+**Prefer the simplest solution that works; do not over-engineer.** Reach for a
+well-established library instead of hand-rolling equivalent functionality (e.g. use
+`tqdm` for a progress bar rather than writing a custom one). Write code the way a
+human maintainer would — plain, readable, no speculative abstraction, no options or
+configuration nobody asked for. When a one-liner does the job, use the one-liner.
+This applies everywhere unless a specific instruction (e.g. the faithfulness rule for
+the ported LTM core) says otherwise.
+
 ## Do NOT create worktrees (hard rule)
 
 **Never create a git worktree in this repository.** Do not call the `EnterWorktree`
