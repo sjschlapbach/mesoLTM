@@ -29,9 +29,14 @@ metadata** instead of the next link, to demonstrate that ``color_by`` is fully
 overridable (and that ``props`` travel with the vehicle and round-trip through the
 JSON history).
 
+Alongside the agent-movement video, each scenario also renders a **static flow map**
+(:func:`~mesoltm.visualizations.plot_network`): every link is coloured by its total
+load over the run, with opposing/parallel links fanned onto separate arcs, so the
+corridors that carried the most traffic across the grid stand out at a glance.
+
 Everything is written to ``examples/output/grid_visualization/``: an MP4 per
-scenario, the small scenario's per-step PNGs, three stills for the large one, and
-the JSON history **logfile** for each.
+scenario, the small scenario's per-step PNGs, three stills for the large one, a
+link-load flow map per scenario, and the JSON history **logfile** for each.
 
 Run: ``python examples/grid_visualization.py``
 """
@@ -54,11 +59,13 @@ from mesoltm import (  # noqa: E402
     NetworkState,
     ReroutingPlugin,
     ShortestPathPolicy,
+    SimulationHistory,
     Vehicle,
     grid_network,
 )
 from mesoltm.visualizations import (  # noqa: E402
     NetworkLayout,
+    plot_network,
     render_frame,
     save_animation,
 )
@@ -135,7 +142,8 @@ def run_grid(
 
     Vehicles are injected over ``[0, last_release]`` at random distinct O/D pairs,
     each seeded with a shortest-path route and then re-planned live by the
-    :class:`DensityRerouter`. Returns the populated ``SimulationHistory``.
+    :class:`DensityRerouter`. Returns the run ``Simulation`` (its ``history`` holds
+    the recorded frames and its ``network_state`` the final per-link loads).
     """
     net = grid_network(
         rows,
@@ -189,10 +197,10 @@ def run_grid(
     arrived = sum(len(n.get_arrived_trips()) for n in sim.nodes)
     print(f"  {arrived} of {n_vehicles} vehicles arrived; log -> {history_path}")
     assert sim.history is not None
-    return sim.history
+    return sim
 
 
-def _tight_frames(history):
+def _tight_frames(history: SimulationHistory) -> list:
     """Trim the empty tail (after the last vehicle left) so the clip stays tight."""
     last = max(
         (i for i, f in enumerate(history.frames) if f.agents or f.waiting),
@@ -216,10 +224,24 @@ def _still(
     plt.close(fig)
 
 
+def _flow_map(state: NetworkState, name: str, annotate_links: bool = False) -> None:
+    """Render a static network map of the accumulated per-link load to a PNG.
+
+    Colouring by ``"flow"`` (cumulative outflow) shows the total number of vehicles
+    that traversed each link over the whole run, so at a glance you can see which
+    links carried the heaviest load across the grid. Opposing/parallel links are
+    fanned onto separate arcs, so each direction's load is read individually.
+    """
+    fig, ax = plt.subplots(figsize=(10, 10))
+    plot_network(state, color_by="flow", ax=ax, annotate_links=annotate_links)
+    print("  figure saved to", savefig(fig, name, subdir=SUBDIR))
+    plt.close(fig)
+
+
 def run_small(out_dir: pathlib.Path) -> None:
     """A tiny 2x2 grid for manual verification (frames + log are inspectable)."""
     print("2x2 verification grid:")
-    history = run_grid(
+    sim = run_grid(
         rows=2,
         cols=2,
         holes=[],
@@ -229,6 +251,8 @@ def run_small(out_dir: pathlib.Path) -> None:
         seed=1,
         history_path=str(out_dir / "grid2x2_history.json"),
     )
+    history = sim.history
+    assert history is not None  # record_history=True was set at compile
     layout = NetworkLayout.from_history(history)
     frames = _tight_frames(history)
     # Slow (subsample=3) and with full per-agent detail + node labels so the small
@@ -246,13 +270,18 @@ def run_small(out_dir: pathlib.Path) -> None:
     )
     print("  video saved to", video)
     print("  per-step frames saved under", out_dir / "grid2x2_frames")
+    # A static flow map of the whole run: each link coloured by its total load, with
+    # per-link labels (few enough links here to annotate every one).
+    state = sim.network_state
+    assert state is not None  # attached by compile()
+    _flow_map(state, "grid2x2_link_loads", annotate_links=True)
 
 
 def run_large(out_dir: pathlib.Path) -> None:
     """A dense 7x7 holed grid — the readability stress test."""
     print("7x7 dense grid:")
     holes = [(1, 1), (1, 4), (3, 3), (4, 1), (5, 5), (2, 5)]  # a few missing nodes
-    history = run_grid(
+    sim = run_grid(
         rows=7,
         cols=7,
         holes=holes,
@@ -262,6 +291,8 @@ def run_large(out_dir: pathlib.Path) -> None:
         seed=3,
         history_path=str(out_dir / "grid7x7_history.json"),
     )
+    history = sim.history
+    assert history is not None  # record_history=True was set at compile
     layout = NetworkLayout.from_history(history)
     frames = _tight_frames(history)
     video = save_animation(
@@ -303,6 +334,12 @@ def run_large(out_dir: pathlib.Path) -> None:
         color_by=lambda item: item.props.get("cls", "car"),
         palette=CLASS_COLORS,
     )
+    # ... and a static flow map of the whole run: every link coloured by its total
+    # load, so the corridors that carried the most traffic across the holed grid
+    # stand out at a glance (labels omitted — too many links to annotate cleanly).
+    state = sim.network_state
+    assert state is not None  # attached by compile()
+    _flow_map(state, "grid7x7_link_loads")
 
 
 def main() -> None:

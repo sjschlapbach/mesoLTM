@@ -54,8 +54,13 @@ These take the trip records from [`collect_trips`](metrics.md) (or the simulatio
 ## Network maps
 
 **`plot_network(state, color_by="occupancy", annotate_links=False)`** draws the
-network, colouring links by `"flow"`, `"occupancy"`, `"density"`, or `"capacity"`,
-with a colorbar and parallel links fanned out as arcs. Pass the live
+network (with [networkx](https://networkx.org/)), colouring links by `"flow"`,
+`"occupancy"`, `"density"`, or `"capacity"`, with a colorbar. Links that share an
+edge — parallel links and the two directions of a bidirectional edge (`A→B` and
+`B→A`) — are fanned onto separate arcs so their arrows never overlap; a lone link is
+drawn straight. Because it uses networkx it copes with **arbitrary node placements**
+(not just grid-aligned) and **any number of links** between a node pair. Colour by
+`"flow"` after a run to read each link's total load across the network. Pass the live
 [`NetworkState`](../reference/network.md#network-state) (`sim.network_state`):
 
 ```python

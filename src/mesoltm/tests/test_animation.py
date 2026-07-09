@@ -20,7 +20,7 @@ from ..network.builders import corridor_network  # noqa: E402
 from ..visualizations import animation as anim  # noqa: E402
 
 
-def _recorded_history():
+def _recorded_history() -> anim.SimulationHistory:
     """Record a short corridor run with four vehicles for rendering tests."""
     net = corridor_network([200.0, 200.0, 200.0])
     net.set_origin(
@@ -32,6 +32,7 @@ def _recorded_history():
     )
     sim = net.compile(time_step=1.0, total_time=80.0, record_history=True)
     sim.run()
+    assert sim.history is not None  # record_history=True was set at compile
     return sim.history
 
 
@@ -61,15 +62,13 @@ def test_layout_and_render_frame():
 def test_color_by_next_link_and_detail_levels():
     """Rendering supports next-link colouring and the detail presets/overrides."""
     history = _recorded_history()
-    assert history is not None
     layout = anim.NetworkLayout.from_history(history)
     busy = max(history.frames, key=lambda f: len(f.agents))
-    for kwargs in (
-        {"color_by": "next_link"},
-        {"detail": "minimal"},
-        {"detail": "full", "show_node_labels": False},
+    for ax in (
+        anim.render_frame(busy, layout, color_by="next_link"),
+        anim.render_frame(busy, layout, detail="minimal"),
+        anim.render_frame(busy, layout, detail="full", show_node_labels=False),
     ):
-        ax = anim.render_frame(busy, layout, **kwargs)
         assert ax is not None
         matplotlib.pyplot.close(ax.figure)
     # next-link palette assigns a colour per distinct next link (stable over frames).
@@ -101,6 +100,7 @@ def test_color_by_custom_callable_reads_props():
     )
     sim = net.compile(time_step=1.0, total_time=60.0, record_history=True)
     sim.run()
+    assert sim.history is not None  # record_history=True was set at compile
 
     def by_class(item):
         return item.props.get("cls", "car")
@@ -119,6 +119,7 @@ def test_opposing_links_are_fanned_onto_distinct_arcs():
     net = corridor_network([200.0, 200.0])
     rev = net.add_link("n1", "n0", length=200.0)  # reverse link on the n0<->n1 edge
     sim = net.compile(time_step=1.0, total_time=10.0)
+    assert sim.network_state is not None  # attached by compile()
     layout = anim.NetworkLayout.from_state(sim.network_state)
     fwd = layout.links["1"]  # n0 -> n1
     rev_arc = layout.links[str(rev)]  # n1 -> n0, same physical edge

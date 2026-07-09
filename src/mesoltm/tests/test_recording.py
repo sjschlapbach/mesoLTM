@@ -51,6 +51,7 @@ def test_agent_visits_links_in_route_order_with_logged_remaining_route():
     """The agent moves 1->2->3; the logged remaining route shrinks accordingly."""
     sim = _corridor_with_vehicle()
     sim.run()
+    assert sim.history is not None  # record_history=True was set at compile
     visited: list = []
     for frame in sim.history.frames:
         for agent in frame.agents:
@@ -81,6 +82,7 @@ def test_classify_flows_into_category():
 
     sim.history_classify = lambda vehicle, state: f"veh{vehicle.vehicle_id}"
     sim.run()
+    assert sim.history is not None  # record_history=True was set at compile
     categories = {a.category for f in sim.history.frames for a in f.agents}
     assert categories == {"veh7"}
 
@@ -101,6 +103,7 @@ def test_origin_queue_is_captured_as_waiting():
     net.set_destination("b")
     sim = net.compile(time_step=1.0, total_time=120.0, record_history=True)
     sim.run()
+    assert sim.history is not None  # record_history=True was set at compile
 
     waiting_frames = [f for f in sim.history.frames if f.waiting]
     assert waiting_frames, "expected an entry queue to form at the origin"
@@ -128,6 +131,7 @@ def test_vehicle_props_are_captured_and_roundtrip(tmp_path):
     )
     sim = net.compile(time_step=1.0, total_time=60.0, record_history=True)
     sim.run()
+    assert sim.history is not None  # record_history=True was set at compile
 
     agents = [a for f in sim.history.frames for a in f.agents]
     assert agents and all(a.props == {"cls": "truck", "vot": 9} for a in agents)
@@ -143,6 +147,7 @@ def test_history_save_load_roundtrip(tmp_path):
     """A saved history reloads with the same frames, dt and node positions."""
     sim = _corridor_with_vehicle()
     sim.run()
+    assert sim.history is not None  # record_history=True was set at compile
     path = str(tmp_path / "hist.json")
     sim.history.save(path)
     loaded = SimulationHistory.load(path)
@@ -183,6 +188,7 @@ def test_policy_routed_vehicle_logs_no_fabricated_plan():
     )
     sim.run()
     assert sum(len(n.get_arrived_trips()) for n in sim.nodes) == 1
+    assert sim.history is not None  # record_history=True was set at compile
     # No plan is stored on the vehicle -> the log carries no route / next link.
     agents = [a for f in sim.history.frames for a in f.agents]
     assert agents, "the vehicle should appear on real links"
@@ -220,6 +226,7 @@ def test_logged_route_matches_midrun_reroute():
         record_history=True,
     )
     sim.run()
+    assert sim.history is not None  # record_history=True was set at compile
 
     visited: list = []
     on_links: set = set()
