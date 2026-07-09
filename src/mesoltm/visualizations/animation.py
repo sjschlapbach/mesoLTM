@@ -51,6 +51,8 @@ from matplotlib.animation import FFMpegWriter, PillowWriter
 from matplotlib.lines import Line2D
 
 from ..recording import DEFAULT_CATEGORY, SimulationHistory
+from ._draw import bezier_point as _bezier_point
+from ._draw import draw_arc, draw_nodes, fan_links
 
 if TYPE_CHECKING:
     from ..core.simulation import Simulation
@@ -73,8 +75,6 @@ OKABE_ITO = [
 # Default meaning of an agent dot's colour (the recorded classify category).
 DEFAULT_COLOR_BY = "category"
 
-_NODE_FACE = "#ffffff"
-_NODE_EDGE = "#333333"
 _LINK_BASE = "#c9ced6"
 _HIGHLIGHT = "#cc3311"
 _TEXT = "#222222"
@@ -83,51 +83,6 @@ _TEXT = "#222222"
 def _to_key(value: object) -> str:
     """Coerce a node/link id to a string layout key (ids may be int/tuple/str)."""
     return str(value)
-
-
-def _perp(p0: tuple, p1: tuple) -> tuple:
-    """Return the unit vector perpendicular to the segment ``p0 -> p1``."""
-    dx, dy = p1[0] - p0[0], p1[1] - p0[1]
-    length = math.hypot(dx, dy) or 1.0
-    return (-dy / length, dx / length)
-
-
-def _lane_shift(p0: tuple, p1: tuple, rad: float) -> tuple:
-    """Shift a link's endpoints slightly off the shared centreline (as a lane).
-
-    Translates both endpoints perpendicular to travel by :data:`_LANE_OFFSET` of
-    the chord, toward the side **opposite** the arc's bow (``rad``). For a
-    bidirectional edge this swaps the two arrows apart so they open a lens with
-    empty space between them (rather than pinching/crossing at mid-span), while
-    each arrow keeps its own curvature. A straight link (``rad == 0``) is left on
-    the centreline.
-    """
-    if rad == 0.0:
-        return p0, p1
-    nx_, ny_ = _perp(p0, p1)
-    side = -1.0 if rad > 0 else 1.0  # opposite the arc's bow -> open the lens
-    chord = math.dist(p0, p1)
-    dx, dy = side * _LANE_OFFSET * chord * nx_, side * _LANE_OFFSET * chord * ny_
-    return (p0[0] + dx, p0[1] + dy), (p1[0] + dx, p1[1] + dy)
-
-
-def _bezier_point(p0: tuple, p1: tuple, rad: float, t: float) -> tuple:
-    """Point at parameter ``t`` on the quadratic arc matching ``arc3,rad``.
-
-    ``rad`` is the fractional perpendicular offset of the control point from the
-    chord midpoint (matching matplotlib's ``connectionstyle="arc3"``), so slots
-    computed here lie on the same curve the link is drawn with.
-    """
-    if rad == 0.0:
-        return (p0[0] + (p1[0] - p0[0]) * t, p0[1] + (p1[1] - p0[1]) * t)
-    chord = math.dist(p0, p1)
-    px, py = _perp(p0, p1)
-    mx, my = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
-    cx, cy = mx + rad * chord * px, my + rad * chord * py
-    u = 1.0 - t
-    x = u * u * p0[0] + 2 * u * t * cx + t * t * p1[0]
-    y = u * u * p0[1] + 2 * u * t * cy + t * t * p1[1]
-    return (x, y)
 
 
 class NetworkLayout:
@@ -179,30 +134,13 @@ class NetworkLayout:
         labels = {_to_key(node): _to_key(node) for node in node_positions}
         resolved = cls._resolve_positions(node_positions, link_endpoints)
 
-        # Group links by the *undirected* node pair so opposing links on the same
-        # edge (A->B and B->A) and true parallel links are fanned apart onto
-        # separate arcs — otherwise their agents would be drawn on top of one
-        # another. Each link keeps a fixed edge normal regardless of its own
-        # direction (the arc sign is flipped for the non-canonical direction), so
-        # distinct lane offsets always map to distinct, non-overlapping arcs.
-        groups: dict = {}
-        for lid, (u, v) in link_endpoints.items():
-            uk, vk = _to_key(u), _to_key(v)
-            groups.setdefault(tuple(sorted((uk, vk))), []).append(
-                (_to_key(lid), uk, vk)
-            )
-        links: dict = {}
-        for pair, members in groups.items():
-            count = len(members)
-            for i, (lid_key, uk, vk) in enumerate(members):
-                if uk not in resolved or vk not in resolved:
-                    continue
-                offset = 0.0 if count == 1 else _PARALLEL_FAN * (i - (count - 1) / 2)
-                # Canonical direction (u,v)==sorted pair keeps +offset; the reverse
-                # flips it so the two directions bow to opposite sides of the edge.
-                rad = offset if (uk, vk) == pair else -offset
-                p0, p1 = _lane_shift(resolved[uk], resolved[vk], rad)
-                links[lid_key] = (p0, p1, rad)
+        # Fan links onto arcs the same way plot_network does (shared helper), so the
+        # video and the static map draw identical arcs.
+        endpoints = {
+            _to_key(lid): (_to_key(u), _to_key(v))
+            for lid, (u, v) in link_endpoints.items()
+        }
+        links = fan_links(resolved, endpoints)
 
         lengths = [math.dist(p0, p1) for (p0, p1, _rad) in links.values()]
         min_link = min(lengths) if lengths else 1.0
@@ -377,17 +315,6 @@ def _resolve_detail(layout: NetworkLayout, detail: str, overrides: dict) -> dict
 # vehicle on a quiet frame does not look maximally congested.
 _CONGESTION_REF = 6.0
 
-# How far parallel/opposing links on the same edge are fanned apart (as a
-# fraction of the chord, per lane step). Large enough that the arcs — and the
-# agents drawn on them — stay clearly separated even on a dense grid.
-_PARALLEL_FAN = 0.5
-
-# Small constant lane offset (fraction of the chord) by which a fanned link is
-# shifted off the shared centreline (opposite its arc's bow), so the two arrows of
-# a bidirectional edge open a lens with empty space between them instead of
-# pinching at mid-span — purely cosmetic separation.
-_LANE_OFFSET = 0.07
-
 # The link body agents occupy (fraction of the arc), keeping them off the node
 # markers at either end. Slot 0 (front of queue) sits at ``_SLOT_HI``.
 _SLOT_LO, _SLOT_HI = 0.22, 0.78
@@ -410,42 +337,19 @@ def _draw_backdrop(
             if frac > 0:
                 base = _blend(_LINK_BASE, "#4a5566", 0.6 * frac)
                 lw = 1.5 + 1.3 * frac
-        ax.annotate(
-            "",
-            xy=_bezier_point(p0, p1, rad, 0.86),
-            xytext=_bezier_point(p0, p1, rad, 0.14),
-            arrowprops=dict(
-                arrowstyle="-|>",
-                color=base,
-                lw=lw,
-                linestyle="--" if lid_key in highlight else "-",
-                connectionstyle=f"arc3,rad={rad}",
-                shrinkA=0,
-                shrinkB=0,
-            ),
-            zorder=1,
+        draw_arc(
+            ax,
+            p0,
+            p1,
+            rad,
+            color=base,
+            lw=lw,
+            node_diam=node_pts,
+            linestyle="--" if lid_key in highlight else "-",
         )
-    for node_key, (x, y) in layout.positions.items():
-        ax.scatter(
-            x,
-            y,
-            s=node_pts**2,
-            facecolor=_NODE_FACE,
-            edgecolors=_NODE_EDGE,
-            linewidths=1.2,
-            zorder=5,
-        )
-        if show_labels:
-            ax.annotate(
-                layout.labels[node_key],
-                (x, y),
-                ha="center",
-                va="center",
-                fontsize=min(8.0, 0.5 * node_pts),
-                color=_TEXT,
-                zorder=6,
-                fontweight="bold",
-            )
+    draw_nodes(
+        ax, layout.positions, node_pts, labels=layout.labels if show_labels else None
+    )
 
 
 def _from_key_int(lid_key: str):

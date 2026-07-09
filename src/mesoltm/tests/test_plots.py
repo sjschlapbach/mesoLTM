@@ -16,7 +16,6 @@ matplotlib = pytest.importorskip("matplotlib")
 matplotlib.use("Agg")
 
 import numpy as np  # noqa: E402
-from matplotlib.patches import FancyArrowPatch  # noqa: E402
 
 from ..network.network import Network  # noqa: E402
 from ..network.builders import corridor_network  # noqa: E402
@@ -50,8 +49,12 @@ def _colinear_bidirectional_state() -> NetworkState:
 
 
 def _arrow_paths(ax) -> list[bytes]:
-    """Each link arrow's drawn path as hashable bytes, to compare arcs for overlap."""
-    patches = [p for p in ax.patches if isinstance(p, FancyArrowPatch)]
+    """Each link arrow's drawn path as hashable bytes, to compare arcs for overlap.
+
+    Links are drawn with ``annotate`` arrows, whose ``FancyArrowPatch`` lives on the
+    annotation (``ax.texts``); node/label annotations carry no arrow.
+    """
+    patches = [t.arrow_patch for t in ax.texts if t.arrow_patch is not None]
     return [np.asarray(p.get_path().vertices).tobytes() for p in patches]
 
 

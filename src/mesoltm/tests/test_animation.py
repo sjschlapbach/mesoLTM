@@ -124,17 +124,16 @@ def test_opposing_links_are_fanned_onto_distinct_arcs():
     fwd = layout.links["1"]  # n0 -> n1
     rev_arc = layout.links[str(rev)]  # n1 -> n0, same physical edge
     chord = math.dist(fwd[0], fwd[1])
-    # Same physical edge: the two chords' mid-points are only a small lane offset
-    # apart (not a whole edge away), so they clearly belong to the same edge...
+    # Both directions are drawn on the node centres, so their chords coincide...
     mid_fwd_edge = ((fwd[0][0] + fwd[1][0]) / 2, (fwd[0][1] + fwd[1][1]) / 2)
     mid_rev_edge = (
         (rev_arc[0][0] + rev_arc[1][0]) / 2,
         (rev_arc[0][1] + rev_arc[1][1]) / 2,
     )
-    assert 0.0 < math.dist(mid_fwd_edge, mid_rev_edge) < 0.5 * chord
-    assert fwd[2] != 0.0  # actually curved now (was a straight rad=0 with the old,
-    # directed grouping — which put both single agents on the identical mid-point).
-    # ... yet their drawn mid-points (where a lone agent sits) are clearly separated.
+    assert math.dist(mid_fwd_edge, mid_rev_edge) < 1e-9
+    assert fwd[2] != 0.0 and rev_arc[2] != 0.0  # both curved (a lone link would be 0)
+    # ... yet, drawn in opposite directions at equal curvature, they bow to opposite
+    # sides, so their mid-points (where a lone agent sits) are clearly separated.
     bezier = anim._bezier_point  # pylint: disable=protected-access
     mid_fwd = bezier(fwd[0], fwd[1], fwd[2], 0.5)
     mid_rev = bezier(rev_arc[0], rev_arc[1], rev_arc[2], 0.5)

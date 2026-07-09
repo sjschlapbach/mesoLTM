@@ -31,11 +31,13 @@ plot_link_flow(sim, link_ids, window=60, window_seconds=None, ax=None)   # summe
 plot_link_flows(sim, link_ids, labels=None, window=60, window_seconds=None, ax=None)
 plot_link_time_series(sim, link_ids, labels=None, window=5, axes=None)
 plot_network(state, color_by="occupancy", ax=None, node_size=260.0, annotate_links=False)
-# color_by in {"flow","occupancy","density","capacity"}; drawn with networkx.
-# Links sharing an edge (parallel links + both directions of a bidirectional edge,
-# A->B and B->A) are fanned onto distinct arcs, so opposing arrows never overlap; a
-# lone link stays straight. Robust to arbitrary node layouts and any number of links
-# between a pair. color_by="flow" after a run shows each link's total load.
+# color_by in {"flow","occupancy","density","capacity"}. Shares drawing helpers with
+# the animation (mesoltm.visualizations._draw), so the static map and the video draw
+# identical arcs/nodes; only link colour differs. Links sharing an edge (parallel
+# links + both directions of a bidirectional edge, A->B and B->A) are fanned onto
+# distinct arcs, so opposing arrows never overlap; a lone link stays straight. Robust
+# to arbitrary node layouts and any number of links between a pair. color_by="flow"
+# after a run shows each link's total load.
 ```
 
 Two plot functions are NOT re-exported from `mesoltm.visualizations`; import them

@@ -17,13 +17,13 @@ which the ``[plot]`` extra installs.
 from __future__ import annotations
 
 import math
-from collections import Counter
 from collections.abc import Iterable, Sequence
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
-import networkx as nx
 from matplotlib.colors import Normalize
+
+from ._draw import bezier_point, draw_arc, draw_nodes, fan_links
 
 if TYPE_CHECKING:
     from ..core.simulation import Simulation
@@ -331,29 +331,6 @@ def plot_link_time_series(
     return axes
 
 
-# Per-key arc curvature used to fan links that share an edge (arc3 ``rad``). Key
-# ``k`` (the k-th link between a node pair) bows by ``_PARALLEL_RAD * (k + 1)``; the
-# two directions of a bidirectional edge share a key and, drawn in opposite
-# directions at equal curvature, bow to opposite sides — so nothing overlaps.
-_PARALLEL_RAD = 0.2
-
-
-def _arc_span(p0: tuple, p1: tuple, rad: float) -> list[tuple]:
-    """Two points bounding an ``arc3`` link's outward bow, for the autoscale.
-
-    A curved :class:`~matplotlib.patches.FancyArrowPatch` does not extend the axes'
-    data limits on its own, so a fanned/curved link could be clipped on a flat layout
-    where the nodes alone give no spread. Returning the mid-span offset to *both*
-    sides (the bow's sign depends on draw direction) guarantees it stays in view.
-    """
-    mx, my = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
-    dx, dy = p1[0] - p0[0], p1[1] - p0[1]
-    length = math.hypot(dx, dy) or 1.0
-    px, py = -dy / length, dx / length  # unit perpendicular to the chord
-    bow = 0.5 * rad * length  # ~apex offset of the arc from the chord midpoint
-    return [(mx + bow * px, my + bow * py), (mx - bow * px, my - bow * py)]
-
-
 def plot_network(
     state: NetworkState,
     color_by: str = "occupancy",
@@ -363,13 +340,14 @@ def plot_network(
 ):
     """Draw the network with links coloured by a per-link quantity.
 
-    Drawn with networkx on top of matplotlib, so it is robust to arbitrary node
-    placements (not just grid-aligned) and to any number of links between a node
-    pair. Requires node positions (set when building the network). Connector links
-    are omitted; only real links are drawn. Links that share an edge — true parallel
-    links *and* the two directions of a bidirectional edge (``A->B`` and ``B->A``) —
-    are fanned onto separate arcs so their arrows never overlap; a lone link is drawn
-    straight.
+    Uses the **same drawing helpers as the animation** (:mod:`._draw`), so the
+    static map and the video render identical arcs and node markers — only the link
+    colour differs (here it encodes the chosen quantity). Requires node positions
+    (set when building the network). Connector links are omitted; only real links are
+    drawn. Links that share an edge — true parallel links *and* the two directions of
+    a bidirectional edge (``A->B`` and ``B->A``) — are fanned onto separate arcs so
+    their arrows never overlap; a lone link is drawn straight. Works for arbitrary
+    node placements (not just grid-aligned) and any number of links between a pair.
 
     Args:
         state: A :class:`~mesoltm.network.state.NetworkState`.
@@ -378,7 +356,7 @@ def plot_network(
             a run), ``"occupancy"`` (live vehicle count), ``"density"`` or
             ``"capacity"``.
         ax: Optional axes; created if omitted.
-        node_size: Marker size for nodes.
+        node_size: Node marker area (matplotlib ``scatter`` ``s``).
         annotate_links: If ``True``, label each link on its arc with its id and
             value — so it is clear which link carries which flow.
 
@@ -401,111 +379,40 @@ def plot_network(
     endpoints = {
         lid: ep for lid in state.link_ids() if (ep := state.endpoints(lid)) is not None
     }
-    real_ids = list(endpoints)
-    values = {lid: value(lid) for lid in real_ids}
+    values = {lid: value(lid) for lid in endpoints}
     vmax = max(values.values(), default=0.0) or 1.0
     cmap = plt.get_cmap("viridis")
     norm = Normalize(vmin=0.0, vmax=vmax)
 
-    # Build a directed multigraph so networkx handles the layout and lets several
-    # links share a node pair. Positions come straight from the network.
-    graph = nx.MultiDiGraph()
-    positions: dict = {}
-    for node in state.nodes():
-        pos = state.position(node)
-        if pos is not None:
-            positions[node] = (float(pos[0]), float(pos[1]))
-            graph.add_node(node)
+    positions = {
+        node: pos for node in state.nodes() if (pos := state.position(node)) is not None
+    }
+    arcs = fan_links(positions, endpoints)  # {lid: (p0, p1, rad)}
+    node_diam = math.sqrt(node_size)  # scatter uses the square as its area
 
-    # How many links share each *undirected* node pair — a pair with more than one
-    # link gets fanned onto arcs; a lone link stays straight.
-    pair_of = {lid: tuple(sorted(endpoints[lid], key=str)) for lid in real_ids}
-    shared = Counter(pair_of.values())
-
-    straight: list = []  # (u, v, key) tuples of lone links
-    curved: list = []  # (u, v, key) tuples of links that share an edge
-    straight_c: list = []  # matching colour values
-    curved_c: list = []
-    straight_lbl: dict = {}  # (u, v, key) -> label text
-    curved_lbl: dict = {}
-    for lid in real_ids:
-        u, v = endpoints[lid]
-        if u not in positions or v not in positions:
-            continue
-        key = graph.add_edge(u, v, link_id=lid)
-        is_shared = shared[pair_of[lid]] > 1
-        (curved if is_shared else straight).append((u, v, key))
-        (curved_c if is_shared else straight_c).append(values[lid])
-        (curved_lbl if is_shared else straight_lbl)[
-            (u, v, key)
-        ] = f"{lid}: {values[lid]:g}"
-
-    # One arc3 style per multi-edge key; index k is the k-th link on a pair.
-    max_key = max((k for _, _, k in curved), default=-1)
-    curved_styles = [f"arc3,rad={_PARALLEL_RAD * (k + 1)}" for k in range(max_key + 1)]
-
-    # Lone links straight, shared links fanned onto their arcs; same styling otherwise.
-    for edges, colours, style in [
-        (straight, straight_c, "arc3,rad=0"),
-        (curved, curved_c, curved_styles),
-    ]:
-        if edges:
-            nx.draw_networkx_edges(
-                graph,
-                positions,
-                edgelist=edges,
-                edge_color=colours,
-                connectionstyle=style,
-                edge_cmap=cmap,
-                edge_vmin=0.0,
-                edge_vmax=vmax,
-                arrowstyle="-|>",
-                arrowsize=13,
-                width=2.5,
-                node_size=node_size,  # so arrowheads stop at the node markers
-                ax=ax,
+    # Draw each link as an arc coloured by its value, keeping the arcs' bows in view
+    # (curved arrows do not grow the data limits on their own).
+    extents = list(positions.values())
+    for lid, (p0, p1, rad) in arcs.items():
+        draw_arc(
+            ax, p0, p1, rad, color=cmap(norm(values[lid])), lw=2.5, node_diam=node_diam
+        )
+        midpoint = bezier_point(p0, p1, rad, 0.5)  # the arc's apex
+        if rad != 0.0:
+            extents.append(midpoint)
+        if annotate_links:
+            # On its own arc, so parallel links' labels separate instead of stacking.
+            ax.annotate(
+                f"{lid}: {values[lid]:g}",
+                midpoint,
+                fontsize=7,
+                ha="center",
+                va="center",
+                zorder=4,
+                bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="0.7", alpha=0.85),
             )
-
-    nx.draw_networkx_nodes(
-        graph,
-        positions,
-        node_color="white",
-        edgecolors="black",
-        linewidths=1.0,
-        node_size=node_size,
-        ax=ax,
-    )
-    nx.draw_networkx_labels(
-        graph, positions, labels={n: str(n) for n in graph.nodes()}, font_size=7, ax=ax
-    )
-
-    if annotate_links:
-        # networkx places each label on its (curved) arc, so parallel links' labels
-        # separate instead of stacking at the shared mid-point.
-        bbox = dict(boxstyle="round,pad=0.15", fc="white", ec="0.7", alpha=0.85)
-        for edge_labels, style in [
-            (straight_lbl, "arc3,rad=0"),
-            (curved_lbl, curved_styles),
-        ]:
-            if edge_labels:
-                nx.draw_networkx_edge_labels(
-                    graph,
-                    positions,
-                    edge_labels=edge_labels,
-                    connectionstyle=style,
-                    font_size=7,
-                    rotate=False,
-                    bbox=bbox,
-                    ax=ax,
-                )
-
-    # Keep every arc's bow inside the view (curved patches do not grow the data
-    # limits themselves), then let the margin leave headroom below the title.
-    extents: list = []
-    for u, v, k in curved:
-        extents += _arc_span(positions[u], positions[v], _PARALLEL_RAD * (k + 1))
-    if extents:
-        ax.update_datalim(extents)
+    draw_nodes(ax, positions, node_diam, labels={node: node for node in positions})
+    ax.update_datalim(extents)
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     ax.figure.colorbar(sm, ax=ax, fraction=0.046, pad=0.04, label=color_by)
