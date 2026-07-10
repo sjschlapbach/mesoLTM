@@ -34,3 +34,13 @@ run, or `start()`/`step()` to drive the loop yourself and `inject()` vehicles
 between steps.
 
 ::: mesoltm.core.simulation.Simulation
+
+## Identifiers
+
+A **link id** is always a plain `int`. A **node id** has no fixed type — it is any
+hashable value you pass to [`Network.add_node`](network.md): `grid_network` labels
+nodes with `(row, col)` integer tuples, `corridor_network` uses strings, and your own
+code may use any scheme. The `mesoltm.NodeId` alias (defined in `mesoltm.core.ids`)
+names that intentionally-general type wherever a node id flows through the API. In a
+recorded [`SimulationHistory`](recording.md) ids round-trip through JSON, so a link id
+there is `int | str` (an `int` while live, a `str` after loading).

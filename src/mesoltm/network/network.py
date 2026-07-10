@@ -20,10 +20,10 @@ destination while vehicles queue only at the origin.
 from __future__ import annotations
 
 import math
-from collections.abc import Hashable
 from typing import TYPE_CHECKING
 
 from ..core.connector_link import ConnectorLink
+from ..core.ids import NodeId
 from ..core.link import Link
 from ..core.nodes.destination_node import DestinationNode
 from ..core.nodes.diverge_node import DivergeNode
@@ -66,19 +66,19 @@ class Network:
         self.default_fd = dict(DEFAULT_FD)
         if default_fd:
             self.default_fd.update(default_fd)
-        self._positions: dict[Hashable, tuple[float, float] | None] = {}
+        self._positions: dict[NodeId, tuple[float, float] | None] = {}
         self._links: dict[int, dict] = {}
         self._next_link_id = 1
-        self._origins: dict[Hashable, list[Vehicle]] = {}
-        self._destinations: set[Hashable] = set()
-        self._priorities: dict[Hashable, dict[int, float]] = {}
+        self._origins: dict[NodeId, list[Vehicle]] = {}
+        self._destinations: set[NodeId] = set()
+        self._priorities: dict[NodeId, dict[int, float]] = {}
         self._compiled = False
 
     # -- construction ----------------------------------------------------------
 
     def add_node(
-        self, node_id: Hashable, pos: tuple[float, float] | None = None
-    ) -> Hashable:
+        self, node_id: NodeId, pos: tuple[float, float] | None = None
+    ) -> NodeId:
         """Add a node (idempotent) and optionally record its ``(x, y)`` position.
 
         Args:
@@ -94,8 +94,8 @@ class Network:
 
     def add_link(
         self,
-        u: Hashable,
-        v: Hashable,
+        u: NodeId,
+        v: NodeId,
         length: float | None = None,
         link_id: int | None = None,
         **fd: float,
@@ -139,7 +139,7 @@ class Network:
         return link_id
 
     def set_origin(
-        self, node_id: Hashable, vehicles: list[Vehicle] | None = None
+        self, node_id: NodeId, vehicles: list[Vehicle] | None = None
     ) -> None:
         """Mark a node as an origin and attach demand vehicles to release from it.
 
@@ -153,12 +153,12 @@ class Network:
         if vehicles:
             self._origins[node_id].extend(vehicles)
 
-    def set_destination(self, node_id: Hashable) -> None:
+    def set_destination(self, node_id: NodeId) -> None:
         """Mark a node as a destination that absorbs arriving vehicles."""
         self.add_node(node_id)
         self._destinations.add(node_id)
 
-    def set_merge_priorities(self, node_id: Hashable, alpha: dict[int, float]) -> None:
+    def set_merge_priorities(self, node_id: NodeId, alpha: dict[int, float]) -> None:
         """Override the merge priority shares of a node's inbound links.
 
         By default a merge/general junction serves its inbound links with priority
@@ -178,7 +178,7 @@ class Network:
 
     # -- compilation -----------------------------------------------------------
 
-    def _uses_source_connector(self, node_id: Hashable, real_out: list[int]) -> bool:
+    def _uses_source_connector(self, node_id: NodeId, real_out: list[int]) -> bool:
         """Return whether an origin needs a source connector (vs. direct attach)."""
         real_in = self._real_in(node_id)
         return not (
@@ -187,18 +187,18 @@ class Network:
             and node_id not in self._destinations
         )
 
-    def _uses_sink_connector(self, node_id: Hashable, real_in: list[int]) -> bool:
+    def _uses_sink_connector(self, node_id: NodeId, real_in: list[int]) -> bool:
         """Return whether a destination needs a sink connector (vs. direct attach)."""
         real_out = self._real_out(node_id)
         return not (
             len(real_out) == 0 and len(real_in) == 1 and node_id not in self._origins
         )
 
-    def _real_in(self, node_id: Hashable) -> list[int]:
+    def _real_in(self, node_id: NodeId) -> list[int]:
         """Return real inbound link ids of a node."""
         return [lid for lid, d in self._links.items() if d["v"] == node_id]
 
-    def _real_out(self, node_id: Hashable) -> list[int]:
+    def _real_out(self, node_id: NodeId) -> list[int]:
         """Return real outbound link ids of a node."""
         return [lid for lid, d in self._links.items() if d["u"] == node_id]
 
@@ -282,9 +282,9 @@ class Network:
         vehicle_budget = sum(len(v) for v in self._origins.values()) + max(
             0, int(injection_budget)
         )
-        source_connectors: dict[Hashable, int] = {}
-        sink_connectors: dict[Hashable, int] = {}
-        origin_node_objs: dict[Hashable, OriginNode] = {}
+        source_connectors: dict[NodeId, int] = {}
+        sink_connectors: dict[NodeId, int] = {}
+        origin_node_objs: dict[NodeId, OriginNode] = {}
         nodes: list[BaseNode] = []
 
         # 2. Origins: connector (or direct) + OriginNode; splice routes.
@@ -344,7 +344,7 @@ class Network:
         # 4. Junction node models for every node with through/connector movements.
         # downstream_node maps each link to the node it flows into; a source
         # connector flows into its own origin junction (its junction shares node_id).
-        downstream_node: dict[int, Hashable] = {
+        downstream_node: dict[int, NodeId] = {
             lid: v for lid, (u, v) in endpoints.items()
         }
         for conn_node, conn_id in source_connectors.items():
@@ -411,7 +411,7 @@ class Network:
         self,
         vehicles: list[Vehicle],
         source_connector: int | None,
-        endpoints: dict[int, tuple[Hashable, Hashable]],
+        endpoints: dict[int, tuple[NodeId, NodeId]],
     ) -> None:
         """Prepend the source connector and append each route's sink connector.
 
@@ -434,7 +434,7 @@ class Network:
             veh._dest_node = dest_node  # pylint: disable=protected-access
 
     def _build_junction(
-        self, node_id: Hashable, inbound: list[Link], outbound: list[Link]
+        self, node_id: NodeId, inbound: list[Link], outbound: list[Link]
     ) -> BaseNode | None:
         """Create the node model for a junction from its inbound/outbound links.
 
@@ -458,7 +458,7 @@ class Network:
             node_id, inbound, outbound, alpha=self._alpha_for(node_id, inbound)
         )
 
-    def _alpha_for(self, node_id: Hashable, inbound_links: list[Link]) -> list[float]:
+    def _alpha_for(self, node_id: NodeId, inbound_links: list[Link]) -> list[float]:
         """Return the merge priority shares ``alpha_i`` for a node's inbound links.
 
         By default each inbound link's share is proportional to its capacity, so

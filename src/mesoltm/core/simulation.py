@@ -16,12 +16,11 @@
 from __future__ import annotations
 
 import csv
-from collections.abc import Hashable
 from typing import TYPE_CHECKING
-
 from tqdm import tqdm
 
 from ..recording import SimulationHistory, capture_frame
+from .ids import NodeId
 
 if TYPE_CHECKING:
     from ..network.state import NetworkState
@@ -247,7 +246,7 @@ class Simulation:
         return self
 
     def inject(
-        self, node_id: Hashable, vehicle: Vehicle, at_time: float | None = None
+        self, node_id: NodeId, vehicle: Vehicle, at_time: float | None = None
     ) -> None:
         """Inject a vehicle into the network to depart from ``node_id``.
 

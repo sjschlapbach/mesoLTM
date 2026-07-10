@@ -15,9 +15,10 @@
 
 from __future__ import annotations
 
-from collections.abc import Hashable, Sequence
+from collections.abc import Sequence
 
 from ..base_link import BaseLink
+from ..ids import NodeId
 from ..vehicle import Vehicle
 from .base_node import BaseNode
 
@@ -39,7 +40,7 @@ class DivergeNode(BaseNode):
 
     def __init__(
         self,
-        node_id: Hashable,
+        node_id: NodeId,
         inbound_link: BaseLink,
         outbound_links: Sequence[BaseLink],
     ) -> None:

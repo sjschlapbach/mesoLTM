@@ -34,6 +34,15 @@ Simulation.save_history(path=None) -> str
 Simulation.network_state, .history, .nodes, .links
 ```
 
+## Identifiers (mesoltm.core)
+
+```python
+NodeId  # = collections.abc.Hashable — a node id is any hashable value passed to
+        #   Network.add_node (grid_network uses (row, col) tuples, corridor_network
+        #   uses strings). Link ids are always plain int; recorded ids are int | str
+        #   (int live, str after a JSON round-trip).
+```
+
 ## Nodes (mesoltm.core.nodes)
 
 ```python

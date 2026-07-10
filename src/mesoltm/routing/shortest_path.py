@@ -10,11 +10,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Hashable
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 import networkx as nx
 
+from ..core.ids import NodeId
 from ..core.vehicle import Vehicle
 
 if TYPE_CHECKING:
@@ -99,7 +100,7 @@ class ShortestPathPolicy:
         self._graph = self._build_graph(state)
 
     def route(
-        self, state: NetworkState, from_node: Hashable, to_node: Hashable
+        self, state: NetworkState, from_node: NodeId, to_node: NodeId
     ) -> list[int]:
         """Return the full shortest real-link route from ``from_node`` to ``to_node``.
 

@@ -11,10 +11,10 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Hashable
 from typing import TYPE_CHECKING, NamedTuple
 
 if TYPE_CHECKING:
+    from ..core.ids import NodeId
     from ..core.link import Link
     from ..core.nodes.origin_node import OriginNode
     from ..core.vehicle import Vehicle
@@ -35,7 +35,7 @@ class VehicleView(NamedTuple):
     vehicle: Vehicle
     link_id: int
     route: list[int]
-    destination: Hashable
+    destination: NodeId
 
 
 class NetworkState:  # pylint: disable=too-many-public-methods
@@ -56,11 +56,11 @@ class NetworkState:  # pylint: disable=too-many-public-methods
     def __init__(
         self,
         links_by_id: dict[int, Link],
-        out_links: dict[Hashable, list[int]],
-        in_links: dict[Hashable, list[int]],
-        origin_nodes: dict[Hashable, OriginNode],
-        node_positions: dict[Hashable, tuple[float, float] | None],
-        endpoints: dict[int, tuple[Hashable, Hashable]],
+        out_links: dict[NodeId, list[int]],
+        in_links: dict[NodeId, list[int]],
+        origin_nodes: dict[NodeId, OriginNode],
+        node_positions: dict[NodeId, tuple[float, float] | None],
+        endpoints: dict[int, tuple[NodeId, NodeId]],
     ) -> None:
         """Create a network state view.
 
@@ -86,9 +86,9 @@ class NetworkState:  # pylint: disable=too-many-public-methods
 
         # Connector topology, populated by Network.compile (empty for hand-built
         # networks): where each link feeds, and the O/D connector link ids.
-        self.downstream_node: dict[int, Hashable] = {}
-        self.sink_connectors: dict[Hashable, int] = {}
-        self.source_connectors: dict[Hashable, int] = {}
+        self.downstream_node: dict[int, NodeId] = {}
+        self.sink_connectors: dict[NodeId, int] = {}
+        self.source_connectors: dict[NodeId, int] = {}
 
         # Dynamic-injection budget the connectors were sized for (set by
         # Network.compile) and a running count of injected vehicles, used to warn
@@ -98,7 +98,7 @@ class NetworkState:  # pylint: disable=too-many-public-methods
 
     # -- topology --------------------------------------------------------------
 
-    def nodes(self) -> list[Hashable]:
+    def nodes(self) -> list[NodeId]:
         """Return all node identifiers in the network."""
         return list(self._node_positions.keys())
 
@@ -106,23 +106,23 @@ class NetworkState:  # pylint: disable=too-many-public-methods
         """Return all link identifiers (real and connector)."""
         return list(self.links_by_id.keys())
 
-    def out_links(self, node_id: Hashable) -> list[int]:
+    def out_links(self, node_id: NodeId) -> list[int]:
         """Return the real outbound link ids of ``node_id``."""
         return list(self._out_links.get(node_id, []))
 
-    def in_links(self, node_id: Hashable) -> list[int]:
+    def in_links(self, node_id: NodeId) -> list[int]:
         """Return the real inbound link ids of ``node_id``."""
         return list(self._in_links.get(node_id, []))
 
-    def links_between(self, u: Hashable, v: Hashable) -> list[int]:
+    def links_between(self, u: NodeId, v: NodeId) -> list[int]:
         """Return all real link ids going directly from node ``u`` to node ``v``."""
         return [lid for lid, (a, b) in self._endpoints.items() if a == u and b == v]
 
-    def endpoints(self, link_id: int) -> tuple[Hashable, Hashable] | None:
+    def endpoints(self, link_id: int) -> tuple[NodeId, NodeId] | None:
         """Return the ``(u, v)`` node endpoints of a real link, or ``None``."""
         return self._endpoints.get(link_id)
 
-    def position(self, node_id: Hashable) -> tuple[float, float] | None:
+    def position(self, node_id: NodeId) -> tuple[float, float] | None:
         """Return the ``(x, y)`` position of ``node_id`` if one was given."""
         return self._node_positions.get(node_id)
 
@@ -159,7 +159,7 @@ class NetworkState:  # pylint: disable=too-many-public-methods
         link = self.links_by_id[link_id]
         return len(link.vehicles) / link.length
 
-    def entry_queue(self, node_id: Hashable) -> int:
+    def entry_queue(self, node_id: NodeId) -> int:
         """Return the number of vehicles waiting to enter at an origin node."""
         node = self._origin_nodes.get(node_id)
         if node is None:
@@ -167,7 +167,7 @@ class NetworkState:  # pylint: disable=too-many-public-methods
 
         return len(node.vehicles)
 
-    def waiting_vehicles(self, node_id: Hashable) -> list[Vehicle]:
+    def waiting_vehicles(self, node_id: NodeId) -> list[Vehicle]:
         """Return the vehicles waiting in an origin's vertical entry queue (live).
 
         These are vehicles whose departure time has passed but that the first
@@ -182,7 +182,7 @@ class NetworkState:  # pylint: disable=too-many-public-methods
     # -- dynamic demand --------------------------------------------------------
 
     def inject(
-        self, node_id: Hashable, vehicle: Vehicle, at_time: float | None = None
+        self, node_id: NodeId, vehicle: Vehicle, at_time: float | None = None
     ) -> None:
         """Add a vehicle to an origin's demand during the run (dynamic injection).
 
@@ -237,7 +237,7 @@ class NetworkState:  # pylint: disable=too-many-public-methods
                 stacklevel=2,
             )
 
-    def _splice_injection_route(self, node_id: Hashable, vehicle: Vehicle) -> None:
+    def _splice_injection_route(self, node_id: NodeId, vehicle: Vehicle) -> None:
         """Wrap a real-link route with its origin/destination connector links.
 
         Mirrors ``Network._splice_routes``: prepend the origin's source connector

@@ -16,8 +16,9 @@
 from __future__ import annotations
 
 import random
-from collections.abc import Hashable, Sequence
+from collections.abc import Sequence
 
+from ..core.ids import NodeId
 from ..core.vehicle import Vehicle
 
 
@@ -27,8 +28,8 @@ def vehicles_from_demand_profile(
     route: Sequence[int] | None = None,
     route_integer_share: dict[tuple[int, ...], int] | None = None,
     random_route: bool = False,
-    origin: Hashable = 0,
-    destination: Hashable = 0,
+    origin: NodeId = 0,
+    destination: NodeId = 0,
 ) -> list[Vehicle]:
     """Expand a piecewise-constant demand profile into individual vehicles.
 

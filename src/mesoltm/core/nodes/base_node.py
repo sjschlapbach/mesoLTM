@@ -15,10 +15,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Hashable, Sequence
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from ..base_link import BaseLink
+from ..ids import NodeId
 from ..vehicle import Vehicle
 
 if TYPE_CHECKING:
@@ -42,10 +43,10 @@ class BaseNode:
         network_state: Optional read-only network state passed to the policy.
     """
 
-    node_id: Hashable
+    node_id: NodeId
 
     def __init__(self) -> None:
-        self.node_id: Hashable = None
+        self.node_id: NodeId = None
         self.routing_policy: RoutingPolicy | None = None
         self.network_state: NetworkState | None = None
 

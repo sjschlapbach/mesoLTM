@@ -10,6 +10,7 @@
 
 from .base_link import BaseLink
 from .connector_link import ConnectorLink
+from .ids import NodeId
 from .link import Link
 from .simulation import Simulation
 from .vehicle import Vehicle
@@ -18,6 +19,7 @@ __all__ = [
     "BaseLink",
     "ConnectorLink",
     "Link",
+    "NodeId",
     "Simulation",
     "Vehicle",
 ]

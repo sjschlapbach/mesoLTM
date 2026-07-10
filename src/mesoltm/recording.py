@@ -36,11 +36,12 @@ live ``Vehicle`` objects, so frames stay valid as the simulation mutates.
 from __future__ import annotations
 
 import json
-from collections.abc import Callable, Hashable, Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from .core.ids import NodeId
     from .core.simulation import Simulation
     from .core.vehicle import Vehicle
     from .network.state import NetworkState, VehicleView
@@ -89,7 +90,7 @@ class AgentSnapshot:
     queue_len: int
     route: Sequence[int | str]
     next_link_id: int | str | None
-    next_node: Hashable | None
+    next_node: NodeId | None
     category: str = DEFAULT_CATEGORY
     props: dict = field(default_factory=dict)
 
@@ -116,10 +117,10 @@ class WaitingSnapshot:
     """
 
     vehicle_id: int
-    node_id: Hashable
+    node_id: NodeId
     route: Sequence[int | str]
     next_link_id: int | str | None
-    next_node: Hashable | None
+    next_node: NodeId | None
     category: str = DEFAULT_CATEGORY
     props: dict = field(default_factory=dict)
 
@@ -160,7 +161,7 @@ def geometry_from_state(state: NetworkState) -> tuple[dict, dict, dict]:
         for lid in state.link_ids()
         if state.endpoints(lid) is not None
     }
-    connector_nodes: dict[int, Hashable] = {}
+    connector_nodes: dict[int, NodeId] = {}
     for node, conn in state.source_connectors.items():
         connector_nodes[conn] = node
     for node, conn in state.sink_connectors.items():
@@ -175,7 +176,7 @@ def _category(
     return DEFAULT_CATEGORY if classify is None else classify(vehicle, state)
 
 
-def _downstream_node(state: NetworkState, link_id: int | None) -> Hashable | None:
+def _downstream_node(state: NetworkState, link_id: int | None) -> NodeId | None:
     """Return the downstream node of a real link, or ``None`` (not a real link)."""
     if link_id is None:
         return None
@@ -184,7 +185,7 @@ def _downstream_node(state: NetworkState, link_id: int | None) -> Hashable | Non
 
 
 def _waiting_snapshot(
-    state: NetworkState, vehicle: Vehicle, node: Hashable, classify: ClassifyFn | None
+    state: NetworkState, vehicle: Vehicle, node: NodeId, classify: ClassifyFn | None
 ) -> WaitingSnapshot:
     """Snapshot a vehicle queued to enter ``node`` (origin queue or connector).
 
