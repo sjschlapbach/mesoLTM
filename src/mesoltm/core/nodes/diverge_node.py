@@ -15,7 +15,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Hashable, Sequence
+
 from ..base_link import BaseLink
+from ..vehicle import Vehicle
 from .base_node import BaseNode
 
 
@@ -35,7 +38,10 @@ class DivergeNode(BaseNode):
     """
 
     def __init__(
-        self, node_id: object, inbound_link: BaseLink, outbound_links: list[BaseLink]
+        self,
+        node_id: Hashable,
+        inbound_link: BaseLink,
+        outbound_links: Sequence[BaseLink],
     ) -> None:
         """Create a diverge node.
 
@@ -64,7 +70,9 @@ class DivergeNode(BaseNode):
         """
         upstream_demand = self.inbound_link.get_demand()
         remaining_supplies = [link.get_supply() for link in self.outbound_links]
-        vehicles_by_outbound_link: list[list] = [[] for _ in self.outbound_links]
+        vehicles_by_outbound_link: list[list[Vehicle]] = [
+            [] for _ in self.outbound_links
+        ]
         total_flow = 0
         while True:
             if upstream_demand == 0:

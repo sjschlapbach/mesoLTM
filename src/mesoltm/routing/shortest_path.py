@@ -10,14 +10,15 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import TYPE_CHECKING, cast
+from collections.abc import Callable, Hashable
+from typing import TYPE_CHECKING
 
 import networkx as nx
 
 from ..core.vehicle import Vehicle
 
 if TYPE_CHECKING:
+    from ..core.nodes.base_node import BaseNode
     from ..network.state import NetworkState
 
 
@@ -98,7 +99,7 @@ class ShortestPathPolicy:
         self._graph = self._build_graph(state)
 
     def route(
-        self, state: NetworkState, from_node: object, to_node: object
+        self, state: NetworkState, from_node: Hashable, to_node: Hashable
     ) -> list[int]:
         """Return the full shortest real-link route from ``from_node`` to ``to_node``.
 
@@ -122,18 +123,19 @@ class ShortestPathPolicy:
         self,
         vehicle: Vehicle,
         current_link_id: int,
-        node: object,
-        state: object,
+        node: BaseNode,
+        state: NetworkState | None,
     ) -> int | None:
         """Return the first link on the shortest path toward the destination.
 
         See :class:`~mesoltm.routing.policy.RoutingPolicy` for the argument
-        contract (``state`` is typed ``object`` to match the protocol; the engine
-        always passes a :class:`NetworkState`). When the vehicle has arrived at its
-        destination node, the destination's sink connector (if any) is returned so
-        it leaves the network.
+        contract (the engine always passes a :class:`NetworkState`; ``None`` yields
+        no decision). When the vehicle has arrived at its destination node, the
+        destination's sink connector (if any) is returned so it leaves the network.
         """
-        net_state = cast("NetworkState", state)
+        if state is None:
+            return None
+        net_state = state
         arriving_node = net_state.downstream_node.get(current_link_id)
         destination = vehicle.destination
 

@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Hashable, Sequence
 from typing import TYPE_CHECKING
 
 from ..base_link import BaseLink
@@ -41,10 +42,10 @@ class BaseNode:
         network_state: Optional read-only network state passed to the policy.
     """
 
-    node_id: object
+    node_id: Hashable
 
     def __init__(self) -> None:
-        self.node_id: object = None
+        self.node_id: Hashable = None
         self.routing_policy: RoutingPolicy | None = None
         self.network_state: NetworkState | None = None
 
@@ -65,7 +66,7 @@ class BaseNode:
         self,
         vehicle: Vehicle,
         current_link_id: int,
-        outbound_links: list[BaseLink],
+        outbound_links: Sequence[BaseLink],
     ) -> int | None:
         """Resolve the index of ``vehicle``'s next outbound link at this node.
 

@@ -21,7 +21,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
+    from ..core.nodes.base_node import BaseNode
     from ..core.vehicle import Vehicle
+    from ..network.state import NetworkState
 
 
 @runtime_checkable
@@ -32,8 +34,8 @@ class RoutingPolicy(Protocol):
         self,
         vehicle: Vehicle,
         current_link_id: int,
-        node: object,
-        state: object,
+        node: BaseNode,
+        state: NetworkState | None,
     ) -> int | None:
         """Return the ``link_id`` the vehicle should enter next.
 
@@ -61,8 +63,8 @@ class StaticRoutePolicy:
         self,
         vehicle: Vehicle,
         current_link_id: int,
-        node: object,
-        state: object,
+        node: BaseNode,
+        state: NetworkState | None,
     ) -> int | None:
         """Return the vehicle's own-route next link (see :class:`RoutingPolicy`)."""
         # The route is fixed on the vehicle, so ``node`` and ``state`` are unused

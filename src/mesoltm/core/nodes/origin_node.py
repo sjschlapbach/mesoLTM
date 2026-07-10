@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import bisect
+from collections.abc import Hashable
 
 from ..base_link import BaseLink
 from ..vehicle import Vehicle
@@ -42,7 +43,7 @@ class OriginNode(BaseNode):
 
     def __init__(
         self,
-        node_id: object,
+        node_id: Hashable,
         link: BaseLink,
         demand_trips: list[Vehicle],
         **kwargs: object,

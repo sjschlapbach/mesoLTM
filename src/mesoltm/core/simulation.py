@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import csv
+from collections.abc import Hashable
 from typing import TYPE_CHECKING
 
 from tqdm import tqdm
@@ -24,7 +25,10 @@ from ..recording import SimulationHistory, capture_frame
 
 if TYPE_CHECKING:
     from ..network.state import NetworkState
+    from ..plugins.plugin import Plugin
     from ..recording import ClassifyFn
+    from .link import Link
+    from .nodes.base_node import BaseNode
     from .vehicle import Vehicle
 
 
@@ -68,14 +72,14 @@ class Simulation:
                 ``link_output_sample_time``. Keyword style mirrors the reference
                 implementation.
         """
-        self.links: list = []
-        self.nodes: list = []
+        self.links: list[Link] = []
+        self.nodes: list[BaseNode] = []
         self.time_step: float = 0.0
         self.total_time: float = 0.0
         self.output_link_file: str | None = None
         self.trip_output_file: str | None = None
         self.link_output_sample_time: float | None = None
-        self.plugins: list | None = None
+        self.plugins: list[Plugin] | None = None
         # Optional read-only state view attached by Network.compile.
         self.network_state: NetworkState | None = None
         # Stepping state (see start()/step()); ``current_step`` is the next step
@@ -243,7 +247,7 @@ class Simulation:
         return self
 
     def inject(
-        self, node_id: object, vehicle: Vehicle, at_time: float | None = None
+        self, node_id: Hashable, vehicle: Vehicle, at_time: float | None = None
     ) -> None:
         """Inject a vehicle into the network to depart from ``node_id``.
 

@@ -42,12 +42,13 @@ from __future__ import annotations
 import math
 import os
 import warnings
-from collections.abc import Callable
+from collections.abc import Callable, Iterable, Sequence
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import networkx as nx
 from matplotlib.animation import FFMpegWriter, PillowWriter
+from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 
 from ..recording import DEFAULT_CATEGORY, SimulationHistory
@@ -57,7 +58,7 @@ from ._draw import draw_arc, draw_nodes, fan_links
 if TYPE_CHECKING:
     from ..core.simulation import Simulation
     from ..network.state import NetworkState
-    from ..recording import ClassifyFn, Frame
+    from ..recording import AgentSnapshot, ClassifyFn, Frame, WaitingSnapshot
 
 # Okabe-Ito colour-blind-safe qualitative palette (categories are assigned these
 # in order of first appearance). Widely used for scientific figures.
@@ -103,7 +104,16 @@ class NetworkLayout:
             automatically on dense networks (e.g. a large grid).
     """
 
-    def __init__(self, positions, labels, links, xlim, ylim, scale, min_link) -> None:
+    def __init__(
+        self,
+        positions: dict[str, tuple[float, float]],
+        labels: dict[str, str],
+        links: dict[str, tuple[tuple[float, float], tuple[float, float], float]],
+        xlim: tuple[float, float],
+        ylim: tuple[float, float],
+        scale: float,
+        min_link: float,
+    ) -> None:
         self.positions = positions
         self.labels = labels
         self.links = links
@@ -158,7 +168,9 @@ class NetworkLayout:
         return cls(resolved, labels, links, xlim, ylim, scale, min_link)
 
     @staticmethod
-    def _resolve_positions(node_positions: dict, link_endpoints: dict) -> dict:
+    def _resolve_positions(
+        node_positions: dict, link_endpoints: dict
+    ) -> dict[str, tuple[float, float]]:
         """Return ``str(node) -> (x, y)``; spring-layout any missing positions."""
         resolved = {
             _to_key(node): (float(pos[0]), float(pos[1]))
@@ -181,7 +193,9 @@ class NetworkLayout:
         return resolved
 
 
-def _effective_category(item, color_by) -> str:
+def _effective_category(
+    item: AgentSnapshot | WaitingSnapshot, color_by: str | Callable[..., str] | None
+) -> str:
     """Return the colour category of an agent/waiting item under a colour mode.
 
     ``color_by`` may be:
@@ -204,10 +218,10 @@ def _effective_category(item, color_by) -> str:
 
 
 def resolve_palette(
-    frames,
-    palette: dict | None = None,
-    color_by: str | Callable | None = DEFAULT_COLOR_BY,
-) -> dict:
+    frames: Sequence[Frame],
+    palette: dict[str, str] | None = None,
+    color_by: str | Callable[..., str] | None = DEFAULT_COLOR_BY,
+) -> dict[str, str]:
     """Return a stable ``category -> colour`` map for a sequence of frames.
 
     Categories keep any colours given in ``palette``; the rest are assigned from
@@ -217,9 +231,10 @@ def resolve_palette(
     when there are more than eight).
     """
     resolved = dict(palette or {})
-    ordered: list = []
+    ordered: list[str] = []
     for frame in frames:
-        for item in (*frame.agents, *frame.waiting):
+        items: list[AgentSnapshot | WaitingSnapshot] = [*frame.agents, *frame.waiting]
+        for item in items:
             category = _effective_category(item, color_by)
             if category not in ordered:
                 ordered.append(category)
@@ -233,7 +248,13 @@ def resolve_palette(
     return resolved
 
 
-def _slot_points(p0: tuple, p1: tuple, rad: float, count: int, max_slots: int):
+def _slot_points(
+    p0: tuple[float, float],
+    p1: tuple[float, float],
+    rad: float,
+    count: int,
+    max_slots: int,
+) -> list[tuple[float, float]]:
     """Return drawing points for up to ``max_slots`` FIFO slots on a link.
 
     Slot 0 (front of queue) sits near the downstream node ``p1``; later slots
@@ -254,7 +275,14 @@ def _slot_points(p0: tuple, p1: tuple, rad: float, count: int, max_slots: int):
     return points
 
 
-def _fit_marker(p0, p1, pts_per_data, queue_len, max_slots, cap) -> float:
+def _fit_marker(
+    p0: tuple[float, float],
+    p1: tuple[float, float],
+    pts_per_data: float,
+    queue_len: int,
+    max_slots: int,
+    cap: float,
+) -> float:
     """Marker diameter (points) that keeps a link's queued agents from overlapping.
 
     Shrinks the marker so the drawn FIFO slots on this link stay separated, never
@@ -289,7 +317,9 @@ def _pts_per_data(ax, layout: NetworkLayout) -> float:
     return min(ax_w_in / x_span, ax_h_in / y_span) * 72.0
 
 
-def _resolve_detail(layout: NetworkLayout, detail: str, overrides: dict) -> dict:
+def _resolve_detail(
+    layout: NetworkLayout, detail: str, overrides: dict[str, bool | None]
+) -> dict[str, bool]:
     """Resolve which annotations to draw from a ``detail`` preset + explicit flags.
 
     ``detail`` is ``"auto"`` (full for compact networks, minimal for large/dense
@@ -321,12 +351,19 @@ _SLOT_LO, _SLOT_HI = 0.22, 0.78
 
 
 def _draw_backdrop(
-    ax, layout: NetworkLayout, highlight_links, occupancy, node_pts, show_labels
+    ax: Axes,
+    layout: NetworkLayout,
+    highlight_links: Iterable[int] | None,
+    occupancy: dict[int | str, int],
+    node_pts: float,
+    show_labels: bool,
 ) -> None:
     """Draw links (arrows, optional occupancy tint/highlight) and nodes."""
     highlight = {_to_key(lid) for lid in (highlight_links or ())}
     for lid_key, (p0, p1, rad) in layout.links.items():
-        base: str | tuple = _HIGHLIGHT if lid_key in highlight else _LINK_BASE
+        base: str | tuple[float, ...] = (
+            _HIGHLIGHT if lid_key in highlight else _LINK_BASE
+        )
         lw = 2.4 if lid_key in highlight else 1.5
         # A busy link is darkened (and thickened) so congestion reads at a glance
         # even when agent dots are tiny on a dense network. A neutral blue-grey
@@ -352,7 +389,7 @@ def _draw_backdrop(
     )
 
 
-def _from_key_int(lid_key: str):
+def _from_key_int(lid_key: str) -> int | str:
     """Best-effort int form of a link key so occupancy lookups match either type."""
     try:
         return int(lid_key)
@@ -360,14 +397,22 @@ def _from_key_int(lid_key: str):
         return lid_key
 
 
-def _blend(color_a: str, color_b: str, t: float) -> tuple:
+def _blend(color_a: str, color_b: str, t: float) -> tuple[float, ...]:
     """Linearly blend two hex colours (``t`` in [0, 1])."""
     ca = tuple(int(color_a[i : i + 2], 16) / 255 for i in (1, 3, 5))
     cb = tuple(int(color_b[i : i + 2], 16) / 255 for i in (1, 3, 5))
     return tuple(ca[i] + (cb[i] - ca[i]) * t for i in range(3))
 
 
-def _draw_next_link_arrow(ax, pos, target, colour, arrow_len, label, label_fs) -> None:
+def _draw_next_link_arrow(
+    ax: Axes,
+    pos: tuple[float, float],
+    target: tuple[float, float] | None,
+    colour: str,
+    arrow_len: float,
+    label: str | None,
+    label_fs: float,
+) -> None:
     """Draw a short intention arrow from an agent toward its next node + a label."""
     if target is None:
         return
@@ -400,18 +445,18 @@ def _draw_next_link_arrow(ax, pos, target, colour, arrow_len, label, label_fs) -
 def render_frame(
     frame: Frame,
     layout: NetworkLayout,
-    ax=None,
+    ax: Axes | None = None,
     *,
-    palette: dict | None = None,
-    color_by: str | Callable | None = DEFAULT_COLOR_BY,
+    palette: dict[str, str] | None = None,
+    color_by: str | Callable[..., str] | None = DEFAULT_COLOR_BY,
     detail: str = "auto",
     show_agent_ids: bool | None = None,
     show_next_link: bool | None = None,
     show_node_labels: bool | None = None,
     max_slots: int = 8,
-    highlight_links=None,
+    highlight_links: Iterable[int] | None = None,
     title: str | None = None,
-):
+) -> Axes:
     """Draw a single recorded frame onto ``ax`` (created if omitted).
 
     Marker, node and label sizes scale to the network so the frame stays readable
@@ -480,7 +525,7 @@ def render_frame(
     )
 
     # Group agents by link so each link's queue is laid out together.
-    by_link: dict = {}
+    by_link: dict[str, list[AgentSnapshot]] = {}
     for agent in frame.agents:
         by_link.setdefault(_to_key(agent.link_id), []).append(agent)
 
@@ -556,12 +601,12 @@ def render_frame(
 
 
 def _draw_waiting(
-    ax,
+    ax: Axes,
     frame: Frame,
     layout: NetworkLayout,
-    colours: dict,
-    node_diam,
-    color_by: str | Callable | None,
+    colours: dict[str, str],
+    node_diam: float,
+    color_by: str | Callable[..., str] | None,
 ) -> None:
     """Draw each origin's waiting queue as a count badge on the node itself.
 
@@ -571,7 +616,7 @@ def _draw_waiting(
     overdrawn with a filled badge carrying the number waiting there, coloured by
     their (usually uniform) category.
     """
-    by_node: dict = {}
+    by_node: dict[str, list[WaitingSnapshot]] = {}
     for waiter in frame.waiting:
         by_node.setdefault(_to_key(waiter.node_id), []).append(waiter)
     badge_diam = max(1.25 * node_diam, 13.0)
@@ -601,7 +646,10 @@ def _draw_waiting(
 
 
 def _draw_legend(
-    ax, frame: Frame, colours: dict, color_by: str | Callable | None
+    ax: Axes,
+    frame: Frame,
+    colours: dict[str, str],
+    color_by: str | Callable[..., str] | None,
 ) -> None:
     """Draw a category legend when there is more than one category on screen.
 
@@ -611,7 +659,8 @@ def _draw_legend(
     if color_by == "next_link":
         return
     present: list[str] = []
-    for item in (*frame.agents, *frame.waiting):
+    items: list[AgentSnapshot | WaitingSnapshot] = [*frame.agents, *frame.waiting]
+    for item in items:
         category = _effective_category(item, color_by)
         if category not in present:
             present.append(category)
@@ -654,14 +703,14 @@ def expand_frame_indices(n_frames: int, subsample: float) -> list[int]:
 
 
 def save_frames(
-    frames,
+    frames: Sequence[Frame],
     layout: NetworkLayout,
     out_dir: str,
     *,
     stride: int = 1,
     dpi: int = 150,
     prefix: str = "frame_",
-    palette: dict | None = None,
+    palette: dict[str, str] | None = None,
     **render_kw,
 ) -> list[str]:
     """Save individual per-step PNGs (the "separate pictures" option).
@@ -699,7 +748,7 @@ def save_frames(
     return paths
 
 
-def _make_writer(out_path: str, fps: int):
+def _make_writer(out_path: str, fps: int) -> tuple[FFMpegWriter | PillowWriter, str]:
     """Pick a writer from the extension; fall back to GIF if ffmpeg is missing.
 
     Returns ``(writer, out_path)`` — ``out_path`` may be rewritten to ``.gif``
@@ -720,14 +769,14 @@ def _make_writer(out_path: str, fps: int):
 
 
 def save_animation(
-    frames,
+    frames: Sequence[Frame],
     layout: NetworkLayout,
     out_path: str,
     *,
     fps: int = 25,
     subsample: float = 1.0,
     dpi: int = 150,
-    palette: dict | None = None,
+    palette: dict[str, str] | None = None,
     frames_dir: str | None = None,
     **render_kw,
 ) -> str:

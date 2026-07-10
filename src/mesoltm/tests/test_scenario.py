@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+from ..core.nodes.origin_node import OriginNode
 from ..core.vehicle import Vehicle
 from ..io.scenario import build_scenario
 from ..network.network import Network
@@ -91,6 +92,6 @@ def test_origin_entry_queue_backpressure():
     net.set_destination("B")
     sim = net.compile(time_step=1.0, total_time=20.0)
     sim.run()
-    origin = next(n for n in sim.nodes if type(n).__name__ == "OriginNode")
+    origin = next(n for n in sim.nodes if isinstance(n, OriginNode))
     # All depart at t=0 but only a few can enter, so a queue must form.
     assert max(origin.entry_queue) > 0

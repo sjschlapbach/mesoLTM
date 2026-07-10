@@ -25,7 +25,7 @@ from ..demand.demand import vehicles_from_demand_profile
 from ..network.network import Network
 
 
-def _parse_route(route_str: str) -> tuple:
+def _parse_route(route_str: str) -> tuple[int, ...]:
     """Parse a ``"1,2,4"`` route string into a tuple of integer link ids."""
     return tuple(int(x) for x in route_str.replace("(", "").replace(")", "").split(","))
 

@@ -36,13 +36,14 @@ live ``Vehicle`` objects, so frames stay valid as the simulation mutates.
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Hashable, Sequence
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from .core.simulation import Simulation
     from .core.vehicle import Vehicle
-    from .network.state import NetworkState
+    from .network.state import NetworkState, VehicleView
 
 # A classifier maps a vehicle (and the live state) to a category label used to
 # colour it in the animation; ``None`` means "one category for every agent".
@@ -83,12 +84,12 @@ class AgentSnapshot:
     """
 
     vehicle_id: int
-    link_id: object
+    link_id: int | str
     queue_index: int
     queue_len: int
-    route: list
-    next_link_id: object
-    next_node: object
+    route: Sequence[int | str]
+    next_link_id: int | str | None
+    next_node: Hashable | None
     category: str = DEFAULT_CATEGORY
     props: dict = field(default_factory=dict)
 
@@ -115,10 +116,10 @@ class WaitingSnapshot:
     """
 
     vehicle_id: int
-    node_id: object
-    route: list
-    next_link_id: object
-    next_node: object
+    node_id: Hashable
+    route: Sequence[int | str]
+    next_link_id: int | str | None
+    next_node: Hashable | None
     category: str = DEFAULT_CATEGORY
     props: dict = field(default_factory=dict)
 
@@ -139,7 +140,7 @@ class Frame:
     time: float
     agents: list[AgentSnapshot]
     waiting: list[WaitingSnapshot]
-    link_occupancy: dict
+    link_occupancy: dict[int | str, int]
 
 
 def geometry_from_state(state: NetworkState) -> tuple[dict, dict, dict]:
@@ -159,7 +160,7 @@ def geometry_from_state(state: NetworkState) -> tuple[dict, dict, dict]:
         for lid in state.link_ids()
         if state.endpoints(lid) is not None
     }
-    connector_nodes: dict = {}
+    connector_nodes: dict[int, Hashable] = {}
     for node, conn in state.source_connectors.items():
         connector_nodes[conn] = node
     for node, conn in state.sink_connectors.items():
@@ -174,7 +175,7 @@ def _category(
     return DEFAULT_CATEGORY if classify is None else classify(vehicle, state)
 
 
-def _downstream_node(state: NetworkState, link_id: int | None) -> object:
+def _downstream_node(state: NetworkState, link_id: int | None) -> Hashable | None:
     """Return the downstream node of a real link, or ``None`` (not a real link)."""
     if link_id is None:
         return None
@@ -183,7 +184,7 @@ def _downstream_node(state: NetworkState, link_id: int | None) -> object:
 
 
 def _waiting_snapshot(
-    state: NetworkState, vehicle: Vehicle, node: object, classify: ClassifyFn | None
+    state: NetworkState, vehicle: Vehicle, node: Hashable, classify: ClassifyFn | None
 ) -> WaitingSnapshot:
     """Snapshot a vehicle queued to enter ``node`` (origin queue or connector).
 
@@ -231,12 +232,12 @@ def capture_frame(
     # Agents on real links, grouped by link in FIFO order (front first): each
     # view carries the vehicle's remaining real-link route straight off
     # ``vehicle.route``.
-    views_by_link: dict = {}
+    views_by_link: dict[int, list[VehicleView]] = {}
     for view in state.vehicles_in_network():
         views_by_link.setdefault(view.link_id, []).append(view)
 
     agents: list[AgentSnapshot] = []
-    occupancy: dict = {}
+    occupancy: dict[int | str, int] = {}
     for lid in state.link_ids():
         if state.endpoints(lid) is None:
             continue  # connector: not drawn as a travelling agent
@@ -417,7 +418,9 @@ def _frame_from_json(data: dict) -> Frame:
     )
 
 
-def record_run(sim, classify: ClassifyFn | None = None) -> SimulationHistory:
+def record_run(
+    sim: Simulation, classify: ClassifyFn | None = None
+) -> SimulationHistory:
     """Run a simulation to completion, recording a frame per step.
 
     A convenience for the batch case (no custom stepping/injection): it enables
@@ -436,4 +439,5 @@ def record_run(sim, classify: ClassifyFn | None = None) -> SimulationHistory:
     sim.record_history = True
     sim.history_classify = classify
     sim.run()
+    assert sim.history is not None  # record_history=True guarantees a history
     return sim.history

@@ -94,7 +94,7 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
 
     # Per-link travel time = (exit - entry) steps * dt, skipping connectors (unless
     # asked) and any segment still open at the end of the horizon.
-    link_travel_times: dict = {}
+    link_travel_times: dict[int, float] = {}
     for seg in vehicle.trajectory:
         if seg["is_connector"] and not include_connectors:
             continue
@@ -200,7 +200,7 @@ def summarize_trips(trips: list[dict]) -> dict:
     travel_times = [t["travel_time"] for t in completed]
     access_times = [t["access_time"] for t in completed if t["access_time"] is not None]
 
-    per_link: dict = defaultdict(list)
+    per_link: dict[int, list[float]] = defaultdict(list)
     for t in completed:
         for link_id, value in t["link_travel_times"].items():
             per_link[link_id].append(value)
