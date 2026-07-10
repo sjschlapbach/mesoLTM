@@ -18,6 +18,10 @@ no matplotlib import of its own (keeping the geometry helpers cheap to reuse/tes
 from __future__ import annotations
 
 from collections import Counter
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
 # Arc curvature (matplotlib ``arc3`` rad) for links that share a node pair: the
 # k-th link on a pair (0-based, per direction) bows by ``PARALLEL_RAD * (k + 1)``,
@@ -31,7 +35,9 @@ NODE_EDGE = "#333333"
 NODE_TEXT = "#222222"
 
 
-def bezier_point(p0: tuple, p1: tuple, rad: float, t: float) -> tuple:
+def bezier_point(
+    p0: tuple[float, float], p1: tuple[float, float], rad: float, t: float
+) -> tuple[float, float]:
     """Point at parameter ``t`` on the exact quadratic curve matplotlib's ``arc3``
     draws for ``connectionstyle="arc3,rad"``.
 
@@ -85,9 +91,9 @@ def fan_links(positions: dict, endpoints: dict) -> dict:
 
 
 def draw_arc(
-    ax,
-    p0: tuple,
-    p1: tuple,
+    ax: Axes,
+    p0: tuple[float, float],
+    p1: tuple[float, float],
     rad: float,
     *,
     color,
@@ -115,7 +121,7 @@ def draw_arc(
 
 
 def draw_nodes(
-    ax, positions: dict, node_diam: float, *, labels: dict | None = None
+    ax: Axes, positions: dict, node_diam: float, *, labels: dict | None = None
 ) -> None:
     """Draw the node markers (and optional bold id labels) in the shared style.
 

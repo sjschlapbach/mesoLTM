@@ -17,6 +17,8 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from .ids import NodeId
+
 
 class Vehicle:
     """A single vehicle with an explicit route through the network.
@@ -58,8 +60,8 @@ class Vehicle:
     def __init__(
         self,
         vehicle_id: int = 0,
-        origin: object = 0,
-        destination: object = 0,
+        origin: NodeId = 0,
+        destination: NodeId = 0,
         start: float = 0.0,
         route: Sequence[int] | None = None,
         props: dict | None = None,
@@ -88,7 +90,7 @@ class Vehicle:
         self.trajectory: list[dict] = []
         self.props: dict = dict(props) if props else {}
         # Destination node cached by the network compiler for connector splicing.
-        self._dest_node: object = None
+        self._dest_node: NodeId | None = None
 
         for key, value in kwargs.items():
             setattr(self, key, value)

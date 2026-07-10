@@ -23,6 +23,7 @@ import math
 from typing import TYPE_CHECKING
 
 from ..core.connector_link import ConnectorLink
+from ..core.ids import NodeId
 from ..core.link import Link
 from ..core.nodes.destination_node import DestinationNode
 from ..core.nodes.diverge_node import DivergeNode
@@ -34,6 +35,10 @@ from ..core.simulation import Simulation
 from .state import NetworkState
 
 if TYPE_CHECKING:
+    from ..core.nodes.base_node import BaseNode
+    from ..core.vehicle import Vehicle
+    from ..plugins.plugin import Plugin
+    from ..recording import ClassifyFn
     from ..routing.policy import RoutingPolicy
 
 DEFAULT_FD = {"v_f": 15.0, "w": 5.0, "rho_jam": 0.15}
@@ -52,7 +57,7 @@ class Network:
             applied to links that do not specify their own.
     """
 
-    def __init__(self, default_fd: dict | None = None) -> None:
+    def __init__(self, default_fd: dict[str, float] | None = None) -> None:
         """Create an empty network.
 
         Args:
@@ -61,17 +66,19 @@ class Network:
         self.default_fd = dict(DEFAULT_FD)
         if default_fd:
             self.default_fd.update(default_fd)
-        self._positions: dict = {}
+        self._positions: dict[NodeId, tuple[float, float] | None] = {}
         self._links: dict[int, dict] = {}
         self._next_link_id = 1
-        self._origins: dict = {}
-        self._destinations: set = set()
-        self._priorities: dict = {}
+        self._origins: dict[NodeId, list[Vehicle]] = {}
+        self._destinations: set[NodeId] = set()
+        self._priorities: dict[NodeId, dict[int, float]] = {}
         self._compiled = False
 
     # -- construction ----------------------------------------------------------
 
-    def add_node(self, node_id: object, pos: tuple | None = None) -> object:
+    def add_node(
+        self, node_id: NodeId, pos: tuple[float, float] | None = None
+    ) -> NodeId:
         """Add a node (idempotent) and optionally record its ``(x, y)`` position.
 
         Args:
@@ -87,8 +94,8 @@ class Network:
 
     def add_link(
         self,
-        u: object,
-        v: object,
+        u: NodeId,
+        v: NodeId,
         length: float | None = None,
         link_id: int | None = None,
         **fd: float,
@@ -131,7 +138,9 @@ class Network:
         self._links[link_id] = {"u": u, "v": v, "length": length, **params}
         return link_id
 
-    def set_origin(self, node_id: object, vehicles: list | None = None) -> None:
+    def set_origin(
+        self, node_id: NodeId, vehicles: list[Vehicle] | None = None
+    ) -> None:
         """Mark a node as an origin and attach demand vehicles to release from it.
 
         Args:
@@ -144,12 +153,12 @@ class Network:
         if vehicles:
             self._origins[node_id].extend(vehicles)
 
-    def set_destination(self, node_id: object) -> None:
+    def set_destination(self, node_id: NodeId) -> None:
         """Mark a node as a destination that absorbs arriving vehicles."""
         self.add_node(node_id)
         self._destinations.add(node_id)
 
-    def set_merge_priorities(self, node_id: object, alpha: dict) -> None:
+    def set_merge_priorities(self, node_id: NodeId, alpha: dict[int, float]) -> None:
         """Override the merge priority shares of a node's inbound links.
 
         By default a merge/general junction serves its inbound links with priority
@@ -169,7 +178,7 @@ class Network:
 
     # -- compilation -----------------------------------------------------------
 
-    def _uses_source_connector(self, node_id: object, real_out: list) -> bool:
+    def _uses_source_connector(self, node_id: NodeId, real_out: list[int]) -> bool:
         """Return whether an origin needs a source connector (vs. direct attach)."""
         real_in = self._real_in(node_id)
         return not (
@@ -178,18 +187,18 @@ class Network:
             and node_id not in self._destinations
         )
 
-    def _uses_sink_connector(self, node_id: object, real_in: list) -> bool:
+    def _uses_sink_connector(self, node_id: NodeId, real_in: list[int]) -> bool:
         """Return whether a destination needs a sink connector (vs. direct attach)."""
         real_out = self._real_out(node_id)
         return not (
             len(real_out) == 0 and len(real_in) == 1 and node_id not in self._origins
         )
 
-    def _real_in(self, node_id: object) -> list[int]:
+    def _real_in(self, node_id: NodeId) -> list[int]:
         """Return real inbound link ids of a node."""
         return [lid for lid, d in self._links.items() if d["v"] == node_id]
 
-    def _real_out(self, node_id: object) -> list[int]:
+    def _real_out(self, node_id: NodeId) -> list[int]:
         """Return real outbound link ids of a node."""
         return [lid for lid, d in self._links.items() if d["u"] == node_id]
 
@@ -198,11 +207,11 @@ class Network:
         time_step: float,
         total_time: float,
         routing_policy: RoutingPolicy | None = None,
-        plugins: list | None = None,
+        plugins: list[Plugin] | None = None,
         injection_budget: int = 100,
         record_history: bool = False,
         history_path: str | None = None,
-        history_classify=None,
+        history_classify: ClassifyFn | None = None,
     ) -> Simulation:
         """Build links, nodes and connectors and return a runnable simulation.
 
@@ -252,7 +261,7 @@ class Network:
             )
 
         # 1. Instantiate all real links.
-        links_by_id: dict = {}
+        links_by_id: dict[int, Link] = {}
         for lid, d in self._links.items():
             links_by_id[lid] = Link(
                 link_id=lid,
@@ -273,10 +282,10 @@ class Network:
         vehicle_budget = sum(len(v) for v in self._origins.values()) + max(
             0, int(injection_budget)
         )
-        source_connectors: dict = {}
-        sink_connectors: dict = {}
-        origin_node_objs: dict = {}
-        nodes: list = []
+        source_connectors: dict[NodeId, int] = {}
+        sink_connectors: dict[NodeId, int] = {}
+        origin_node_objs: dict[NodeId, OriginNode] = {}
+        nodes: list[BaseNode] = []
 
         # 2. Origins: connector (or direct) + OriginNode; splice routes.
         for node_id, vehicles in self._origins.items():
@@ -289,7 +298,7 @@ class Network:
                 )
                 links_by_id[connector_id] = conn
                 source_connectors[node_id] = connector_id
-                inject_link = conn
+                inject_link: Link = conn
                 connector_id += 1
             else:
                 inject_link = links_by_id[real_out[0]]
@@ -335,9 +344,11 @@ class Network:
         # 4. Junction node models for every node with through/connector movements.
         # downstream_node maps each link to the node it flows into; a source
         # connector flows into its own origin junction (its junction shares node_id).
-        downstream_node: dict = {lid: v for lid, (u, v) in endpoints.items()}
-        for lid, src in source_connectors.items():
-            downstream_node[src] = lid  # source connector feeds its junction
+        downstream_node: dict[int, NodeId] = {
+            lid: v for lid, (u, v) in endpoints.items()
+        }
+        for conn_node, conn_id in source_connectors.items():
+            downstream_node[conn_id] = conn_node  # source connector feeds its junction
 
         for node_id in self._positions:
             inbound = [links_by_id[lid] for lid in self._real_in(node_id)]
@@ -375,7 +386,7 @@ class Network:
 
         # Wire the shared network state into every user plugin so callers don't
         # have to reach into the compiled simulation to attach it.
-        all_plugins: list = list(plugins or [])
+        all_plugins: list[Plugin] = list(plugins or [])
         for plugin in all_plugins:
             plugin.state = state
 
@@ -397,7 +408,10 @@ class Network:
     # -- helpers ---------------------------------------------------------------
 
     def _splice_routes(
-        self, vehicles: list, source_connector: int | None, endpoints: dict
+        self,
+        vehicles: list[Vehicle],
+        source_connector: int | None,
+        endpoints: dict[int, tuple[NodeId, NodeId]],
     ) -> None:
         """Prepend the source connector and append each route's sink connector.
 
@@ -420,8 +434,8 @@ class Network:
             veh._dest_node = dest_node  # pylint: disable=protected-access
 
     def _build_junction(
-        self, node_id: object, inbound: list, outbound: list
-    ) -> object | None:
+        self, node_id: NodeId, inbound: list[Link], outbound: list[Link]
+    ) -> BaseNode | None:
         """Create the node model for a junction from its inbound/outbound links.
 
         Returns ``None`` for nodes with no through movement (pure origins or pure
@@ -444,7 +458,7 @@ class Network:
             node_id, inbound, outbound, alpha=self._alpha_for(node_id, inbound)
         )
 
-    def _alpha_for(self, node_id: object, inbound_links: list) -> list[float]:
+    def _alpha_for(self, node_id: NodeId, inbound_links: list[Link]) -> list[float]:
         """Return the merge priority shares ``alpha_i`` for a node's inbound links.
 
         By default each inbound link's share is proportional to its capacity, so

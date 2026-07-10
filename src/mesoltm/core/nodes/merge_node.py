@@ -15,8 +15,12 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from ..base_link import BaseLink
 from ..priorities import priority_vector_from_alpha
+from ..ids import NodeId
+from ..vehicle import Vehicle
 from .base_node import BaseNode
 
 
@@ -43,9 +47,9 @@ class MergeNode(BaseNode):
 
     def __init__(
         self,
-        node_id: object,
+        node_id: NodeId,
         outbound_link: BaseLink,
-        inbound_links: list[BaseLink],
+        inbound_links: Sequence[BaseLink],
         priority_vector: list[int] | None = None,
         alpha: list[float] | None = None,
     ) -> None:
@@ -113,7 +117,7 @@ class MergeNode(BaseNode):
         total_flow = 0
 
         initial_index = self.priority_index
-        inflow_order: list = []
+        inflow_order: list[Vehicle] = []
 
         while True:
             idx = self.priority_vector[self.priority_index]

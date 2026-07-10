@@ -24,6 +24,7 @@ from .core import (
     BaseLink,
     ConnectorLink,
     Link,
+    NodeId,
     Simulation,
     Vehicle,
 )
@@ -74,6 +75,8 @@ __all__ = [
     # vehicle / loop
     "Vehicle",
     "Simulation",
+    # identifiers
+    "NodeId",
     # nodes
     "BaseNode",
     "OneToOneNode",

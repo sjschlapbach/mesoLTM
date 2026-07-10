@@ -23,8 +23,12 @@ through the routing policy instead of reading ``vehicle.route`` inline.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 from ..base_link import BaseLink
 from ..priorities import priority_vector_from_alpha
+from ..ids import NodeId
+from ..vehicle import Vehicle
 from .base_node import BaseNode
 
 
@@ -47,9 +51,9 @@ class GeneralNodeModel(BaseNode):
 
     def __init__(
         self,
-        node_id: object,
-        inbound_links: list[BaseLink],
-        outbound_links: list[BaseLink],
+        node_id: NodeId,
+        inbound_links: Sequence[BaseLink],
+        outbound_links: Sequence[BaseLink],
         priority_vector: list[int] | None = None,
         alpha: list[float] | None = None,
     ) -> None:
@@ -117,7 +121,9 @@ class GeneralNodeModel(BaseNode):
 
         initial_index = self.priority_index
 
-        flow_order_by_outbound_link: list[list] = [[] for _ in self.outbound_links]
+        flow_order_by_outbound_link: list[list[Vehicle]] = [
+            [] for _ in self.outbound_links
+        ]
         priority_base = True
         locked_outbound_indices: list[int] = []
 

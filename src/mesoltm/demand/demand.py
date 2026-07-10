@@ -18,6 +18,7 @@ from __future__ import annotations
 import random
 from collections.abc import Sequence
 
+from ..core.ids import NodeId
 from ..core.vehicle import Vehicle
 
 
@@ -25,10 +26,10 @@ def vehicles_from_demand_profile(
     demand_pattern: Sequence[float],
     total_time: float,
     route: Sequence[int] | None = None,
-    route_integer_share: dict | None = None,
+    route_integer_share: dict[tuple[int, ...], int] | None = None,
     random_route: bool = False,
-    origin: object = 0,
-    destination: object = 0,
+    origin: NodeId = 0,
+    destination: NodeId = 0,
 ) -> list[Vehicle]:
     """Expand a piecewise-constant demand profile into individual vehicles.
 
@@ -59,7 +60,7 @@ def vehicles_from_demand_profile(
     # Flatten the route-share map into one route per unit of weight, so a route with
     # weight w occupies w consecutive entries; picking round-robin over this list
     # then reproduces the requested integer split exactly.
-    share_values: list = []
+    share_values: list[tuple[int, ...]] = []
     share_sum = 0
     if route_integer_share is not None:
         share_sum = sum(route_integer_share.values())

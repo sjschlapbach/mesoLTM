@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import pytest
 
+from ..core.nodes.merge_node import MergeNode
 from ..core.vehicle import Vehicle
 from ..network.builders import (
     grid_network,
@@ -116,7 +117,7 @@ def test_capacity_proportional_priority_vector():
     net.set_origin("C", vehicles=[])
     net.set_destination("D")
     sim = net.compile(time_step=1.0, total_time=10.0)
-    merge = next(n for n in sim.nodes if type(n).__name__ == "MergeNode")
+    merge = next(n for n in sim.nodes if isinstance(n, MergeNode))
     # The stronger approach (index of A's link) should appear more often.
     counts = {i: merge.priority_vector.count(i) for i in set(merge.priority_vector)}
     assert max(counts.values()) > min(counts.values())

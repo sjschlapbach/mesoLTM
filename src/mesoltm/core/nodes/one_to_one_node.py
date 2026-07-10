@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 from ..base_link import BaseLink
+from ..ids import NodeId
 from .base_node import BaseNode
 
 
@@ -32,7 +33,7 @@ class OneToOneNode(BaseNode):
     """
 
     def __init__(
-        self, node_id: object, inbound_link: BaseLink, outbound_link: BaseLink
+        self, node_id: NodeId, inbound_link: BaseLink, outbound_link: BaseLink
     ) -> None:
         """Create a one-to-one node.
 

@@ -17,7 +17,7 @@ from .network import Network
 
 def corridor_network(
     lengths: list[float],
-    fd: dict | None = None,
+    fd: dict[str, float] | None = None,
     node_prefix: str = "n",
 ) -> Network:
     """Build a linear corridor of consecutive links with an origin and destination.
@@ -48,10 +48,10 @@ def grid_network(
     cols: int,
     link_length: float = 200.0,
     spacing: float = 1.0,
-    fd: dict | None = None,
+    fd: dict[str, float] | None = None,
     bidirectional: bool = True,
-    skip_nodes: Iterable[tuple] | None = None,
-    skip_edges: Iterable[tuple] | None = None,
+    skip_nodes: Iterable[tuple[int, int]] | None = None,
+    skip_edges: Iterable[tuple[tuple[int, int], tuple[int, int]]] | None = None,
     all_nodes_od: bool = False,
 ) -> Network:
     """Build a rectangular grid, optionally partial (missing nodes/edges).
@@ -80,7 +80,7 @@ def grid_network(
     skip_nodes = set(skip_nodes or ())
     skip_edges = set(skip_edges or ())
 
-    def present(node: tuple) -> bool:
+    def present(node: tuple[int, int]) -> bool:
         return 0 <= node[0] < rows and 0 <= node[1] < cols and node not in skip_nodes
 
     for i in range(rows):
@@ -89,7 +89,7 @@ def grid_network(
                 continue
             net.add_node((i, j), pos=(j * spacing, i * spacing))
 
-    def maybe_link(a: tuple, b: tuple) -> None:
+    def maybe_link(a: tuple[int, int], b: tuple[int, int]) -> None:
         if present(a) and present(b) and (a, b) not in skip_edges:
             net.add_link(a, b, length=link_length)
 

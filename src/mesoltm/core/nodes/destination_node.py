@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 from ..base_link import BaseLink
+from ..ids import NodeId
 from ..vehicle import Vehicle
 from .base_node import BaseNode
 
@@ -33,7 +34,7 @@ class DestinationNode(BaseNode):
         arrived_vehicles: All vehicles that have completed their trip here.
     """
 
-    def __init__(self, node_id: object, link: BaseLink) -> None:
+    def __init__(self, node_id: NodeId, link: BaseLink) -> None:
         """Create a destination node.
 
         Args:

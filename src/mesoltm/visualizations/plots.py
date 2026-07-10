@@ -21,6 +21,7 @@ from collections.abc import Iterable, Sequence
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 from matplotlib.colors import Normalize
 
 from ._draw import bezier_point, draw_arc, draw_nodes, fan_links
@@ -31,8 +32,8 @@ if TYPE_CHECKING:
 
 
 def plot_cumulative_curves(
-    sim: Simulation, link_ids: Sequence[int] | None = None, ax=None
-):
+    sim: Simulation, link_ids: Sequence[int] | None = None, ax: Axes | None = None
+) -> Axes:
     """Plot cumulative inflow (solid) and outflow (dashed) for links over time.
 
     Args:
@@ -84,8 +85,8 @@ def plot_link_flow(
     link_ids: Iterable[int],
     window: int = 60,
     window_seconds: float | None = None,
-    ax=None,
-):
+    ax: Axes | None = None,
+) -> Axes:
     """Plot the flow (veh/h) through one or a collection of links over time.
 
     When several link ids are given their flows are summed, so this doubles as a
@@ -135,8 +136,8 @@ def plot_link_flows(
     labels: Sequence[str] | None = None,
     window: int = 60,
     window_seconds: float | None = None,
-    ax=None,
-):
+    ax: Axes | None = None,
+) -> Axes:
     """Plot flow (veh/h) over time for each link as its own labelled line.
 
     Unlike :func:`plot_link_flow` (which sums links into one "cut" curve), this
@@ -181,7 +182,9 @@ def plot_link_flows(
     return ax
 
 
-def plot_travel_time_distribution(trips: Sequence[dict], ax=None, bins: int = 20):
+def plot_travel_time_distribution(
+    trips: Sequence[dict], ax: Axes | None = None, bins: int = 20
+) -> Axes:
     """Plot the distribution of per-vehicle overall travel times.
 
     Args:
@@ -212,7 +215,7 @@ def plot_travel_time_distribution(trips: Sequence[dict], ax=None, bins: int = 20
     return ax
 
 
-def plot_link_travel_times(trips: Sequence[dict], ax=None):
+def plot_link_travel_times(trips: Sequence[dict], ax: Axes | None = None) -> Axes:
     """Plot the mean travel time on each link, aggregated over all trips.
 
     Args:
@@ -225,8 +228,8 @@ def plot_link_travel_times(trips: Sequence[dict], ax=None):
     if ax is None:
         _, ax = plt.subplots(figsize=(7, 4))
 
-    totals: dict = {}
-    counts: dict = {}
+    totals: dict[int, float] = {}
+    counts: dict[int, int] = {}
     for t in trips:
         for link_id, value in t["link_travel_times"].items():
             totals[link_id] = totals.get(link_id, 0.0) + value
@@ -334,10 +337,10 @@ def plot_link_time_series(
 def plot_network(
     state: NetworkState,
     color_by: str = "occupancy",
-    ax=None,
+    ax: Axes | None = None,
     node_size: float = 260.0,
     annotate_links: bool = False,
-):
+) -> Axes:
     """Draw the network with links coloured by a per-link quantity.
 
     Uses the **same drawing helpers as the animation** (:mod:`._draw`), so the
