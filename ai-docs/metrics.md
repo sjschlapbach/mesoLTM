@@ -38,9 +38,18 @@ completed trips are also directly available as `vehicle.journeys`.
 ```python
 collect_trips(sim, include_connectors=False) -> list[dict]   # sorted by (vehicle_id, journey_index)
 trip_record(journey, dt, include_connectors=False) -> dict   # takes a journey record
+free_flow_time(route, free_flow_steps, dt) -> float          # sum(T1)*dt; free_flow_steps = {link_id: link.T1}
 summarize_trips(trips) -> dict
 write_trips_csv(trips, path) -> str
 ```
+
+`free_flow_time` is the fastest travel time achievable over a route in the discrete
+model (a multiple of `dt`): each link's free-flow crossing takes exactly its integer
+wave lag `T1` steps, so the bound is `sum(T1)*dt`. Build the map as
+`{l.link_id: l.T1 for l in sim.links}` and pass a trip's connector-free `route` to
+compare with its `travel_time`. It is the discrete counterpart of the continuous
+per-link `state.continuous_free_flow_time(link_id)` (= `length / v_f`, dt-agnostic,
+the default routing weight).
 
 `trip_record` takes a **journey record** (a dict from `vehicle.journeys` /
 `vehicle.snapshot_journey()`), not a live `Vehicle`.
@@ -50,10 +59,11 @@ write_trips_csv(trips, path) -> str
 ```
 vehicle_id, journey_index, origin, destination
 route                # list[int]: real link ids actually driven
-start_time           # desired departure = journey's start
+scheduled_departure_time  # requested departure (may fall between steps)
+departure_time       # ACTUAL departure (origin queue-join); normally ceil(scheduled/dt)*dt, later if injected in the past
 network_entry_time   # entered first real link
 arrival_time         # absorbed at destination
-travel_time          # arrival - start MINUS each connector's 1-step free-flow lag
+travel_time          # arrival - departure_time MINUS each connector's 1-step free-flow lag; multiple of dt
 access_time          # travel_time - network_time (origin-queue + supply-limited connector wait)
 network_time         # time on real links only (connector-free)
 n_links

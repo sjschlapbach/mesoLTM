@@ -44,7 +44,8 @@ used.
 
 ## Congestion-aware cost
 
-By default `ShortestPathPolicy` minimises free-flow travel time. Supply a `cost`
+By default `ShortestPathPolicy` minimises continuous free-flow travel time
+(`state.continuous_free_flow_time(link_id)`, i.e. `length / v_f`). Supply a `cost`
 callback `cost(link_id, state) -> float` to route on live conditions — the `state`
 is the [`NetworkState`](../reference/network.md#network-state), so you can read
 `occupancy`, `density`, or cumulative flows:
@@ -52,7 +53,7 @@ is the [`NetworkState`](../reference/network.md#network-state), so you can read
 ```python
 def congestion_cost(link_id, state):
     # free-flow time plus a penalty that grows with the link's current load
-    return state.free_flow_time(link_id) + 0.5 * state.occupancy(link_id)
+    return state.continuous_free_flow_time(link_id) + 0.5 * state.occupancy(link_id)
 
 policy = ShortestPathPolicy(cost=congestion_cost, dynamic=True)
 ```

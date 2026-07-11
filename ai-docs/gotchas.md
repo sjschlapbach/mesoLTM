@@ -5,8 +5,8 @@ Common pitfalls and hard constraints when using or extending `mesoltm`.
 ## Vehicle vs Link parameters
 
 `v_f`, `w`, `rho_jam` are **Link** (fundamental-diagram) parameters, NOT `Vehicle`
-parameters. `Vehicle(vehicle_id, origin, destination, start, route, props)` has no
-FD attributes.
+parameters. `Vehicle(vehicle_id, origin, destination, scheduled_departure, route,
+props)` has no FD attributes.
 
 ## CFL condition raises ValueError
 

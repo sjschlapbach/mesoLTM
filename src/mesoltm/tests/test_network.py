@@ -27,7 +27,7 @@ def _od_vehicles(origin, destination, n, route=None):
     return [
         Vehicle(
             vehicle_id=k,
-            start=float(k),
+            scheduled_departure=float(k),
             origin=origin,
             destination=destination,
             route=list(route) if route else None,
@@ -48,7 +48,11 @@ def test_connector_origin_and_destination_all_arrive():
         route = [lab, lbd] if k % 2 == 0 else [lac, lcd]
         vehicles.append(
             Vehicle(
-                vehicle_id=k, start=float(k), route=route, origin="A", destination="D"
+                vehicle_id=k,
+                scheduled_departure=float(k),
+                route=route,
+                origin="A",
+                destination="D",
             )
         )
     net.set_origin("A", vehicles=vehicles)
@@ -63,7 +67,9 @@ def test_compile_is_one_shot():
     """A second compile is rejected (it would re-splice vehicle routes)."""
     net = Network()
     lid = net.add_link("A", "B", length=200)
-    net.set_origin("A", vehicles=[Vehicle(vehicle_id=0, start=0.0, route=[lid])])
+    net.set_origin(
+        "A", vehicles=[Vehicle(vehicle_id=0, scheduled_departure=0.0, route=[lid])]
+    )
     net.set_destination("B")
     net.compile(time_step=1.0, total_time=10.0)
     with pytest.raises(RuntimeError, match="once"):

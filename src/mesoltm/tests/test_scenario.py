@@ -85,7 +85,7 @@ def test_origin_entry_queue_backpressure():
     net.set_origin(
         "A",
         vehicles=[
-            Vehicle(vehicle_id=k, start=0.0, origin="A", destination="B")
+            Vehicle(vehicle_id=k, scheduled_departure=0.0, origin="A", destination="B")
             for k in range(50)
         ],
     )

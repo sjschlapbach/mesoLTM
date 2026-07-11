@@ -47,10 +47,10 @@ class OneToOneNode(BaseNode):
         self.inbound_link = inbound_link
         self.outbound_link = outbound_link
 
-    def prepare_step(self, t: int) -> None:
+    def prepare_step(self, step: int, time: float) -> None:
         """No-op; the transfer happens during flow computation."""
 
-    def compute_flows(self, t: int) -> None:
+    def compute_flows(self, step: int, time: float) -> None:
         """Transfer the feasible number of vehicles from inbound to outbound.
 
         Paper Section 3.4.1, Eq. (11): ĝ_u(i) = f̂_d(i) = min{D̂_u(i), Ŝ_d(i)}.
@@ -59,5 +59,5 @@ class OneToOneNode(BaseNode):
         of vehicles moved from the upstream to the downstream link.
         """
         flow = min(self.inbound_link.get_demand(), self.outbound_link.get_supply())
-        vehicles = self.inbound_link.set_outflow(flow, t)
-        self.outbound_link.set_inflow(vehicles, t)
+        vehicles = self.inbound_link.set_outflow(flow, step)
+        self.outbound_link.set_inflow(vehicles, step)

@@ -64,10 +64,14 @@ def test_omitted_vehicles_keep_their_route():
         "A",
         vehicles=[
             Vehicle(
-                vehicle_id=1, start=0.0, route=[ids["a_m"], ids["m_b"], ids["b_d"]]
+                vehicle_id=1,
+                scheduled_departure=0.0,
+                route=[ids["a_m"], ids["m_b"], ids["b_d"]],
             ),
             Vehicle(
-                vehicle_id=2, start=0.0, route=[ids["a_m"], ids["m_b"], ids["b_d"]]
+                vehicle_id=2,
+                scheduled_departure=0.0,
+                route=[ids["a_m"], ids["m_b"], ids["b_d"]],
             ),
         ],
     )

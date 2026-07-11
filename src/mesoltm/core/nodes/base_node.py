@@ -53,11 +53,23 @@ class BaseNode:
     def start(self, time_step: float, total_time: float) -> None:
         """Allocate per-step state for the simulation horizon."""
 
-    def prepare_step(self, t: int) -> None:
-        """Hook run before link demand/supply is computed (e.g. load departures)."""
+    def prepare_step(self, step: int, time: float) -> None:
+        """Hook run before link demand/supply is computed (e.g. load departures).
 
-    def compute_flows(self, t: int) -> None:
-        """Move vehicles across the node for step ``t``."""
+        Args:
+            step: The current simulation step index.
+            time: The current simulation time in seconds (``step * dt``), supplied by
+                the simulation (the single owner of the clock) so nodes need not
+                store the time step themselves.
+        """
+
+    def compute_flows(self, step: int, time: float) -> None:
+        """Move vehicles across the node for the current step.
+
+        Args:
+            step: The current simulation step index.
+            time: The current simulation time in seconds (``step * dt``).
+        """
 
     def get_arrived_trips(self) -> list[dict]:
         """Return records of vehicles that finished their trip at this node."""

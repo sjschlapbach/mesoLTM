@@ -40,6 +40,7 @@ from .core.nodes import (
 from .demand import vehicles_from_demand_profile
 from .metrics import (
     collect_trips,
+    free_flow_time,
     summarize_trips,
     trip_record,
     write_trips_csv,
@@ -90,6 +91,7 @@ __all__ = [
     # metrics
     "collect_trips",
     "trip_record",
+    "free_flow_time",
     "summarize_trips",
     "write_trips_csv",
     "RoutingPolicy",

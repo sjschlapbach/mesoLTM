@@ -28,7 +28,7 @@ from mesoltm import Vehicle, grid_network, ShortestPathPolicy
 
 net = grid_network(4, 4, link_length=200.0, all_nodes_od=True)
 net.set_origin((0, 0), vehicles=[
-    Vehicle(vehicle_id=k, start=float(k), origin=(0, 0), destination=(3, 3))
+    Vehicle(vehicle_id=k, scheduled_departure=float(k), origin=(0, 0), destination=(3, 3))
     for k in range(50)
 ])
 sim = net.compile(time_step=1.0, total_time=400.0,

@@ -80,7 +80,7 @@ def vehicles_from_demand_profile(
                 vehicle_id=len(vehicles) + u,
                 origin=origin,
                 destination=destination,
-                start=time_step_demand * i + u * trip_interval,
+                scheduled_departure=time_step_demand * i + u * trip_interval,
                 route=route,
             )
             for u in range(num_trips)

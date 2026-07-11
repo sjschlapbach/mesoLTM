@@ -28,7 +28,9 @@ def _corridor() -> tuple[Network, int, int]:
     net = Network()
     l1 = net.add_link("O", "M", length=300.0, v_f=15.0, w=5.0, rho_jam=0.15)
     l2 = net.add_link("M", "D", length=300.0, v_f=15.0, w=5.0, rho_jam=0.15)
-    net.set_origin("O", vehicles=[Vehicle(vehicle_id=1, start=0.0, route=[l1, l2])])
+    net.set_origin(
+        "O", vehicles=[Vehicle(vehicle_id=1, scheduled_departure=0.0, route=[l1, l2])]
+    )
     net.set_origin("M")  # no static demand; used for dynamic injection
     net.set_destination("D")
     return net, l1, l2
@@ -93,7 +95,8 @@ def test_inject_vehicle_reaches_destination_empty_connector_no_access():
     assert 99 in trips  # injected vehicle completed its trip
     rec = trips[99]
     assert rec["route"] == [l2]  # connectors excluded from the driven route
-    assert rec["start_time"] == 5.0  # departure defaulted to the injection step
+    assert rec["scheduled_departure_time"] == 5.0  # defaulted to the injection step
+    assert rec["departure_time"] == 5.0  # already on a step boundary (dt=1)
     # M is a through junction, so injection crosses a source connector, but it is
     # empty/unrestricted: its single free-flow step is removed, so access is zero.
     assert rec["access_time"] == 0.0
@@ -129,7 +132,8 @@ def test_inject_departure_time_can_be_scheduled():
         sim.step()
 
     rec = {t["vehicle_id"]: t for t in collect_trips(sim)}[42]
-    assert rec["start_time"] == 50.0
+    assert rec["scheduled_departure_time"] == 50.0
+    assert rec["departure_time"] == 50.0
     assert rec["network_entry_time"] >= 50.0
 
 

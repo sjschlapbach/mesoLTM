@@ -126,7 +126,7 @@ state.position(node_id) -> tuple | None
 # static link attributes
 state.length(link_id) -> float
 state.capacity(link_id) -> float           # veh/s
-state.free_flow_time(link_id) -> float     # seconds
+state.continuous_free_flow_time(link_id) -> float     # seconds, length/v_f (dt-agnostic; default routing weight)
 
 # live state
 state.vehicles_on(link_id) -> list

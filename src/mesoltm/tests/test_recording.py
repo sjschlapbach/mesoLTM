@@ -23,7 +23,11 @@ def _corridor_with_vehicle():
         "n0",
         [
             Vehicle(
-                vehicle_id=0, origin="n0", destination="n3", route=[1, 2, 3], start=1.0
+                vehicle_id=0,
+                origin="n0",
+                destination="n3",
+                route=[1, 2, 3],
+                scheduled_departure=1.0,
             )
         ],
     )
@@ -41,7 +45,7 @@ def test_records_one_frame_per_step_plus_initial():
 def test_history_off_by_default():
     """Without record_history the run captures nothing."""
     net = corridor_network([200.0])
-    net.set_origin("n0", [Vehicle(vehicle_id=0, route=[1], start=0.0)])
+    net.set_origin("n0", [Vehicle(vehicle_id=0, route=[1], scheduled_departure=0.0)])
     sim = net.compile(time_step=1.0, total_time=20.0)
     sim.run()
     assert sim.history is None
@@ -76,7 +80,12 @@ def test_classify_flows_into_category():
     """A classify callback sets each captured agent's colour category."""
     net = corridor_network([200.0, 200.0])
     net.set_origin(
-        "n0", [Vehicle(vehicle_id=7, destination="n2", route=[1, 2], start=0.0)]
+        "n0",
+        [
+            Vehicle(
+                vehicle_id=7, destination="n2", route=[1, 2], scheduled_departure=0.0
+            )
+        ],
     )
     sim = net.compile(time_step=1.0, total_time=40.0, record_history=True)
 
@@ -96,7 +105,13 @@ def test_origin_queue_is_captured_as_waiting():
     net.add_node("b", pos=(1.0, 0.0))
     net.add_link("a", "b", length=200.0, rho_jam=0.02)  # low-capacity bottleneck
     vehicles = [
-        Vehicle(vehicle_id=i, origin="a", destination="b", route=[1], start=0.0)
+        Vehicle(
+            vehicle_id=i,
+            origin="a",
+            destination="b",
+            route=[1],
+            scheduled_departure=0.0,
+        )
         for i in range(8)
     ]
     net.set_origin("a", vehicles)
@@ -124,7 +139,7 @@ def test_vehicle_props_are_captured_and_roundtrip(tmp_path):
                 origin="n0",
                 destination="n3",
                 route=[1, 2, 3],
-                start=1.0,
+                scheduled_departure=1.0,
                 props={"cls": "truck", "vot": 9},
             )
         ],
@@ -160,7 +175,7 @@ def test_history_save_load_roundtrip(tmp_path):
 def test_record_run_convenience():
     """record_run enables logging, runs the sim and returns the history."""
     net = corridor_network([200.0, 200.0])
-    net.set_origin("n0", [Vehicle(vehicle_id=0, route=[1, 2], start=0.0)])
+    net.set_origin("n0", [Vehicle(vehicle_id=0, route=[1, 2], scheduled_departure=0.0)])
     sim = net.compile(time_step=1.0, total_time=40.0)
     history = record_run(sim)
     assert isinstance(history, SimulationHistory)
@@ -178,7 +193,11 @@ def test_policy_routed_vehicle_logs_no_fabricated_plan():
     net = grid_network(3, 3, link_length=100.0, all_nodes_od=True)
     net.set_origin(
         (0, 0),
-        [Vehicle(vehicle_id=0, origin=(0, 0), destination=(2, 2), start=0.0)],
+        [
+            Vehicle(
+                vehicle_id=0, origin=(0, 0), destination=(2, 2), scheduled_departure=0.0
+            )
+        ],
     )
     sim = net.compile(
         time_step=1.0,

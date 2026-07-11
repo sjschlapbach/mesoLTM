@@ -21,7 +21,12 @@ def test_shortest_path_routes_all_vehicles_on_partial_grid():
     """Shortest-path routing delivers every vehicle on a partial grid."""
     net = grid_network(3, 3, skip_nodes=[(1, 1)], all_nodes_od=True)
     vehicles = [
-        Vehicle(vehicle_id=k, start=float(k), origin=(0, 0), destination=(2, 2))
+        Vehicle(
+            vehicle_id=k,
+            scheduled_departure=float(k),
+            origin=(0, 0),
+            destination=(2, 2),
+        )
         for k in range(20)
     ]
     net.set_origin((0, 0), vehicles=vehicles)
@@ -37,7 +42,12 @@ def test_plugin_closes_link_and_forces_reroute():
     """Closing a link mid-run stops new vehicles from entering it."""
     net = grid_network(3, 3, all_nodes_od=True)
     vehicles = [
-        Vehicle(vehicle_id=k, start=float(k), origin=(0, 0), destination=(2, 0))
+        Vehicle(
+            vehicle_id=k,
+            scheduled_departure=float(k),
+            origin=(0, 0),
+            destination=(2, 0),
+        )
         for k in range(30)
     ]
     net.set_origin((0, 0), vehicles=vehicles)
@@ -45,7 +55,7 @@ def test_plugin_closes_link_and_forces_reroute():
     closed: set = set()
 
     def cost(link_id, state):
-        return state.free_flow_time(link_id) + (
+        return state.continuous_free_flow_time(link_id) + (
             1e6 if state.endpoints(link_id) in closed else 0.0
         )
 
@@ -84,7 +94,9 @@ def test_detour_link_used_only_when_cheaper():
     net.set_origin(
         "A",
         vehicles=[
-            Vehicle(vehicle_id=k, start=float(k), origin="A", destination="C")
+            Vehicle(
+                vehicle_id=k, scheduled_departure=float(k), origin="A", destination="C"
+            )
             for k in range(10)
         ],
     )

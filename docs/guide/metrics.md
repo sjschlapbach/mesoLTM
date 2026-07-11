@@ -32,10 +32,11 @@ queued at the horizon's end are omitted.
 |-------|---------|
 | `vehicle_id`, `journey_index`, `origin`, `destination` | Identity (which vehicle, which of its trips) |
 | `route` | The ordered real link ids actually driven |
-| `start_time` | Desired departure (`vehicle.start`) |
+| `scheduled_departure_time` | Requested departure (`vehicle.scheduled_departure`); may fall between steps |
+| `departure_time` | The **actual** departure — when the vehicle entered the origin queue (normally `ceil(scheduled_departure / dt) * dt`, later if injected with a past departure time) |
 | `network_entry_time` | When it entered the first real link |
 | `arrival_time` | When it was absorbed at the destination |
-| `travel_time` | Time in system, desired departure → arrival, **less each connector's one-step free-flow lag** |
+| `travel_time` | Time in system, **discrete `departure_time` → arrival**, **less each connector's one-step free-flow lag** (a clean multiple of `dt`) |
 | `access_time` | The part of `travel_time` not on real links: origin-queue wait + any supply-limited connector wait, `travel_time − network_time` |
 | `network_time` | Time on real links only (connector-free) |
 | `n_links`, `link_travel_times` | Per-link travel times (`{link_id: seconds}`) |
@@ -53,6 +54,39 @@ queued at the horizon's end are omitted.
 
 By default connector links are excluded from `route` and `link_travel_times`; pass
 `include_connectors=True` to keep them.
+
+!!! note "Travel time runs from the *actual* departure, not the scheduled time"
+    `departure_time` is the moment the vehicle actually entered the origin queue —
+    the first simulation step **at or after** its `scheduled_departure`, i.e.
+    `ceil(scheduled_departure / dt) * dt`. `travel_time` is measured from there, so
+    the sub-step wait for the next step (a discretisation artifact, not real travel)
+    is excluded and `travel_time` is always a multiple of `dt`. If a vehicle is
+    injected with a departure time already in the **past** (it cannot depart before
+    it exists), `departure_time` is the step it was actually enqueued — not the stale
+    schedule — so `travel_time` isn't inflated by that gap. When `scheduled_departure`
+    already lands on a step boundary and isn't in the past, `departure_time ==
+    scheduled_departure_time`.
+
+## Fastest achievable time (`free_flow_time`)
+
+Because vehicles advance in whole steps, each link's free-flow crossing takes exactly
+its integer wave lag `T1` steps, so the fastest a vehicle can traverse a route is
+`sum(T1) * dt`. `free_flow_time(route, free_flow_steps, dt)` returns this discrete
+lower bound — directly comparable to a trip's connector-free `travel_time`:
+
+```python
+from mesoltm import free_flow_time
+
+steps = {l.link_id: l.T1 for l in sim.links}   # each link's free-flow step lag
+for t in collect_trips(sim):
+    fastest = free_flow_time(t["route"], steps, sim.time_step)
+    delay = t["travel_time"] - fastest         # congestion + access delay
+```
+
+This is the discrete counterpart of the continuous per-link value `length / v_f`,
+exposed on the live network state as `state.continuous_free_flow_time(link_id)` (used
+by default as the shortest-path routing weight); the latter ignores `dt`, the former
+rounds to it.
 
 ## Network summary
 

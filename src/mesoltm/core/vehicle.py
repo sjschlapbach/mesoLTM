@@ -32,7 +32,18 @@ class Vehicle:
         vehicle_id: Unique identifier of the vehicle.
         origin: Origin node/link identifier (bookkeeping only).
         destination: Destination node/link identifier (bookkeeping only).
-        start: Departure time in seconds.
+        scheduled_departure: The *requested* departure time in seconds (an input).
+            The vehicle is only released at the first discrete step at or after this
+            time (see
+            :meth:`~mesoltm.core.nodes.origin_node.OriginNode.prepare_step`);
+            :attr:`departure_time` records when that release actually happened.
+        departure_time: The **actual** departure time in seconds — the moment the
+            vehicle is put into the origin queue / onto its first (connector) link,
+            stamped by :meth:`~mesoltm.core.nodes.origin_node.OriginNode.prepare_step`
+            (``None`` until then). This is normally
+            ``ceil(scheduled_departure / dt) * dt``, but is later if the vehicle was
+            injected with a departure time already in the past (it cannot depart
+            before it exists). Travel time is measured from here.
         route: Ordered sequence of ``link_id`` values the vehicle intends to
             traverse. The route may be mutated at any time (e.g. by a plugin or
             routing policy) to reroute the vehicle at its next node — the network
@@ -48,8 +59,10 @@ class Vehicle:
             metrics) can attach and evolve information now that every vehicle's
             location is tracked. Must be JSON-serialisable to survive the animation
             history round-trip.
-        end: Arrival time step, set by the destination node when the vehicle
-            exits the network (``None`` while still travelling).
+        arrival_time: Arrival time in seconds, stamped by the destination node when
+            the vehicle exits the network (``None`` while still travelling). Tracked
+            as a time (like :attr:`departure_time`) so downstream processing needs no
+            step→seconds conversion.
         trajectory: Ordered per-link travel log, one entry per link the vehicle
             enters: ``{"link_id", "entry_step", "exit_step", "is_connector"}``.
             ``exit_step`` is ``None`` while the vehicle is still on that link.
@@ -58,16 +71,18 @@ class Vehicle:
         journeys: The **single source of truth** for the trips this vehicle has
             completed. Every time the vehicle is absorbed at a destination its
             just-finished trip is snapshotted (see :meth:`snapshot_journey`) and
-            appended here — a self-contained record of that journey's ``start``,
-            ``end``, ``route`` (via its ``trajectory``) and endpoints. This works
+            appended here — a self-contained record of that journey's
+            ``scheduled_departure``, ``departure_time``, ``arrival_time``, ``route``
+            (via its ``trajectory``) and endpoints. This works
             uniformly no matter how the vehicle came to exist: a vehicle from a
             static demand profile completes exactly one journey (``journeys`` has
             one entry), while a vehicle injected — and re-injected — by hand records
             one entry per trip. All trip metrics (:mod:`mesoltm.metrics`) are
             derived from these journey records, so demand-profile and hand-injected
             runs share one consistent accounting path. The **live** fields above
-            (``route``/``position``/``trajectory``/``start``/``end``) always
-            describe the *current* journey and are reset when the vehicle is
+            (``route``/``position``/``trajectory``/``departure_time``/
+            ``arrival_time``) always describe the *current* journey and are reset
+            when the vehicle is
             re-injected (see :meth:`reset_for_new_journey`); the completed journeys
             live on in ``journeys``.
         active: ``True`` from the moment the vehicle is queued at an origin (static
@@ -82,7 +97,7 @@ class Vehicle:
         vehicle_id: int = 0,
         origin: NodeId = 0,
         destination: NodeId = 0,
-        start: float = 0.0,
+        scheduled_departure: float = 0.0,
         route: Sequence[int] | None = None,
         props: dict | None = None,
         **kwargs: object,
@@ -93,7 +108,9 @@ class Vehicle:
             vehicle_id: Unique identifier.
             origin: Origin identifier (bookkeeping).
             destination: Destination identifier (bookkeeping).
-            start: Departure time in seconds.
+            scheduled_departure: Scheduled departure time in seconds (see the class
+                attribute; the vehicle is released at the first discrete step at or
+                after this time).
             route: Ordered ``link_id`` sequence; copied into a mutable list.
             props: Optional free-form metadata dict (copied into a mutable dict);
                 see :attr:`props`. Updatable at any time after creation.
@@ -103,10 +120,11 @@ class Vehicle:
         self.vehicle_id = vehicle_id
         self.origin = origin
         self.destination = destination
-        self.start = start
+        self.scheduled_departure = scheduled_departure
         self.route: list[int] = list(route) if route is not None else []
         self.position = 0
-        self.end: int | None = None
+        self.departure_time: float | None = None
+        self.arrival_time: float | None = None
         self.trajectory: list[dict] = []
         self.props: dict = dict(props) if props else {}
         # Completed-journey archive (single source of truth for finished trips) and
@@ -211,15 +229,17 @@ class Vehicle:
 
         Called by the destination node the moment the vehicle is absorbed. The
         returned dict is self-contained — it carries the journey's endpoints, its
-        desired departure (``start``) and arrival (``end``) steps, its position in
-        the vehicle's ``journeys`` list (``journey_index``), and a copy of the
+        ``scheduled_departure`` (requested), ``departure_time`` (actual) and
+        ``arrival_time`` (all seconds), its position in the vehicle's ``journeys``
+        list (``journey_index``), and a copy of the
         per-link ``trajectory`` — so it survives unchanged even if the vehicle is
         later re-injected and its live fields are reset. It is the atomic unit all
         trip metrics are computed from (see :mod:`mesoltm.metrics`).
 
         Returns:
-            A journey record: ``{"vehicle_id", "origin", "destination", "start",
-            "end", "journey_index", "trajectory"}``. The ``trajectory`` is a shallow
+            A journey record: ``{"vehicle_id", "origin", "destination",
+            "scheduled_departure", "departure_time", "arrival_time",
+            "journey_index", "trajectory"}``. The ``trajectory`` is a shallow
             copy of the segment list (its segment dicts are never mutated once the
             journey has ended), so the snapshot is decoupled from later journeys.
         """
@@ -227,8 +247,9 @@ class Vehicle:
             "vehicle_id": self.vehicle_id,
             "origin": self.origin,
             "destination": self.destination,
-            "start": self.start,
-            "end": self.end,
+            "scheduled_departure": self.scheduled_departure,
+            "departure_time": self.departure_time,
+            "arrival_time": self.arrival_time,
             "journey_index": len(self.journeys),
             "trajectory": list(self.trajectory),
         }
@@ -236,18 +257,22 @@ class Vehicle:
     def reset_for_new_journey(self) -> None:
         """Clear the live journey state so the vehicle can start a fresh trip.
 
-        Wipes the current-journey working fields (``trajectory``, ``end``,
-        ``position``) while leaving the completed :attr:`journeys` untouched. Called
-        by :meth:`~mesoltm.network.state.NetworkState.inject` when an already-used
+        Wipes the current-journey working fields (``trajectory``,
+        ``departure_time``, ``arrival_time``, ``position``) while leaving the
+        completed :attr:`journeys` untouched. Called by
+        :meth:`~mesoltm.network.state.NetworkState.inject` when an already-used
         vehicle is re-injected; the new ``route`` is set by the injection splice
-        immediately afterwards.
+        immediately afterwards, and ``departure_time`` is re-stamped when the vehicle
+        next enters the origin queue.
         """
         self.trajectory = []
-        self.end = None
+        self.departure_time = None
+        self.arrival_time = None
         self.position = 0
 
     def __repr__(self) -> str:
         return (
-            f"Vehicle(id={self.vehicle_id}, start={self.start}, "
+            f"Vehicle(id={self.vehicle_id}, "
+            f"scheduled_departure={self.scheduled_departure}, "
             f"route={self.route}, position={self.position})"
         )

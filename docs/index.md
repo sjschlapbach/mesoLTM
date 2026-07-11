@@ -40,7 +40,7 @@ from mesoltm import Vehicle, grid_network, ShortestPathPolicy
 # A 4x4 grid where every node can be an origin or a destination.
 net = grid_network(4, 4, link_length=200.0, all_nodes_od=True)
 net.set_origin((0, 0), vehicles=[
-    Vehicle(vehicle_id=k, start=float(k), origin=(0, 0), destination=(3, 3))
+    Vehicle(vehicle_id=k, scheduled_departure=float(k), origin=(0, 0), destination=(3, 3))
     for k in range(50)
 ])
 

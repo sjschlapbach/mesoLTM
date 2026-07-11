@@ -59,10 +59,10 @@ class DestinationNode(BaseNode):
         """Allocate the per-step arrival series for the horizon."""
         self.inflow = [0] * int(total_time / time_step)
 
-    def prepare_step(self, t: int) -> None:
+    def prepare_step(self, step: int, time: float) -> None:
         """No-op; destinations act only during flow computation."""
 
-    def compute_flows(self, t: int) -> None:
+    def compute_flows(self, step: int, time: float) -> None:
         """Pull all vehicles ready to leave the link and record their journeys.
 
         For each arriving vehicle the just-finished trip is frozen into a journey
@@ -70,17 +70,23 @@ class DestinationNode(BaseNode):
         both to the vehicle's ``journeys`` (its own history, and the guard used when
         it is re-injected) and to this node's ``completed_journeys`` (the per-
         destination index the metrics read). The vehicle is marked idle
-        (``active = False``) so it may be injected again for a further trip.
+        (``active = False``) so it may be injected again for a further trip. Each
+        vehicle's ``arrival_time`` is stamped with the current simulation ``time``
+        (passed down from the simulation).
+
+        Args:
+            step: The current simulation step index.
+            time: The current simulation time in seconds (``step * dt``).
         """
         outflow = self.link.get_demand()
-        vehicles = self.link.set_outflow(outflow, t)
+        vehicles = self.link.set_outflow(outflow, step)
         for vehicle in vehicles:
-            vehicle.end = t
+            vehicle.arrival_time = time
             vehicle.active = False
             journey = vehicle.snapshot_journey()
             vehicle.journeys.append(journey)
             self.completed_journeys.append(journey)
-        self.inflow[t] = outflow
+        self.inflow[step] = outflow
         self.arrived_vehicles.extend(vehicles)
 
     def get_arrived_trips(self) -> list[dict]:
@@ -93,8 +99,9 @@ class DestinationNode(BaseNode):
                     "journey_index": journey["journey_index"],
                     "origin": journey["origin"],
                     "destination": journey["destination"],
-                    "start": journey["start"],
-                    "end": journey["end"],
+                    "scheduled_departure": journey["scheduled_departure"],
+                    "departure_time": journey["departure_time"],
+                    "arrival_time": journey["arrival_time"],
                 }
             )
         return records

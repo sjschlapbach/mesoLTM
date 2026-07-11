@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from .trips import (
     collect_trips,
+    free_flow_time,
     summarize_trips,
     trip_record,
     write_trips_csv,
@@ -20,6 +21,7 @@ from .trips import (
 __all__ = [
     "collect_trips",
     "trip_record",
+    "free_flow_time",
     "summarize_trips",
     "write_trips_csv",
 ]

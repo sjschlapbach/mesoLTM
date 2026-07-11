@@ -139,8 +139,17 @@ class NetworkState:  # pylint: disable=too-many-public-methods
         link = self.links_by_id[link_id]
         return link.rho_jam * link.v_f * link.w / (link.v_f + link.w)
 
-    def free_flow_time(self, link_id: int) -> float:
-        """Return the free-flow travel time (s) of a link."""
+    def continuous_free_flow_time(self, link_id: int) -> float:
+        """Return the continuous-time free-flow travel time (s) of a link.
+
+        This is the continuous LTM value ``length / v_f`` — the exact time a vehicle
+        would need to traverse the link at free-flow speed, **independent of the
+        simulation time step**. The discrete model advances vehicles in whole steps,
+        so the *achievable* free-flow time is instead the link's integer wave lag
+        ``T1 * dt`` (see :func:`mesoltm.metrics.free_flow_time` for the route-level
+        discrete value). Use this continuous value where a fine-grained, dt-agnostic
+        cost is wanted (e.g. as a routing edge weight).
+        """
         link = self.links_by_id[link_id]
         return link.length / link.v_f
 
@@ -218,8 +227,9 @@ class NetworkState:  # pylint: disable=too-many-public-methods
 
         Args:
             node_id: An origin node (marked via ``Network.set_origin``).
-            vehicle: The vehicle to inject; ``start``, ``route`` and ``position``
-                are set here (and the live journey state reset on re-injection).
+            vehicle: The vehicle to inject; ``scheduled_departure``, ``route`` and
+                ``position`` are set here (and the live journey state reset on
+                re-injection).
             at_time: Departure time in seconds; defaults to the current step's
                 time (``step * dt``) so it is considered in the next step.
             check_reentry_node: When re-injecting an already-used vehicle, require
@@ -260,7 +270,9 @@ class NetworkState:  # pylint: disable=too-many-public-methods
             vehicle.reset_for_new_journey()
 
         self._splice_injection_route(node_id, vehicle)
-        vehicle.start = self.step * self.time_step if at_time is None else at_time
+        vehicle.scheduled_departure = (
+            self.step * self.time_step if at_time is None else at_time
+        )
         origin.add_trip(vehicle)
 
         # Warn if more vehicles are injected than the connectors were sized for: the

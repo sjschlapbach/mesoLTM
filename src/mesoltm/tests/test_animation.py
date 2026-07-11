@@ -26,7 +26,12 @@ def _recorded_history() -> anim.SimulationHistory:
     net.set_origin(
         "n0",
         [
-            Vehicle(vehicle_id=i, destination="n3", route=[1, 2, 3], start=float(i))
+            Vehicle(
+                vehicle_id=i,
+                destination="n3",
+                route=[1, 2, 3],
+                scheduled_departure=float(i),
+            )
             for i in range(4)
         ],
     )
@@ -94,8 +99,18 @@ def test_color_by_custom_callable_reads_props():
     net.set_origin(
         "n0",
         [
-            Vehicle(vehicle_id=0, route=[1, 2], start=0.0, props={"cls": "van"}),
-            Vehicle(vehicle_id=1, route=[1, 2], start=0.0, props={"cls": "truck"}),
+            Vehicle(
+                vehicle_id=0,
+                route=[1, 2],
+                scheduled_departure=0.0,
+                props={"cls": "van"},
+            ),
+            Vehicle(
+                vehicle_id=1,
+                route=[1, 2],
+                scheduled_departure=0.0,
+                props={"cls": "truck"},
+            ),
         ],
     )
     sim = net.compile(time_step=1.0, total_time=60.0, record_history=True)

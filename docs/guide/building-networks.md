@@ -23,7 +23,7 @@ l2 = net.add_link("b", "c", length=300.0)
 
 # Mark origins (with demand) and destinations.
 net.set_origin("a", vehicles=[
-    Vehicle(vehicle_id=k, start=float(k), origin="a", destination="c", route=[l1, l2])
+    Vehicle(vehicle_id=k, scheduled_departure=float(k), origin="a", destination="c", route=[l1, l2])
     for k in range(20)
 ])
 net.set_destination("c")

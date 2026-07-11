@@ -15,7 +15,7 @@ v = Vehicle(
     vehicle_id=1,
     origin="a",            # bookkeeping identifier
     destination="c",       # used by routing policies
-    start=5.0,             # departure time in seconds
+    scheduled_departure=5.0,  # scheduled departure (s); released at step ceil(5/dt)
     route=[1, 2, 4],       # ordered real link ids (optional; mutable)
     props={"vclass": "car"},  # free-form metadata dict (optional; JSON-serialisable)
 )
@@ -24,13 +24,15 @@ v = Vehicle(
 Signature and attributes:
 
 ```python
-Vehicle(vehicle_id=0, origin=0, destination=0, start=0.0, route=None, props=None, **kwargs)
+Vehicle(vehicle_id=0, origin=0, destination=0, scheduled_departure=0.0, route=None, props=None, **kwargs)
 # attributes:
 v.route        # list[int]: ordered link ids; rewrite to reroute
 v.position     # int: index of current link within route
 v.props        # dict: per-vehicle metadata (core never reads it)
 v.trajectory   # list[dict]: auto-log [{link_id, entry_step, exit_step, is_connector}]
-v.end          # int | None: arrival step (set by destination node)
+v.scheduled_departure  # float: requested departure (s); released at step ceil(scheduled/dt)
+v.departure_time  # float | None: ACTUAL departure (s), stamped on origin queue-join
+v.arrival_time # float | None: arrival time (s) (set by destination node)
 v.journeys     # list[dict]: completed-trip records — the single source of truth
 v.active       # bool: True while queued/en route, False once absorbed
 ```
@@ -41,7 +43,7 @@ next node onward — this is how all rerouting works.
 
 ## Journeys: the single source of truth for completed trips
 
-The live fields (`route`/`position`/`trajectory`/`start`/`end`) describe the
+The live fields (`route`/`position`/`trajectory`/`departure_time`/`arrival_time`) describe the
 vehicle's **current** journey. When the vehicle is absorbed at a destination the
 finished trip is frozen into a **journey record** and appended to `v.journeys`:
 
@@ -49,8 +51,9 @@ finished trip is frozen into a **journey record** and appended to `v.journeys`:
 journey = {
     "vehicle_id": 7,
     "origin": "A", "destination": "B",
-    "start": 0.0,          # desired departure (seconds)
-    "end": 21,             # arrival step
+    "scheduled_departure": 0.0,  # requested departure (seconds)
+    "departure_time": 0.0,       # ACTUAL departure = origin queue-join (seconds)
+    "arrival_time": 21.0,        # arrival (seconds)
     "journey_index": 0,    # 0-based position in v.journeys
     "trajectory": [ {link_id, entry_step, exit_step, is_connector}, ... ],  # a copy
 }
@@ -86,7 +89,7 @@ assert len(v.journeys) == 2
 Two things to know:
 
 - **Set `v.route` to the new trip's real links before re-injecting.** Re-injection
-  resets the live journey state (`trajectory`/`end`/`position`) but deliberately
+  resets the live journey state (`trajectory`/`departure_time`/`arrival_time`/`position`) but deliberately
   does **not** touch `route`, which still holds the previous, connector-spliced
   route. `inject` reads `v.route` as the new real-link route, so you must overwrite
   it (as you would when defining any new trip).
@@ -127,7 +130,7 @@ Congestion-aware cost using live `NetworkState`:
 
 ```python
 def congestion_cost(link_id, state):
-    return state.free_flow_time(link_id) + 0.5 * state.occupancy(link_id)
+    return state.continuous_free_flow_time(link_id) + 0.5 * state.occupancy(link_id)
 
 policy = ShortestPathPolicy(cost=congestion_cost, dynamic=True)
 ```

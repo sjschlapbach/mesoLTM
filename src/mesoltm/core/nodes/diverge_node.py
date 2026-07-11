@@ -56,10 +56,10 @@ class DivergeNode(BaseNode):
         self.inbound_link = inbound_link
         self.outbound_links = outbound_links
 
-    def prepare_step(self, t: int) -> None:
+    def prepare_step(self, step: int, time: float) -> None:
         """No-op; the transfer happens during flow computation."""
 
-    def compute_flows(self, t: int) -> None:
+    def compute_flows(self, step: int, time: float) -> None:
         """Advance vehicles in FIFO order while their target link has supply.
 
         Paper Section 3.4.2, Algorithm 1 (the discrete, vehicle-level diverge). The
@@ -100,8 +100,8 @@ class DivergeNode(BaseNode):
             else:
                 break
 
-        ret_val = self.inbound_link.set_outflow(total_flow, t)
+        ret_val = self.inbound_link.set_outflow(total_flow, step)
         for idx_outb, vehicles in enumerate(vehicles_by_outbound_link):
-            self.outbound_links[idx_outb].set_inflow(vehicles, t)
+            self.outbound_links[idx_outb].set_inflow(vehicles, step)
 
         assert len(ret_val) == sum(len(vs) for vs in vehicles_by_outbound_link)

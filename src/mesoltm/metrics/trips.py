@@ -12,10 +12,16 @@ As a :class:`~mesoltm.core.vehicle.Vehicle` moves it logs which links it entered
 and when; when it is absorbed at a destination that finished trip is frozen into a
 **journey record** on ``vehicle.journeys`` (the single source of truth for a
 vehicle's completed trips). These functions turn each journey record into a compact
-trip record — the route actually driven, the travel time (desired departure to
-arrival, less each connector's one-step free-flow lag but keeping any supply-limited
-connector wait), that access time on its own, and the travel time on each link
-traversed.
+trip record — the route actually driven, the travel time (from the vehicle's
+**actual departure** — when it entered the origin queue — to its arrival, less each
+connector's one-step free-flow lag but keeping any supply-limited connector wait),
+that access time on its own, and the travel time on each link traversed.
+
+For a fastest-possible reference to compare travel times against, :func:`free_flow_time`
+gives the shortest travel time actually achievable over a route in the discrete model
+(a multiple of ``dt``); it is the discrete counterpart of the continuous per-link
+``length / v_f`` value exposed as
+:meth:`~mesoltm.network.state.NetworkState.continuous_free_flow_time`.
 
 Because every completed trip — whether it came from a static demand profile (one
 vehicle, one journey) or from a hand-injected and re-injected vehicle (one vehicle,
@@ -30,6 +36,7 @@ from __future__ import annotations
 
 import csv
 from collections import defaultdict
+from collections.abc import Mapping, Sequence
 from statistics import mean, median
 from typing import TYPE_CHECKING
 
@@ -40,16 +47,26 @@ if TYPE_CHECKING:
 def trip_record(journey: dict, dt: float, include_connectors: bool = False) -> dict:
     """Build the travel-time record for a single completed journey.
 
-    The reported ``travel_time`` is the time from the vehicle's desired departure
+    The reported ``travel_time`` is the time from the vehicle's **actual departure**
     to its arrival, **minus the artificial one-step free-flow lag that each
     auto-inserted O/D connector imposes** (a one-cell connector always costs one
-    free-flow step to cross, even when empty and unrestricted). Time a vehicle
-    spends on a connector *beyond* that one step is **kept**: it is a genuine
-    supply-limited wait to enter or leave the network (downstream space was the
-    binding constraint). ``travel_time`` splits into ``access_time`` (origin-queue
-    wait plus any supply-limited connector wait) and ``network_time`` (time on real
-    links only), so ``travel_time == access_time + network_time``; ``network_time``
-    reflects only real links and is unaffected by connectors.
+    free-flow step to cross, even when empty and unrestricted). The actual departure
+    (``departure_time``) is the instant the vehicle entered the origin queue —
+    stamped by
+    :meth:`~mesoltm.core.nodes.origin_node.OriginNode.prepare_step` at the first
+    step at or after its ``scheduled_departure`` — and the arrival (``arrival_time``)
+    is stamped at absorption; both are read straight off the journey record (already
+    in seconds). Measuring from the actual departure (rather than the sub-step
+    ``scheduled_departure``) keeps ``travel_time`` a clean multiple of ``dt`` and, for
+    a vehicle injected with a past departure time, avoids charging travel for time
+    before the vehicle could exist.
+
+    Time a vehicle spends on a connector *beyond* its one free-flow step is **kept**:
+    it is a genuine supply-limited wait to enter or leave the network (downstream
+    space was the binding constraint). ``travel_time`` splits into ``access_time``
+    (origin-queue wait plus any supply-limited connector wait) and ``network_time``
+    (time on real links only), so ``travel_time == access_time + network_time``;
+    ``network_time`` reflects only real links and is unaffected by connectors.
 
     Args:
         journey: A completed journey record as produced by
@@ -65,12 +82,16 @@ def trip_record(journey: dict, dt: float, include_connectors: bool = False) -> d
 
         * ``vehicle_id``, ``journey_index``, ``origin``, ``destination``;
         * ``route`` — the ordered real link ids the vehicle actually drove;
-        * ``start_time`` — desired departure (the journey's ``start``);
+        * ``scheduled_departure_time`` — the journey's requested departure
+          (``scheduled_departure``), which may fall between steps;
+        * ``departure_time`` — the actual departure: when the vehicle entered the
+          origin queue (normally ``ceil(scheduled_departure / dt) * dt``, later if it
+          was injected with a past departure time);
         * ``network_entry_time`` — when it entered the first real link;
         * ``arrival_time`` — when it was absorbed at the destination;
-        * ``travel_time`` — time in system from desired departure to arrival, with
-          each connector's one-step free-flow lag removed (supply-limited connector
-          waiting is kept);
+        * ``travel_time`` — time in system from the actual ``departure_time`` to
+          arrival, with each connector's one-step free-flow lag removed
+          (supply-limited connector waiting is kept);
         * ``access_time`` — the part of ``travel_time`` not spent on real links:
           origin-queue wait plus any supply-limited O/D connector wait,
           ``travel_time − network_time``;
@@ -89,7 +110,14 @@ def trip_record(journey: dict, dt: float, include_connectors: bool = False) -> d
     # already the first real link.
     real_entry = next((seg for seg in trajectory if not seg["is_connector"]), None)
     network_entry_step = real_entry["entry_step"] if real_entry is not None else None
-    arrival_step = journey["end"]
+
+    # Both the requested (``scheduled_departure``) and the actual departure
+    # (``departure_time`` — when the vehicle entered the origin queue, stamped by
+    # OriginNode.prepare_step) and the arrival are tracked directly on the journey,
+    # already in seconds. Travel time is measured from the actual departure.
+    scheduled_departure = journey["scheduled_departure"]
+    departure_time = journey["departure_time"]
+    arrival_time = journey["arrival_time"]
 
     # The route actually driven = the real links in the order they were traversed
     # (connectors are internal access stubs, dropped unless explicitly requested).
@@ -110,7 +138,6 @@ def trip_record(journey: dict, dt: float, include_connectors: bool = False) -> d
         link_travel_times[seg["link_id"]] = (seg["exit_step"] - seg["entry_step"]) * dt
 
     network_entry_time = None if network_entry_step is None else network_entry_step * dt
-    arrival_time = None if arrival_step is None else arrival_step * dt
 
     # network = time actually spent on *real* links (connector-free), summed from
     # the non-connector trajectory segments. Independent of ``include_connectors``,
@@ -136,15 +163,13 @@ def trip_record(journey: dict, dt: float, include_connectors: bool = False) -> d
             crossing = (seg["exit_step"] - seg["entry_step"]) * dt
             connector_free_flow_lag += min(crossing, dt)
 
-    # travel_time = desired departure -> arrival, minus each connector's one-step
+    # travel_time = actual departure -> arrival, minus each connector's one-step
     # free-flow lag; access = the part not spent on real links (origin-queue wait +
     # any supply-limited connector wait), so the identity
     # ``travel_time == access_time + network_time`` always holds.
     travel_time = None
-    if arrival_time is not None:
-        travel_time = max(
-            0.0, arrival_time - journey["start"] - connector_free_flow_lag
-        )
+    if arrival_time is not None and departure_time is not None:
+        travel_time = max(0.0, arrival_time - departure_time - connector_free_flow_lag)
     access_time = None
     if travel_time is not None and network_time is not None:
         access_time = max(0.0, travel_time - network_time)
@@ -157,7 +182,8 @@ def trip_record(journey: dict, dt: float, include_connectors: bool = False) -> d
         "origin": journey["origin"],
         "destination": journey["destination"],
         "route": route,
-        "start_time": journey["start"],
+        "scheduled_departure_time": scheduled_departure,
+        "departure_time": departure_time,
         "network_entry_time": network_entry_time,
         "arrival_time": arrival_time,
         "travel_time": travel_time,
@@ -166,6 +192,35 @@ def trip_record(journey: dict, dt: float, include_connectors: bool = False) -> d
         "n_links": len(link_travel_times),
         "link_travel_times": link_travel_times,
     }
+
+
+def free_flow_time(
+    route: Sequence[int], free_flow_steps: Mapping[int, int], dt: float
+) -> float:
+    """Fastest travel time actually achievable over ``route`` (a multiple of ``dt``).
+
+    Vehicles advance in whole steps, so each link's free-flow crossing takes exactly
+    its integer wave lag ``T1`` steps (:attr:`mesoltm.core.link.Link.T1`) — a vehicle
+    that enters at step ``s`` first becomes dischargeable at ``s + T1`` — and an
+    uncongested vehicle can do no better. The fastest achievable time over the route
+    is therefore ``sum(T1) * dt``. This is the *discrete* free-flow time; the
+    continuous per-link value ``length / v_f`` (unaware of ``dt``) is exposed
+    separately as
+    :meth:`~mesoltm.network.state.NetworkState.continuous_free_flow_time`.
+
+    Args:
+        route: Ordered ``link_id`` values to traverse. Pass the connector-free route
+            of a trip record (its ``route``) to get a value comparable with that
+            record's connector-free ``travel_time``.
+        free_flow_steps: Maps each ``link_id`` on ``route`` to that link's ``T1``
+            (whole free-flow steps). Build it from a run as
+            ``{l.link_id: l.T1 for l in sim.links}``.
+        dt: Simulation step ``dt`` in seconds.
+
+    Returns:
+        The fastest achievable travel time in seconds, a multiple of ``dt``.
+    """
+    return sum(free_flow_steps[lid] for lid in route) * dt
 
 
 def collect_trips(sim: Simulation, include_connectors: bool = False) -> list[dict]:
@@ -253,7 +308,8 @@ def write_trips_csv(trips: list[dict], path: str) -> str:
         "origin",
         "destination",
         "route",
-        "start_time",
+        "scheduled_departure_time",
+        "departure_time",
         "network_entry_time",
         "arrival_time",
         "travel_time",

@@ -12,7 +12,7 @@ from mesoltm import Vehicle, corridor_network
 
 net = corridor_network([300.0, 300.0, 300.0])   # nodes n0..n3
 net.set_origin("n0", vehicles=[
-    Vehicle(vehicle_id=k, start=2.0 * k, origin="n0", destination="n3")
+    Vehicle(vehicle_id=k, scheduled_departure=2.0 * k, origin="n0", destination="n3")
     for k in range(40)
 ])
 net.set_destination("n3")
@@ -31,7 +31,7 @@ from mesoltm import Vehicle, grid_network, ShortestPathPolicy
 
 net = grid_network(4, 4, link_length=200.0, all_nodes_od=True)
 net.set_origin((0, 0), vehicles=[
-    Vehicle(vehicle_id=k, start=float(k), origin=(0, 0), destination=(3, 3))
+    Vehicle(vehicle_id=k, scheduled_departure=float(k), origin=(0, 0), destination=(3, 3))
     for k in range(50)
 ])
 sim = net.compile(time_step=1.0, total_time=400.0,

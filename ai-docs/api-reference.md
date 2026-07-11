@@ -18,7 +18,7 @@ Key `Link` methods (mostly engine-internal): `start(time_step, total_time)`,
 ## Vehicle and Simulation (mesoltm.core)
 
 ```python
-Vehicle(vehicle_id=0, origin=0, destination=0, start=0.0, route=None, props=None, **kwargs)
+Vehicle(vehicle_id=0, origin=0, destination=0, scheduled_departure=0.0, route=None, props=None, **kwargs)
 #   attrs: route(list[int]), position(int), props(dict), trajectory(list[dict]), end(int|None)
 #          journeys(list[dict], single source of truth for completed trips), active(bool)
 Vehicle.next_link(current_link_id) -> int | None
@@ -58,7 +58,7 @@ MergeNode(node_id, outbound_link, inbound_links, priority_vector=None, alpha=Non
 GeneralNodeModel(node_id, inbound_links, outbound_links, priority_vector=None, alpha=None)
 OriginNode(node_id, link, demand_trips, **kwargs)           # add_trip(vehicle)
 DestinationNode(node_id, link)                              # get_arrived_trips() -> list[dict]
-# arrived-trip record keys: trip_id, origin, destination, start, end
+# arrived-trip record keys: trip_id, origin, destination, scheduled_departure, departure_time, arrival_time
 ```
 
 Priority helper (not re-exported; `mesoltm.core.priorities`):
@@ -90,7 +90,7 @@ network_from_dict(data) -> Network
 ```
 
 `NetworkState` (see [simulation.md](simulation.md) for the full method list):
-`out_links/in_links/endpoints/length/capacity/free_flow_time/occupancy/density/
+`out_links/in_links/endpoints/length/capacity/continuous_free_flow_time/occupancy/density/
 entry_queue/waiting_vehicles/vehicles_in_network/remaining_real_route/set_route/
 inject/cumulative_inflow/cumulative_outflow`; attr `step`.
 
@@ -129,8 +129,12 @@ vehicles_from_demand_profile(demand_pattern, total_time, route=None,
 ```python
 collect_trips(sim, include_connectors=False) -> list[dict]   # one per journey; (vehicle_id, journey_index)
 trip_record(journey, dt, include_connectors=False) -> dict   # journey record, not a live Vehicle
+free_flow_time(route, free_flow_steps, dt) -> float          # sum(T1)*dt; free_flow_steps={l.link_id: l.T1}
 summarize_trips(trips) -> dict
 write_trips_csv(trips, path) -> str
+# trip_record keys: vehicle_id, journey_index, origin, destination, route,
+#   scheduled_departure_time, departure_time, network_entry_time, arrival_time,
+#   travel_time, access_time, network_time, n_links, link_travel_times
 ```
 
 ## Recording (mesoltm.recording; matplotlib-free)

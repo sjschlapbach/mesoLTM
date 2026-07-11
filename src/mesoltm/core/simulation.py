@@ -182,18 +182,23 @@ class Simulation:
         if self.network_state is not None:
             self.network_state.step = t
 
+        # The simulation is the single owner of the clock: it converts the step
+        # index to the current simulation time once and passes both down, so nodes
+        # need not store the time step themselves.
+        sim_time = t * self.time_step
+
         if self.plugins is not None:
             for obj in self.plugins:
                 obj.run_step(t)
 
         for node in self.nodes:
-            node.prepare_step(t)
+            node.prepare_step(t, sim_time)
 
         for link in self.links:
             link.compute_demand_and_supplies(t)
 
         for node in self.nodes:
-            node.compute_flows(t)
+            node.compute_flows(t, sim_time)
 
         for link in self.links:
             link.update_state_variables(t, self.time_step)
@@ -280,9 +285,9 @@ class Simulation:
         Args:
             node_id: An origin node (must have been marked via
                 ``Network.set_origin``) to release the vehicle from.
-            vehicle: The vehicle to inject; its ``start`` is overwritten with the
-                effective departure time, and its live journey state is reset when
-                it is being re-injected.
+            vehicle: The vehicle to inject; its ``scheduled_departure`` is overwritten
+                with the given departure time, and its live journey state is reset
+                when it is being re-injected.
             at_time: Departure time in seconds. Defaults to the current step's time
                 (``current_step * dt``), so the vehicle is considered for release
                 in the very next :meth:`step`.

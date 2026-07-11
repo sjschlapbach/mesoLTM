@@ -97,11 +97,11 @@ class GeneralNodeModel(BaseNode):
             capacities = [link.get_capacity() for link in self.inbound_links]
             self.priority_vector = priority_vector_from_alpha(capacities)
 
-    def prepare_step(self, t: int) -> None:
+    def prepare_step(self, step: int, time: float) -> None:
         """No-op; the transfer happens during flow computation."""
 
-    def compute_flows(self, t: int) -> None:
-        """Resolve node flows over all inbound/outbound links for step ``t``.
+    def compute_flows(self, step: int, time: float) -> None:
+        """Resolve node flows over all inbound/outbound links for the current step.
 
         Paper Section 3.4.4, Algorithm 3 (the general M-in x N-out node). It combines
         the priority-vector merge of Algorithm 2 (over inbound links) with the
@@ -207,7 +207,7 @@ class GeneralNodeModel(BaseNode):
                 priority_base = False
 
         for idx_outb, flow in enumerate(flow_order_by_outbound_link):
-            self.outbound_links[idx_outb].set_inflow(flow, t)
+            self.outbound_links[idx_outb].set_inflow(flow, step)
 
         for idx_inb, count in enumerate(flow_by_inbound_link):
-            self.inbound_links[idx_inb].set_outflow(count, t)
+            self.inbound_links[idx_inb].set_outflow(count, step)

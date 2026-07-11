@@ -54,7 +54,8 @@ class ShortestPathPolicy:
                 :class:`~mesoltm.network.state.NetworkState` (exported as
                 ``mesoltm.NetworkState``) — so a congestion-aware cost can read
                 ``state.occupancy(link_id)``, ``state.density(link_id)`` etc. with
-                full typing. Defaults to the link's free-flow travel time.
+                full typing. Defaults to the link's continuous free-flow travel time
+                (``state.continuous_free_flow_time(link_id)``, i.e. ``length / v_f``).
             dynamic: Whether to recompute the graph on each decision (needed when
                 ``cost`` depends on live state).
         """
@@ -74,7 +75,7 @@ class ShortestPathPolicy:
             cost = (
                 self._cost(lid, state)
                 if self._cost is not None
-                else state.free_flow_time(lid)
+                else state.continuous_free_flow_time(lid)
             )
 
             if not g.has_edge(u, v) or cost < g[u][v]["cost"]:

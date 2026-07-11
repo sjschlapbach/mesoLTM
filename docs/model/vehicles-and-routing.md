@@ -14,7 +14,7 @@ v = Vehicle(
     vehicle_id=1,
     origin="n0",
     destination="n3",
-    start=5.0,               # departure time in seconds
+    scheduled_departure=5.0, # scheduled departure time in seconds
     route=[1, 2, 4],         # ordered link ids to traverse (optional)
     props={"vclass": "car"}, # free-form metadata (optional)
 )
@@ -28,7 +28,9 @@ Key attributes:
 | `position` | Index of the current link within `route` (robust to routes that revisit a link). |
 | `props` | Free-form `dict` of per-vehicle metadata. The core never reads it; plugins, `color_by`, and custom metrics do. Must be JSON-serialisable to survive the animation history round-trip. |
 | `trajectory` | Auto-populated per-link log (`entry_step`, `exit_step`, `is_connector`) for the **current** trip; per-journey [metrics](../guide/metrics.md) are derived from it. |
-| `end` | Arrival step of the current trip, stamped by the destination node. |
+| `scheduled_departure` | Requested departure time in seconds. The vehicle is released at the first step at/after it (step `ceil(scheduled_departure / dt)`). |
+| `departure_time` | **Actual** departure time in seconds (`None` until then), stamped when the vehicle enters the origin queue. |
+| `arrival_time` | Arrival time in seconds of the current trip (`None` while travelling), stamped by the destination node. |
 | `journeys` | The completed-trip records (**the single source of truth** for this vehicle's finished trips). One entry per trip — a demand-profile vehicle has one; a [re-injected](../guide/stepping-and-injection.md#re-injecting-a-vehicle-for-another-trip) one has several. |
 | `active` | `True` while the vehicle is queued or moving; `False` once it has been absorbed at a destination. |
 

@@ -92,10 +92,10 @@ class MergeNode(BaseNode):
             capacities = [link.get_capacity() for link in self.inbound_links]
             self.priority_vector = priority_vector_from_alpha(capacities)
 
-    def prepare_step(self, t: int) -> None:
+    def prepare_step(self, step: int, time: float) -> None:
         """No-op; the transfer happens during flow computation."""
 
-    def compute_flows(self, t: int) -> None:
+    def compute_flows(self, step: int, time: float) -> None:
         """Serve inbound links round-robin by priority until supply runs out.
 
         Paper Section 3.4.3, Algorithm 2 (the discrete priority merge). The
@@ -157,7 +157,7 @@ class MergeNode(BaseNode):
             else:
                 break
 
-        self.outbound_link.set_inflow(inflow_order, t)
+        self.outbound_link.set_inflow(inflow_order, step)
 
         for idx_inb, flow in enumerate(flow_by_inbound_link):
-            self.inbound_links[idx_inb].set_outflow(flow, t)
+            self.inbound_links[idx_inb].set_outflow(flow, step)

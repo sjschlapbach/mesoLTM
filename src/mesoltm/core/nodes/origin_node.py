@@ -53,16 +53,13 @@ class OriginNode(BaseNode):
         Args:
             node_id: Unique identifier.
             link: The (real or connector) link to inject vehicles onto.
-            demand_trips: Vehicles to release, sorted by ``start`` time.
+            demand_trips: Vehicles to release, sorted by ``scheduled_departure``.
             **kwargs: Extra attributes set directly on the instance.
         """
         super().__init__()
         self.node_id = node_id
         self.link = link
         self.demand_trips = demand_trips
-        # ``time_step`` is the only timing value the origin needs at step time (to
-        # test each vehicle's departure against ``t * dt``); it is set in start().
-        self.time_step: float = 0.0
         self.entry_queue: list[int] = []
         self.outflow: list[int] = []
         self._demand: int = 0
@@ -73,24 +70,38 @@ class OriginNode(BaseNode):
 
     def start(self, time_step: float, total_time: float) -> None:
         """Allocate the entry-queue and outflow series for the horizon."""
-        self.time_step = time_step
         total_steps = int(total_time / time_step)
         self._demand = 0
         self.entry_queue = [0 for _ in range(total_steps + 1)]
         self.outflow = [0 for _ in range(total_steps)]
         self.vehicles = []
 
-    def prepare_step(self, t: int) -> None:
+    def prepare_step(self, step: int, time: float) -> None:
         """Move vehicles whose departure time has arrived into the waiting buffer.
 
         Origins hold a vertical (point) entry queue: vehicles wait here at zero
         length until the first link has supply to admit them, so back-pressure from
         the network builds up at the origin rather than being lost. A vehicle joins
-        the waiting buffer once its departure time is reached (``start <= i*dt``).
+        the waiting buffer once its departure time is reached
+        (``scheduled_departure <= time``), i.e. at step ``ceil(scheduled/dt)``.
+
+        This queue-join is the vehicle's **actual departure**: the moment it enters
+        the network's origin queue (before any admission to the first link). The
+        current simulation ``time`` (passed down from the simulation) is stamped onto
+        ``vehicle.departure_time`` here, so travel time is measured from when the
+        vehicle really started — which, for a vehicle injected with a departure time
+        already in the past, is later than ``ceil(scheduled/dt)`` (it cannot depart
+        before it exists).
+
+        Args:
+            step: The current simulation step index (unused here; kept for the
+                uniform node-step interface).
+            time: The current simulation time in seconds (``step * dt``).
         """
         vehicles_departed = 0
         for vehicle in self.demand_trips:
-            if vehicle.start <= t * self.time_step:
+            if vehicle.scheduled_departure <= time:
+                vehicle.departure_time = time
                 vehicles_departed += 1
                 self.vehicles.append(vehicle)
             else:
@@ -113,23 +124,28 @@ class OriginNode(BaseNode):
         idle one.
         """
         vehicle.active = True
-        bisect.insort(self.demand_trips, vehicle, key=lambda v: v.start)
+        bisect.insort(self.demand_trips, vehicle, key=lambda v: v.scheduled_departure)
 
-    def compute_flows(self, t: int) -> None:
+    def compute_flows(self, step: int, time: float) -> None:
         """Inject ``min(waiting, link supply)`` vehicles; record the leftover queue.
 
         The origin's sending flow is the number of vehicles waiting; the admitted
         flow is capped by the first link's discrete supply Ŝ (Eq. 7), so at most
         ``min(waiting, Ŝ)`` whole vehicles enter this step and the rest stay in the
         vertical queue (recorded in ``entry_queue``).
+
+        Args:
+            step: The current simulation step index.
+            time: The current simulation time in seconds (unused here; kept for the
+                uniform node-step interface).
         """
         flow = min(self._demand, self.link.get_supply())
         if flow > 0:
             vehicles = self.vehicles[0:flow]
             self.vehicles = self.vehicles[flow:]
-            self.link.set_inflow(vehicles, t)
+            self.link.set_inflow(vehicles, step)
         else:
-            self.link.set_inflow([], t)
+            self.link.set_inflow([], step)
         self._demand = 0
-        self.entry_queue[t + 1] = len(self.vehicles)
-        self.outflow[t] = flow
+        self.entry_queue[step + 1] = len(self.vehicles)
+        self.outflow[step] = flow

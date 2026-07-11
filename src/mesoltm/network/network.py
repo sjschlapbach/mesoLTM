@@ -307,7 +307,7 @@ class Network:
             origin = OriginNode(
                 node_id=f"{node_id}#origin",
                 link=inject_link,
-                demand_trips=sorted(vehicles, key=lambda x: x.start),
+                demand_trips=sorted(vehicles, key=lambda x: x.scheduled_departure),
             )
             origin_node_objs[node_id] = origin
             nodes.append(origin)
