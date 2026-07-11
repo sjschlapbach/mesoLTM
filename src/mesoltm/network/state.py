@@ -182,7 +182,11 @@ class NetworkState:  # pylint: disable=too-many-public-methods
     # -- dynamic demand --------------------------------------------------------
 
     def inject(
-        self, node_id: NodeId, vehicle: Vehicle, at_time: float | None = None
+        self,
+        node_id: NodeId,
+        vehicle: Vehicle,
+        at_time: float | None = None,
+        check_reentry_node: bool = True,
     ) -> None:
         """Add a vehicle to an origin's demand during the run (dynamic injection).
 
@@ -192,22 +196,42 @@ class NetworkState:  # pylint: disable=too-many-public-methods
         real links. The vehicle then joins the origin's departure queue in
         departure-time order and is released like any other vehicle.
 
-        If the number of injected vehicles exceeds the ``injection_budget`` the
-        connectors were sized for (see
-        :meth:`~mesoltm.network.network.Network.compile`), a :class:`RuntimeWarning`
-        is emitted: the connector buffer may then be too small to admit the vehicle
-        promptly, so it waits in the origin queue (and may not enter within the
-        horizon) rather than being silently discarded.
+        The **same** vehicle may be injected repeatedly to make several trips, each
+        recorded as its own journey (see
+        :attr:`~mesoltm.core.vehicle.Vehicle.journeys`). Two guardrails protect
+        re-injection:
+
+        * The vehicle must not still be moving through, or waiting to enter, the
+          network — its previous journey must have completed (it was absorbed at a
+          destination). Otherwise a :class:`RuntimeError` is raised.
+        * By default the vehicle must re-enter at the **same real node** where it
+          last left the network (its previous journey's final real link's downstream
+          node — auxiliary O/D connector nodes are never considered). A mismatch
+          raises :class:`ValueError`; pass ``check_reentry_node=False`` to allow a
+          deliberate re-entry elsewhere.
+
+        If the number of injections exceeds the ``injection_budget`` the connectors
+        were sized for (see :meth:`~mesoltm.network.network.Network.compile`), a
+        :class:`RuntimeWarning` is emitted: the connector buffer may then be too
+        small to admit the vehicle promptly, so it waits in the origin queue (and
+        may not enter within the horizon) rather than being silently discarded.
 
         Args:
             node_id: An origin node (marked via ``Network.set_origin``).
             vehicle: The vehicle to inject; ``start``, ``route`` and ``position``
-                are set here.
+                are set here (and the live journey state reset on re-injection).
             at_time: Departure time in seconds; defaults to the current step's
                 time (``step * dt``) so it is considered in the next step.
+            check_reentry_node: When re-injecting an already-used vehicle, require
+                it to re-enter at the real node it last left from. Defaults to
+                ``True``.
 
         Raises:
-            ValueError: If ``node_id`` is not a registered origin node.
+            ValueError: If ``node_id`` is not a registered origin node, or (on
+                re-injection with ``check_reentry_node``) the vehicle last left the
+                network at a different real node.
+            RuntimeError: If the vehicle is still active (its current journey has
+                not completed).
         """
         origin = self._origin_nodes.get(node_id)
         if origin is None:
@@ -215,6 +239,26 @@ class NetworkState:  # pylint: disable=too-many-public-methods
                 f"cannot inject at {node_id!r}: it is not an origin "
                 f"(call Network.set_origin before compile)"
             )
+        if vehicle.active:
+            raise RuntimeError(
+                f"cannot inject vehicle {vehicle.vehicle_id!r} at {node_id!r}: it is "
+                f"still active in the network (its current journey has not completed). "
+                f"Wait until it is absorbed at a destination before re-injecting it."
+            )
+
+        if vehicle.journeys:
+            # Re-injection: reset the live journey state and (by default) verify the
+            # vehicle re-enters at the real node where it last left the network.
+            if check_reentry_node:
+                exit_node = self._journey_exit_node(vehicle.journeys[-1])
+                if exit_node is not None and exit_node != node_id:
+                    raise ValueError(
+                        f"cannot re-inject vehicle {vehicle.vehicle_id!r} at "
+                        f"{node_id!r}: it last left the network at node {exit_node!r}. "
+                        f"Re-enter it there, or pass check_reentry_node=False."
+                    )
+            vehicle.reset_for_new_journey()
+
         self._splice_injection_route(node_id, vehicle)
         vehicle.start = self.step * self.time_step if at_time is None else at_time
         origin.add_trip(vehicle)
@@ -267,6 +311,22 @@ class NetworkState:  # pylint: disable=too-many-public-methods
         sink = self.sink_connectors.get(dest_node)
         if sink is not None:
             route.append(sink)
+
+    def _journey_exit_node(self, journey: dict) -> NodeId | None:
+        """Return the real node at which a completed ``journey`` left the network.
+
+        This is the downstream node of the journey's last **real** (non-connector)
+        link. Connector links have no ``endpoints`` entry, so they are naturally
+        excluded — only actual network nodes are ever returned, never an auxiliary
+        O/D connector node. Returns ``None`` if the journey never reached a real
+        link (e.g. it only crossed connectors).
+        """
+        for segment in reversed(journey["trajectory"]):
+            endpoint = self._endpoints.get(segment["link_id"])
+            if endpoint is not None:
+                return endpoint[1]
+
+        return None
 
     # -- rerouting -------------------------------------------------------------
 

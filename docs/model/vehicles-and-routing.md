@@ -27,8 +27,10 @@ Key attributes:
 | `route` | Ordered list of `link_id`s the vehicle intends to traverse. **Mutable at any time** — rewriting it reroutes the vehicle at its next node. |
 | `position` | Index of the current link within `route` (robust to routes that revisit a link). |
 | `props` | Free-form `dict` of per-vehicle metadata. The core never reads it; plugins, `color_by`, and custom metrics do. Must be JSON-serialisable to survive the animation history round-trip. |
-| `trajectory` | Auto-populated per-link log (`entry_step`, `exit_step`, `is_connector`) that per-vehicle [metrics](../guide/metrics.md) are derived from. |
-| `end` | Arrival step, stamped by the destination node. |
+| `trajectory` | Auto-populated per-link log (`entry_step`, `exit_step`, `is_connector`) for the **current** trip; per-journey [metrics](../guide/metrics.md) are derived from it. |
+| `end` | Arrival step of the current trip, stamped by the destination node. |
+| `journeys` | The completed-trip records (**the single source of truth** for this vehicle's finished trips). One entry per trip — a demand-profile vehicle has one; a [re-injected](../guide/stepping-and-injection.md#re-injecting-a-vehicle-for-another-trip) one has several. |
+| `active` | `True` while the vehicle is queued or moving; `False` once it has been absorbed at a destination. |
 
 !!! warning "Vehicles do not carry FD parameters"
     `v_f`, `w`, `rho_jam` describe the **road** (`Link`), not the vehicle. A

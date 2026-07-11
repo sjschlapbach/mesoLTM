@@ -62,6 +62,32 @@ sim.inject("a", Vehicle(vehicle_id=999, origin="a", destination="c", route=[l1, 
 Injection only appends to a node's demand list, exactly as static demand does — it
 never perturbs the per-step arithmetic. See [Deviations §B5](../model/deviations-from-the-paper.md).
 
+## Re-injecting a vehicle for another trip
+
+The **same** vehicle can be injected again once it has finished a trip, to send it
+on another one. Each trip is recorded as a separate **journey** on
+`vehicle.journeys` — the single source of truth for that vehicle's completed trips.
+This is uniform with a static demand profile (which makes one vehicle per trip), so
+[trip metrics](metrics.md) account for both the same way: one record per journey.
+
+```python
+v = Vehicle(vehicle_id=7, origin="a", destination="b", route=[l_ab])
+sim.inject("a", v)                                   # journey 0: a → b
+while sim.current_step < sim.total_steps and v.active:
+    sim.step()                                       # v.active turns False when it arrives
+
+v.origin, v.destination, v.route = "b", "c", [l_bc]  # define the next trip
+sim.inject("b", v)                                   # journey 1: re-enter at b, b → c
+```
+
+Set `v.route` to the next trip's real links before re-injecting (re-injection resets
+the live journey state but not `route`). Two guardrails apply: a vehicle that is
+still moving (`v.active`) cannot be re-injected (`RuntimeError`), and by default it
+must re-enter at the real node where it last left the network (`ValueError`
+otherwise; pass `check_reentry_node=False` to override). Count each re-injection
+toward `injection_budget`. See [`multi_trip_injection.py`](examples.md) for a full
+runnable demo.
+
 ## Seeding an injected route with shortest path
 
 To inject toward a destination without hand-writing the route, plan it first with

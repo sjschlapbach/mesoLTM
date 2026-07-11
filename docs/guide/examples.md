@@ -15,6 +15,7 @@ covered in the guide pages linked in the last column.
 | `rerouting_demo.py` | Manual per-vehicle rerouting onto a detour mid-run | [Plugins](plugins.md) |
 | `adaptive_rerouting_intersection.py` | An uncontrolled 2-in/2-out junction; agents re-checked against the live shortest path each step | [Plugins](plugins.md), [Routing](routing.md) |
 | `bottleneck_access_policy.py` | A coin-toss bottleneck admission policy driven with `start`/`step`/`inject`, recorded as a video | [Stepping & injection](stepping-and-injection.md), [Animations](animations.md) |
+| `multi_trip_injection.py` | Re-injecting one vehicle for several consecutive trips, tracked as multiple journeys, with the re-injection guardrails | [Stepping & injection](stepping-and-injection.md), [Metrics](metrics.md) |
 | `vehicle_metrics_demo.py` | Per-vehicle travel times and travel-time plots | [Metrics](metrics.md), [Visualizations](visualizations.md) |
 | `grid_visualization.py` | Congestion-aware grid rerouting recorded as a video, coloured by next link and by custom `props` | [Animations](animations.md) |
 | `paper_validation.py` | Reproduces the paper's Section 4 figures through the shipped pipeline | [Deviations from the paper](../model/deviations-from-the-paper.md) |

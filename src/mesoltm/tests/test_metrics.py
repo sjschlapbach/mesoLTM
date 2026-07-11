@@ -120,7 +120,7 @@ def test_supply_limited_connector_wait_is_kept_but_free_flow_lag_removed():
     ]
     v.end = 13
 
-    rec = trip_record(v, dt)
+    rec = trip_record(v.snapshot_journey(), dt)
     assert rec["network_time"] == 10.0  # the real link only
     # 3 s on the connector minus the 1 s free-flow lag = 2 s of genuine entry wait.
     assert rec["access_time"] == 2.0
@@ -140,7 +140,7 @@ def test_free_flow_origin_and_destination_connectors_add_nothing():
     ]
     v.end = 12
 
-    rec = trip_record(v, dt)
+    rec = trip_record(v.snapshot_journey(), dt)
     assert rec["network_time"] == 10.0
     assert rec["access_time"] == 0.0  # both connectors were free-flow
     assert rec["travel_time"] == 10.0  # 12 total minus 2 free-flow steps
