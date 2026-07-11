@@ -2246,7 +2246,7 @@ importable from the <code>mesoltm.visualizations.plots</code> submodule (noted b
 
 
 <a href="#mesoltm.visualizations.plots.plot_cumulative_curves" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_cumulative_curves</span><span class="p">(</span><span class="n">sim</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span><span class="p">,</span> <span class="n">link_ids</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_cumulative_curves</span><span class="p">(</span><span class="n">sim</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span><span class="p">,</span> <span class="n">link_ids</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2302,6 +2302,7 @@ importable from the <code>mesoltm.visualizations.plots</code> submodule (noted b
                 <code>ax</code>
             </td>
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2327,6 +2328,7 @@ importable from the <code>mesoltm.visualizations.plots</code> submodule (noted b
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2350,7 +2352,7 @@ importable from the <code>mesoltm.visualizations.plots</code> submodule (noted b
 
 
 <a href="#mesoltm.visualizations.plots.plot_link_flow" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_link_flow</span><span class="p">(</span><span class="n">sim</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span><span class="p">,</span> <span class="n">link_ids</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">],</span> <span class="n">window</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">window_seconds</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_link_flow</span><span class="p">(</span><span class="n">sim</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span><span class="p">,</span> <span class="n">link_ids</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">],</span> <span class="n">window</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">window_seconds</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2443,6 +2445,7 @@ of the flow curve is independent of <code>dt</code>.</p>
                 <code>ax</code>
             </td>
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2468,6 +2471,7 @@ of the flow curve is independent of <code>dt</code>.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2491,7 +2495,7 @@ of the flow curve is independent of <code>dt</code>.</p>
 
 
 <a href="#mesoltm.visualizations.plots.plot_link_flows" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_link_flows</span><span class="p">(</span><span class="n">sim</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span><span class="p">,</span> <span class="n">link_ids</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">],</span> <span class="n">labels</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">window_seconds</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_link_flows</span><span class="p">(</span><span class="n">sim</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span><span class="p">,</span> <span class="n">link_ids</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">],</span> <span class="n">labels</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">window_seconds</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2601,6 +2605,7 @@ of the flow curve is independent of <code>dt</code>.</p>
                 <code>ax</code>
             </td>
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2626,6 +2631,7 @@ of the flow curve is independent of <code>dt</code>.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2794,15 +2800,20 @@ created if omitted.</p>
 
 
 <a href="#mesoltm.visualizations.plots.plot_network" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_network</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkState (mesoltm.network.state.NetworkState)" href="../network/#mesoltm.network.state.NetworkState">NetworkState</a></span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">node_size</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">260.0</span><span class="p">,</span> <span class="n">annotate_links</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_network</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkState (mesoltm.network.state.NetworkState)" href="../network/#mesoltm.network.state.NetworkState">NetworkState</a></span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">node_size</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">260.0</span><span class="p">,</span> <span class="n">annotate_links</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
 
         <p>Draw the network with links coloured by a per-link quantity.</p>
-<p>Requires node positions (set when building the network). Connector links are
-omitted; only real links are drawn. Parallel links between the same node pair
-are fanned out with a slight arc so they are individually visible.</p>
+<p>Uses the <strong>same drawing helpers as the animation</strong> (:mod:<code>._draw</code>), so the
+static map and the video render identical arcs and node markers — only the link
+colour differs (here it encodes the chosen quantity). Requires node positions
+(set when building the network). Connector links are omitted; only real links are
+drawn. Links that share an edge — true parallel links <em>and</em> the two directions of
+a bidirectional edge (<code>A-&gt;B</code> and <code>B-&gt;A</code>) — are fanned onto separate arcs so
+their arrows never overlap; a lone link is drawn straight. Works for arbitrary
+node placements (not just grid-aligned) and any number of links between a pair.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2856,6 +2867,7 @@ a run), <code>"occupancy"</code> (live vehicle count), <code>"density"</code> or
                 <code>ax</code>
             </td>
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2875,7 +2887,7 @@ a run), <code>"occupancy"</code> (live vehicle count), <code>"density"</code> or
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Marker size for nodes.</p>
+                <p>Node marker area (matplotlib <code>scatter</code> <code>s</code>).</p>
               </div>
             </td>
             <td>
@@ -2891,7 +2903,7 @@ a run), <code>"occupancy"</code> (live vehicle count), <code>"density"</code> or
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>True</code>, label each link at its midpoint with its id and
+                <p>If <code>True</code>, label each link on its arc with its id and
 value — so it is clear which link carries which flow.</p>
               </div>
             </td>
@@ -2914,6 +2926,7 @@ value — so it is clear which link carries which flow.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2937,7 +2950,7 @@ value — so it is clear which link carries which flow.</p>
 
 
 <a href="#mesoltm.visualizations.plots.plot_travel_time_distribution" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_travel_time_distribution</span><span class="p">(</span><span class="n">trips</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_travel_time_distribution</span><span class="p">(</span><span class="n">trips</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">],</span> <span class="n">ax</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2977,6 +2990,7 @@ value — so it is clear which link carries which flow.</p>
                 <code>ax</code>
             </td>
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3018,6 +3032,7 @@ value — so it is clear which link carries which flow.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3041,7 +3056,7 @@ value — so it is clear which link carries which flow.</p>
 
 
 <a href="#mesoltm.visualizations.plots.plot_link_travel_times" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_link_travel_times</span><span class="p">(</span><span class="n">trips</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plot_link_travel_times</span><span class="p">(</span><span class="n">trips</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">],</span> <span class="n">ax</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3081,6 +3096,7 @@ value — so it is clear which link carries which flow.</p>
                 <code>ax</code>
             </td>
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3106,6 +3122,7 @@ value — so it is clear which link carries which flow.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3390,7 +3407,12 @@ explaining how to enable history logging.</p>
 
 
 <a href="#mesoltm.visualizations.animation.save_animation" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">save_animation</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">layout</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkLayout (mesoltm.visualizations.animation.NetworkLayout)" href="#mesoltm.visualizations.animation.NetworkLayout">NetworkLayout</a></span><span class="p">,</span> <span class="n">out_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fps</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span> <span class="n">subsample</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">frames_dir</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">render_kw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="str">str</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">save_animation</span><span class="p">(</span><span class="n">frames</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Frame
+
+
+  
+      dataclass
+   (mesoltm.recording.Frame)" href="../recording/#mesoltm.recording.Frame">Frame</a></span><span class="p">],</span> <span class="n">layout</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkLayout (mesoltm.visualizations.animation.NetworkLayout)" href="#mesoltm.visualizations.animation.NetworkLayout">NetworkLayout</a></span><span class="p">,</span> <span class="n">out_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fps</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span> <span class="n">subsample</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">frames_dir</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">render_kw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="str">str</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3414,6 +3436,12 @@ explaining how to enable history logging.</p>
                 <code>frames</code>
             </td>
             <td>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="            Frame
+
+
+  
+      dataclass
+   (mesoltm.recording.Frame)" href="../recording/#mesoltm.recording.Frame">Frame</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3511,7 +3539,7 @@ down (each step held longer), <code>&lt;1</code> speeds it up (steps dropped).</
                 <code>palette</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span> | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="str">str</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3594,7 +3622,12 @@ omitted, only the video is written.</p>
 
 
 <a href="#mesoltm.visualizations.animation.save_frames" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">save_frames</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">layout</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkLayout (mesoltm.visualizations.animation.NetworkLayout)" href="#mesoltm.visualizations.animation.NetworkLayout">NetworkLayout</a></span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stride</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;frame_&#39;</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">render_kw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">save_frames</span><span class="p">(</span><span class="n">frames</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Frame
+
+
+  
+      dataclass
+   (mesoltm.recording.Frame)" href="../recording/#mesoltm.recording.Frame">Frame</a></span><span class="p">],</span> <span class="n">layout</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkLayout (mesoltm.visualizations.animation.NetworkLayout)" href="#mesoltm.visualizations.animation.NetworkLayout">NetworkLayout</a></span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stride</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;frame_&#39;</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">render_kw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3618,6 +3651,12 @@ omitted, only the video is written.</p>
                 <code>frames</code>
             </td>
             <td>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="            Frame
+
+
+  
+      dataclass
+   (mesoltm.recording.Frame)" href="../recording/#mesoltm.recording.Frame">Frame</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3713,7 +3752,7 @@ omitted, only the video is written.</p>
                 <code>palette</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span> | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="str">str</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3785,7 +3824,7 @@ frames share colours/legend).</p>
 
   
       dataclass
-   (mesoltm.recording.Frame)" href="../recording/#mesoltm.recording.Frame">Frame</a></span><span class="p">,</span> <span class="n">layout</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkLayout (mesoltm.visualizations.animation.NetworkLayout)" href="#mesoltm.visualizations.animation.NetworkLayout">NetworkLayout</a></span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="collections.abc.Callable">Callable</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n"><span title="mesoltm.visualizations.animation.DEFAULT_COLOR_BY">DEFAULT_COLOR_BY</span></span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">show_agent_ids</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">show_next_link</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">show_node_labels</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_slots</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">highlight_links</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+   (mesoltm.recording.Frame)" href="../recording/#mesoltm.recording.Frame">Frame</a></span><span class="p">,</span> <span class="n">layout</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkLayout (mesoltm.visualizations.animation.NetworkLayout)" href="#mesoltm.visualizations.animation.NetworkLayout">NetworkLayout</a></span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="collections.abc.Callable">Callable</span></span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n"><span title="mesoltm.visualizations.animation.DEFAULT_COLOR_BY">DEFAULT_COLOR_BY</span></span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">show_agent_ids</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">show_next_link</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">show_node_labels</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_slots</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">highlight_links</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3850,6 +3889,7 @@ scenarios can stay clean while the extra detail remains available on request.</p
                 <code>ax</code>
             </td>
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3865,7 +3905,7 @@ scenarios can stay clean while the extra detail remains available on request.</p
                 <code>palette</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span> | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="str">str</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3881,7 +3921,7 @@ scenarios can stay clean while the extra detail remains available on request.</p
                 <code>color_by</code>
             </td>
             <td>
-                  <code><span title="str">str</span> | <span title="collections.abc.Callable">Callable</span> | None</code>
+                  <code><span title="str">str</span> | <span title="collections.abc.Callable">Callable</span>[..., <span title="str">str</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3987,6 +4027,7 @@ overflow tag (when agent ids are shown).</p>
                 <code>highlight_links</code>
             </td>
             <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="int">int</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4028,6 +4069,7 @@ overflow tag (when agent ids are shown).</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><span title="matplotlib.axes.Axes">Axes</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4052,7 +4094,7 @@ overflow tag (when agent ids are shown).</p>
 
 
 <a href="#mesoltm.visualizations.animation.NetworkLayout" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">NetworkLayout</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">min_link</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">NetworkLayout</span><span class="p">(</span><span class="n">positions</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]],</span> <span class="n">labels</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">],</span> <span class="n">links</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">],</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">],</span> <span class="n"><span title="float">float</span></span><span class="p">]],</span> <span class="n">xlim</span><span class="p">:</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">],</span> <span class="n">ylim</span><span class="p">:</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">],</span> <span class="n">scale</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">min_link</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4231,7 +4273,12 @@ automatically on dense networks (e.g. a large grid).</p>
 
 
 <a href="#mesoltm.visualizations.animation.resolve_palette" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">resolve_palette</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="collections.abc.Callable">Callable</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n"><span title="mesoltm.visualizations.animation.DEFAULT_COLOR_BY">DEFAULT_COLOR_BY</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">resolve_palette</span><span class="p">(</span><span class="n">frames</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Frame
+
+
+  
+      dataclass
+   (mesoltm.recording.Frame)" href="../recording/#mesoltm.recording.Frame">Frame</a></span><span class="p">],</span> <span class="n">palette</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="collections.abc.Callable">Callable</span></span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n"><span title="mesoltm.visualizations.animation.DEFAULT_COLOR_BY">DEFAULT_COLOR_BY</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">

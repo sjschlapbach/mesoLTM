@@ -2627,7 +2627,7 @@ reference behaviour.</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.core.nodes.base_node.BaseNode.node_id">node_id</span></code></td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2778,7 +2778,7 @@ reference behaviour.</p>
 
 
 <a href="#mesoltm.core.nodes.one_to_one_node.OneToOneNode" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">OneToOneNode</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">inbound_link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">,</span> <span class="n">outbound_link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">OneToOneNode</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">inbound_link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">,</span> <span class="n">outbound_link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2854,7 +2854,7 @@ connects to exactly one downstream link.</p>
                 <code>node_id</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2982,7 +2982,7 @@ of vehicles moved from the upstream to the downstream link.</p>
 
 
 <a href="#mesoltm.core.nodes.diverge_node.DivergeNode" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">DivergeNode</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">inbound_link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">,</span> <span class="n">outbound_links</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">])</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">DivergeNode</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">inbound_link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">,</span> <span class="n">outbound_links</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">])</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3061,7 +3061,7 @@ policy (defaulting to the vehicle's own route).</p>
                 <code>node_id</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3093,7 +3093,7 @@ policy (defaulting to the vehicle's own route).</p>
                 <code>outbound_links</code>
             </td>
             <td>
-                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a>]</code>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3191,7 +3191,7 @@ entry order and push each to its next link while that link still has supply
 
 
 <a href="#mesoltm.core.nodes.merge_node.MergeNode" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">MergeNode</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">outbound_link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">,</span> <span class="n">inbound_links</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">],</span> <span class="n">priority_vector</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">MergeNode</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">outbound_link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">,</span> <span class="n">inbound_links</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">],</span> <span class="n">priority_vector</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3297,7 +3297,7 @@ capacity-proportional (see the class docstring), resolved in :meth:<code>start</
                 <code>node_id</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3329,7 +3329,7 @@ capacity-proportional (see the class docstring), resolved in :meth:<code>start</
                 <code>inbound_links</code>
             </td>
             <td>
-                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a>]</code>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3484,7 +3484,7 @@ average without ever splitting a vehicle.</p>
 
 
 <a href="#mesoltm.core.nodes.general_node_model.GeneralNodeModel" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">GeneralNodeModel</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">inbound_links</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">],</span> <span class="n">outbound_links</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">],</span> <span class="n">priority_vector</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">GeneralNodeModel</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">inbound_links</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">],</span> <span class="n">outbound_links</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">],</span> <span class="n">priority_vector</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3586,7 +3586,7 @@ If neither is given, the priorities default to capacity-proportional (see
                 <code>node_id</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3602,7 +3602,7 @@ If neither is given, the priorities default to capacity-proportional (see
                 <code>inbound_links</code>
             </td>
             <td>
-                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a>]</code>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3618,7 +3618,7 @@ If neither is given, the priorities default to capacity-proportional (see
                 <code>outbound_links</code>
             </td>
             <td>
-                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a>]</code>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3772,7 +3772,7 @@ blocked movement cannot starve the others. All flows stay integer.</p>
 
 
 <a href="#mesoltm.core.nodes.origin_node.OriginNode" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">OriginNode</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">,</span> <span class="n">demand_trips</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">OriginNode</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">,</span> <span class="n">demand_trips</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3874,7 +3874,7 @@ post-processing).</p>
                 <code>node_id</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4019,6 +4019,10 @@ the waiting buffer once its departure time is reached (<code>start &lt;= i*dt</c
 stops at the first not-yet-departing vehicle) stays valid. Typically called
 via :meth:<code>~mesoltm.network.state.NetworkState.inject</code>, which also splices
 on the origin/destination connector links.</p>
+<p>The vehicle is flagged <code>active</code> here — the single point every vehicle
+(static demand and dynamic injection alike) passes through on its way into
+the network — so re-injection can tell a still-travelling vehicle from an
+idle one.</p>
 
 
     </div>
@@ -4066,7 +4070,7 @@ vertical queue (recorded in <code>entry_queue</code>).</p>
 
 
 <a href="#mesoltm.core.nodes.destination_node.DestinationNode" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">DestinationNode</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">DestinationNode</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">link</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseLink (mesoltm.core.base_link.BaseLink)" href="../core/#mesoltm.core.base_link.BaseLink">BaseLink</a></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4128,7 +4132,24 @@ accepts the full downstream demand of its link, so it never constrains flow.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>All vehicles that have completed their trip here.</p>
+                <p>The vehicle objects absorbed here, in arrival order (an
+event log; a re-injected vehicle that arrives twice appears twice).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="mesoltm.core.nodes.destination_node.DestinationNode.completed_journeys">completed_journeys</span></code></td>
+            <td>
+                  <code><span title="list">list</span>[<span title="dict">dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The completed-journey records that ended here, one per
+arrival. Each entry is the <em>same</em> dict object appended to the vehicle's
+:attr:<code>~mesoltm.core.vehicle.Vehicle.journeys</code> — there is exactly one
+journey record per completed trip (the single source of truth); this
+list is just the per-destination index the trip metrics aggregate over
+(see :func:<code>mesoltm.metrics.collect_trips</code>).</p>
               </div>
             </td>
           </tr>
@@ -4154,7 +4175,7 @@ accepts the full downstream demand of its link, so it never constrains flow.</p>
                 <code>node_id</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4258,7 +4279,13 @@ accepts the full downstream demand of its link, so it never constrains flow.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Pull all vehicles ready to leave the link and stamp their arrival step.</p>
+        <p>Pull all vehicles ready to leave the link and record their journeys.</p>
+<p>For each arriving vehicle the just-finished trip is frozen into a journey
+record (:meth:<code>~mesoltm.core.vehicle.Vehicle.snapshot_journey</code>) and appended
+both to the vehicle's <code>journeys</code> (its own history, and the guard used when
+it is re-injected) and to this node's <code>completed_journeys</code> (the per-
+destination index the metrics read). The vehicle is marked idle
+(<code>active = False</code>) so it may be injected again for a further trip.</p>
 
 
     </div>
@@ -4278,7 +4305,7 @@ accepts the full downstream demand of its link, so it never constrains flow.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return per-vehicle arrival records for trip output.</p>
+        <p>Return one arrival record per completed journey that ended here.</p>
 
 
     </div>

@@ -1094,6 +1094,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#re-injecting-a-vehicle-for-another-trip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Re-injecting a vehicle for another trip
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#seeding-an-injected-route-with-shortest-path" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1806,6 +1817,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#re-injecting-a-vehicle-for-another-trip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Re-injecting a vehicle for another trip
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#seeding-an-injected-route-with-shortest-path" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1888,13 +1910,34 @@ discarded</strong> — raise <code>injection_budget</code> and re-run.</p>
 </div>
 <p>Injection only appends to a node's demand list, exactly as static demand does — it
 never perturbs the per-step arithmetic. See <a href="../../model/deviations-from-the-paper/">Deviations §B5</a>.</p>
+<h2 id="re-injecting-a-vehicle-for-another-trip">Re-injecting a vehicle for another trip<a class="headerlink" href="#re-injecting-a-vehicle-for-another-trip" title="Permanent link">&para;</a></h2>
+<p>The <strong>same</strong> vehicle can be injected again once it has finished a trip, to send it
+on another one. Each trip is recorded as a separate <strong>journey</strong> on
+<code>vehicle.journeys</code> — the single source of truth for that vehicle's completed trips.
+This is uniform with a static demand profile (which makes one vehicle per trip), so
+<a href="../metrics/">trip metrics</a> account for both the same way: one record per journey.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">v</span> <span class="o">=</span> <span class="n">Vehicle</span><span class="p">(</span><span class="n">vehicle_id</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="p">[</span><span class="n">l_ab</span><span class="p">])</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">sim</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>                                   <span class="c1"># journey 0: a → b</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">while</span> <span class="n">sim</span><span class="o">.</span><span class="n">current_step</span> <span class="o">&lt;</span> <span class="n">sim</span><span class="o">.</span><span class="n">total_steps</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">sim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>                                       <span class="c1"># v.active turns False when it arrives</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">v</span><span class="o">.</span><span class="n">origin</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">route</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">l_bc</span><span class="p">]</span>  <span class="c1"># define the next trip</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">sim</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>                                   <span class="c1"># journey 1: re-enter at b, b → c</span>
+</code></pre></div>
+<p>Set <code>v.route</code> to the next trip's real links before re-injecting (re-injection resets
+the live journey state but not <code>route</code>). Two guardrails apply: a vehicle that is
+still moving (<code>v.active</code>) cannot be re-injected (<code>RuntimeError</code>), and by default it
+must re-enter at the real node where it last left the network (<code>ValueError</code>
+otherwise; pass <code>check_reentry_node=False</code> to override). Count each re-injection
+toward <code>injection_budget</code>. See <a href="../examples/"><code>multi_trip_injection.py</code></a> for a full
+runnable demo.</p>
 <h2 id="seeding-an-injected-route-with-shortest-path">Seeding an injected route with shortest path<a class="headerlink" href="#seeding-an-injected-route-with-shortest-path" title="Permanent link">&para;</a></h2>
 <p>To inject toward a destination without hand-writing the route, plan it first with
 a <a href="../routing/"><code>ShortestPathPolicy</code></a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mesoltm</span><span class="w"> </span><span class="kn">import</span> <span class="n">ShortestPathPolicy</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">policy</span> <span class="o">=</span> <span class="n">ShortestPathPolicy</span><span class="p">(</span><span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">route</span> <span class="o">=</span> <span class="n">policy</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">network_state</span><span class="p">,</span> <span class="n">from_node</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">to_node</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">)</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">sim</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">Vehicle</span><span class="p">(</span><span class="n">vehicle_id</span><span class="o">=</span><span class="mi">999</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="n">route</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mesoltm</span><span class="w"> </span><span class="kn">import</span> <span class="n">ShortestPathPolicy</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">policy</span> <span class="o">=</span> <span class="n">ShortestPathPolicy</span><span class="p">(</span><span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">route</span> <span class="o">=</span> <span class="n">policy</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">network_state</span><span class="p">,</span> <span class="n">from_node</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">to_node</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">)</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">sim</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">Vehicle</span><span class="p">(</span><span class="n">vehicle_id</span><span class="o">=</span><span class="mi">999</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="n">route</span><span class="p">))</span>
 </code></pre></div>
 <p>For a full worked example (a coin-toss bottleneck admission policy driven with
 <code>start</code>/<code>step</code>/<code>inject</code>), see <a href="../examples/"><code>bottleneck_access_policy.py</code></a>.</p>

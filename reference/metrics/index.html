@@ -1879,9 +1879,11 @@ See <a href="../../guide/metrics/">Metrics &amp; trip analysis</a>.</p>
     <div class="doc doc-contents first">
 
         <p>Collect travel-time records for every completed trip in a finished run.</p>
-<p>Completed trips are gathered from the destination nodes' absorbed vehicles.
-Vehicles still en route or waiting in an origin queue at the end of the horizon
-are not included.</p>
+<p>Completed trips are gathered from the destination nodes' recorded journeys —
+one record per completed journey. A vehicle from a static demand profile
+contributes one journey; a hand-injected vehicle that was re-injected
+contributes one per trip. Vehicles still en route or waiting in an origin queue
+at the end of the horizon have no completed journey and are not included.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1946,7 +1948,7 @@ are not included.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list of per-vehicle records (see :func:<code>trip_record</code>), sorted by</p>
+                <p>A list of per-journey records (see :func:<code>trip_record</code>), sorted by</p>
               </div>
             </td>
           </tr>
@@ -1956,7 +1958,7 @@ are not included.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>vehicle_id</code>.</p>
+                <p><code>(vehicle_id, journey_index)</code>.</p>
               </div>
             </td>
           </tr>
@@ -1976,12 +1978,12 @@ are not included.</p>
 
 
 <a href="#mesoltm.metrics.trips.trip_record" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">trip_record</span><span class="p">(</span><span class="n">vehicle</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">include_connectors</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">trip_record</span><span class="p">(</span><span class="n">journey</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">include_connectors</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
 
-        <p>Build the travel-time record for a single completed vehicle.</p>
+        <p>Build the travel-time record for a single completed journey.</p>
 <p>The reported <code>travel_time</code> is the time from the vehicle's desired departure
 to its arrival, <strong>minus the artificial one-step free-flow lag that each
 auto-inserted O/D connector imposes</strong> (a one-cell connector always costs one
@@ -2007,14 +2009,16 @@ reflects only real links and is unaffected by connectors.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>vehicle</code>
+                <code>journey</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></code>
+                  <code><span title="dict">dict</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A vehicle that has finished its trip (<code>vehicle.end</code> set).</p>
+                <p>A completed journey record as produced by
+:meth:<code>~mesoltm.core.vehicle.Vehicle.snapshot_journey</code> and stored on
+<code>vehicle.journeys</code> / a destination's <code>completed_journeys</code>.</p>
               </div>
             </td>
             <td>
@@ -2085,7 +2089,7 @@ reported (connectors are internal access stubs).</p>
             <td>
               <div class="doc-md-description">
                 <ul>
-<li><code>vehicle_id</code>, <code>origin</code>, <code>destination</code>;</li>
+<li><code>vehicle_id</code>, <code>journey_index</code>, <code>origin</code>, <code>destination</code>;</li>
 </ul>
               </div>
             </td>
@@ -2109,7 +2113,7 @@ reported (connectors are internal access stubs).</p>
             <td>
               <div class="doc-md-description">
                 <ul>
-<li><code>start_time</code> — desired departure (<code>vehicle.start</code>);</li>
+<li><code>start_time</code> — desired departure (the journey's <code>start</code>);</li>
 </ul>
               </div>
             </td>
@@ -2335,7 +2339,7 @@ origin-queue wait plus any supply-limited O/D connector wait,
 
     <div class="doc doc-contents first">
 
-        <p>Write trip records to a CSV file (one row per vehicle).</p>
+        <p>Write trip records to a CSV file (one row per completed journey).</p>
 <p>The <code>route</code> and per-link travel times are flattened into single columns
 (<code>"l1;l2;..."</code> and <code>"link_id:seconds;..."</code>) so the file stays flat.</p>
 

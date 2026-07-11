@@ -2037,7 +2037,7 @@ with a congestion-aware cost. See <a href="../../guide/routing/">Routing</a>.</p
 
 
 <a href="#mesoltm.routing.policy.RoutingPolicy.next_link" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">next_link</span><span class="p">(</span><span class="n">vehicle</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">,</span> <span class="n">current_link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">next_link</span><span class="p">(</span><span class="n">vehicle</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">,</span> <span class="n">current_link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseNode (mesoltm.core.nodes.base_node.BaseNode)" href="../nodes/#mesoltm.core.nodes.base_node.BaseNode">BaseNode</a></span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkState (mesoltm.network.state.NetworkState)" href="../network/#mesoltm.network.state.NetworkState">NetworkState</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2093,7 +2093,7 @@ with a congestion-aware cost. See <a href="../../guide/routing/">Routing</a>.</p
                 <code>node</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            BaseNode (mesoltm.core.nodes.base_node.BaseNode)" href="../nodes/#mesoltm.core.nodes.base_node.BaseNode">BaseNode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2110,7 +2110,7 @@ outbound links).</p>
                 <code>state</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            NetworkState (mesoltm.network.state.NetworkState)" href="../network/#mesoltm.network.state.NetworkState">NetworkState</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2209,7 +2209,7 @@ first occurrence of the current link — matching the reference implementation.<
 
 
 <a href="#mesoltm.routing.policy.StaticRoutePolicy.next_link" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">next_link</span><span class="p">(</span><span class="n">vehicle</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">,</span> <span class="n">current_link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">next_link</span><span class="p">(</span><span class="n">vehicle</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">,</span> <span class="n">current_link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseNode (mesoltm.core.nodes.base_node.BaseNode)" href="../nodes/#mesoltm.core.nodes.base_node.BaseNode">BaseNode</a></span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkState (mesoltm.network.state.NetworkState)" href="../network/#mesoltm.network.state.NetworkState">NetworkState</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2388,7 +2388,7 @@ the lookups reuse it instead of rebuilding it per call.</p>
 
 
 <a href="#mesoltm.routing.shortest_path.ShortestPathPolicy.route" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">route</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkState (mesoltm.network.state.NetworkState)" href="../network/#mesoltm.network.state.NetworkState">NetworkState</a></span><span class="p">,</span> <span class="n">from_node</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">to_node</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">route</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkState (mesoltm.network.state.NetworkState)" href="../network/#mesoltm.network.state.NetworkState">NetworkState</a></span><span class="p">,</span> <span class="n">from_node</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">to_node</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2412,17 +2412,16 @@ function and <code>dynamic</code> setting as :meth:<code>next_link</code>.</p>
 
 
 <a href="#mesoltm.routing.shortest_path.ShortestPathPolicy.next_link" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">next_link</span><span class="p">(</span><span class="n">vehicle</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">,</span> <span class="n">current_link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">next_link</span><span class="p">(</span><span class="n">vehicle</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">,</span> <span class="n">current_link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseNode (mesoltm.core.nodes.base_node.BaseNode)" href="../nodes/#mesoltm.core.nodes.base_node.BaseNode">BaseNode</a></span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            NetworkState (mesoltm.network.state.NetworkState)" href="../network/#mesoltm.network.state.NetworkState">NetworkState</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Return the first link on the shortest path toward the destination.</p>
 <p>See :class:<code>~mesoltm.routing.policy.RoutingPolicy</code> for the argument
-contract (<code>state</code> is typed <code>object</code> to match the protocol; the engine
-always passes a :class:<code>NetworkState</code>). When the vehicle has arrived at its
-destination node, the destination's sink connector (if any) is returned so
-it leaves the network.</p>
+contract (the engine always passes a :class:<code>NetworkState</code>; <code>None</code> yields
+no decision). When the vehicle has arrived at its destination node, the
+destination's sink connector (if any) is returned so it leaves the network.</p>
 
 
     </div>

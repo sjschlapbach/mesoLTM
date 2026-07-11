@@ -1837,19 +1837,29 @@
 
 
 <h1 id="metrics-trip-analysis">Metrics &amp; trip analysis<a class="headerlink" href="#metrics-trip-analysis" title="Permanent link">&para;</a></h1>
-<p>After a run, <code>mesoltm.metrics</code> turns each vehicle's automatically-recorded
-<code>trajectory</code> into per-vehicle travel-time records and network-level summaries.</p>
+<p>After a run, <code>mesoltm.metrics</code> turns each completed <strong>journey</strong> into a travel-time
+record and network-level summaries. One journey = one completed trip.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mesoltm</span><span class="w"> </span><span class="kn">import</span> <span class="n">collect_trips</span><span class="p">,</span> <span class="n">summarize_trips</span><span class="p">,</span> <span class="n">write_trips_csv</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">sim</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">trips</span> <span class="o">=</span> <span class="n">collect_trips</span><span class="p">(</span><span class="n">sim</span><span class="p">)</span>             <span class="c1"># one record per completed vehicle</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">trips</span> <span class="o">=</span> <span class="n">collect_trips</span><span class="p">(</span><span class="n">sim</span><span class="p">)</span>             <span class="c1"># one record per completed journey</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">summarize_trips</span><span class="p">(</span><span class="n">trips</span><span class="p">)</span>       <span class="c1"># network-level aggregates</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">write_trips_csv</span><span class="p">(</span><span class="n">trips</span><span class="p">,</span> <span class="s2">&quot;trips.csv&quot;</span><span class="p">)</span>    <span class="c1"># flat CSV, one row per vehicle</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">write_trips_csv</span><span class="p">(</span><span class="n">trips</span><span class="p">,</span> <span class="s2">&quot;trips.csv&quot;</span><span class="p">)</span>    <span class="c1"># flat CSV, one row per journey</span>
 </code></pre></div>
-<p>Only vehicles that reached a destination are included; vehicles still en route or
+<p>Only journeys that reached a destination are included; vehicles still en route or
 queued at the horizon's end are omitted.</p>
+<div class="admonition note">
+<p class="admonition-title">One source of truth for all trips</p>
+<p>A completed trip is recorded the same way no matter how the vehicle came to
+exist. A vehicle from a <strong>static demand profile</strong> makes one trip → one journey;
+a <strong>hand-injected</strong> vehicle <a href="../stepping-and-injection/#re-injecting-a-vehicle-for-another-trip">re-injected</a>
+for several trips reuses one object → one journey per trip. Every journey lives
+on <code>vehicle.journeys</code>, and <code>collect_trips</code> reports exactly one record per
+journey — so metrics need no special-casing, and records are keyed by
+<code>(vehicle_id, journey_index)</code> (<code>journey_index</code> is <code>0</code> for a single-trip vehicle).</p>
+</div>
 <h2 id="the-trip-record">The trip record<a class="headerlink" href="#the-trip-record" title="Permanent link">&para;</a></h2>
-<p><code>collect_trips</code> (via <code>trip_record</code>) returns, per vehicle:</p>
+<p><code>collect_trips</code> (via <code>trip_record</code>) returns, per journey:</p>
 <table>
 <thead>
 <tr>
@@ -1859,8 +1869,8 @@ queued at the horizon's end are omitted.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>vehicle_id</code>, <code>origin</code>, <code>destination</code></td>
-<td>Identity</td>
+<td><code>vehicle_id</code>, <code>journey_index</code>, <code>origin</code>, <code>destination</code></td>
+<td>Identity (which vehicle, which of its trips)</td>
 </tr>
 <tr>
 <td><code>route</code></td>
@@ -1919,7 +1929,8 @@ mean/median/min/max <code>travel_time</code>, <code>mean_access_time</code>, <co
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>      <span class="nb">round</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s2">&quot;total_vehicle_hours&quot;</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;veh-h&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="csv-output">CSV output<a class="headerlink" href="#csv-output" title="Permanent link">&para;</a></h2>
-<p><code>write_trips_csv</code> flattens <code>route</code> (<code>"l1;l2;..."</code>) and <code>link_travel_times</code>
+<p><code>write_trips_csv</code> writes one row per journey (columns begin <code>vehicle_id,
+journey_index, …</code>) and flattens <code>route</code> (<code>"l1;l2;..."</code>) and <code>link_travel_times</code>
 (<code>"id:seconds;..."</code>) into single columns so the file stays flat. The
 <a href="../../getting-started/running-a-scenario/">CLI and JSON scenarios</a> can also write
 per-trip and per-link CSVs directly via <code>trip_output_file</code> / <code>link_output_file</code>.</p>

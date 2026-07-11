@@ -2648,7 +2648,7 @@ See <a href="../../guide/building-networks/">Building networks</a>.</p>
 
 
 <a href="#mesoltm.network.network.Network" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Network</span><span class="p">(</span><span class="n">default_fd</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Network</span><span class="p">(</span><span class="n">default_fd</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2701,7 +2701,7 @@ applied to links that do not specify their own.</p>
                 <code>default_fd</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span> | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="float">float</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2744,7 +2744,7 @@ applied to links that do not specify their own.</p>
 
 
 <a href="#mesoltm.network.network.Network.add_node" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n"><span title="tuple">tuple</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="object">object</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2768,7 +2768,7 @@ applied to links that do not specify their own.</p>
                 <code>node_id</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2784,7 +2784,7 @@ applied to links that do not specify their own.</p>
                 <code>pos</code>
             </td>
             <td>
-                  <code><span title="tuple">tuple</span> | None</code>
+                  <code><span title="tuple">tuple</span>[<span title="float">float</span>, <span title="float">float</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2810,7 +2810,7 @@ applied to links that do not specify their own.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2834,7 +2834,7 @@ applied to links that do not specify their own.</p>
 
 
 <a href="#mesoltm.network.network.Network.add_link" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_link</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">fd</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_link</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">fd</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2862,7 +2862,7 @@ distance — no intermediate nodes required.</p>
                 <code>u</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2878,7 +2878,7 @@ distance — no intermediate nodes required.</p>
                 <code>v</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2977,7 +2977,7 @@ distance between node positions when both are known.</p>
 
 
 <a href="#mesoltm.network.network.Network.set_origin" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_origin</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">vehicles</span><span class="p">:</span> <span class="n"><span title="list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_origin</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">vehicles</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3001,7 +3001,7 @@ distance between node positions when both are known.</p>
                 <code>node_id</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3017,7 +3017,7 @@ distance between node positions when both are known.</p>
                 <code>vehicles</code>
             </td>
             <td>
-                  <code><span title="list">list</span> | None</code>
+                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3045,7 +3045,7 @@ calls append more vehicles.</p>
 
 
 <a href="#mesoltm.network.network.Network.set_destination" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_destination</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_destination</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3065,7 +3065,7 @@ calls append more vehicles.</p>
 
 
 <a href="#mesoltm.network.network.Network.set_merge_priorities" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_merge_priorities</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_merge_priorities</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3093,7 +3093,7 @@ e.g. to give a main road priority over a ramp regardless of capacity.</p>
                 <code>node_id</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3109,7 +3109,7 @@ e.g. to give a main road priority over a ramp regardless of capacity.</p>
                 <code>alpha</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span></code>
+                  <code><span title="dict">dict</span>[<span title="int">int</span>, <span title="float">float</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3139,7 +3139,7 @@ origin connector — fall back to their capacity-proportional weight.</p>
 
 
 <a href="#mesoltm.network.network.Network.compile" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">compile</span><span class="p">(</span><span class="n">time_step</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">total_time</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">routing_policy</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RoutingPolicy (mesoltm.routing.policy.RoutingPolicy)" href="../routing/#mesoltm.routing.policy.RoutingPolicy">RoutingPolicy</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">plugins</span><span class="p">:</span> <span class="n"><span title="list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">injection_budget</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">record_history</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">history_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">history_classify</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">compile</span><span class="p">(</span><span class="n">time_step</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">total_time</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">routing_policy</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RoutingPolicy (mesoltm.routing.policy.RoutingPolicy)" href="../routing/#mesoltm.routing.policy.RoutingPolicy">RoutingPolicy</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">plugins</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Plugin (mesoltm.plugins.plugin.Plugin)" href="../plugins/#mesoltm.plugins.plugin.Plugin">Plugin</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">injection_budget</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">record_history</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">history_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">history_classify</span><span class="p">:</span> <span class="n"><span title="mesoltm.recording.ClassifyFn">ClassifyFn</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3213,7 +3213,7 @@ own (connector-spliced) routes.</p>
                 <code>plugins</code>
             </td>
             <td>
-                  <code><span title="list">list</span> | None</code>
+                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="            Plugin (mesoltm.plugins.plugin.Plugin)" href="../plugins/#mesoltm.plugins.plugin.Plugin">Plugin</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3297,6 +3297,7 @@ separate step.</p>
                 <code>history_classify</code>
             </td>
             <td>
+                  <code><span title="mesoltm.recording.ClassifyFn">ClassifyFn</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3381,7 +3382,7 @@ rerouting (<code>set_route</code>) and dynamic demand (<code>inject</code>).</p>
 
 
 <a href="#mesoltm.network.state.NetworkState" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">NetworkState</span><span class="p">(</span><span class="n">links_by_id</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">,</span> <span class="n">out_links</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">,</span> <span class="n">in_links</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">,</span> <span class="n">origin_nodes</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">,</span> <span class="n">node_positions</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">,</span> <span class="n">endpoints</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">NetworkState</span><span class="p">(</span><span class="n">links_by_id</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            Link (mesoltm.core.link.Link)" href="../core/#mesoltm.core.link.Link">Link</a></span><span class="p">],</span> <span class="n">out_links</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]],</span> <span class="n">in_links</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]],</span> <span class="n">origin_nodes</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            OriginNode (mesoltm.core.nodes.origin_node.OriginNode)" href="../nodes/#mesoltm.core.nodes.origin_node.OriginNode">OriginNode</a></span><span class="p">],</span> <span class="n">node_positions</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span> <span class="n">endpoints</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">]])</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3449,7 +3450,7 @@ cumulative-count arrays at a given step.</p>
                 <code>links_by_id</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span></code>
+                  <code><span title="dict">dict</span>[<span title="int">int</span>, <a class="autorefs autorefs-internal" title="            Link (mesoltm.core.link.Link)" href="../core/#mesoltm.core.link.Link">Link</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3465,7 +3466,7 @@ cumulative-count arrays at a given step.</p>
                 <code>out_links</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span></code>
+                  <code><span title="dict">dict</span>[<span title="mesoltm.core.ids.NodeId">NodeId</span>, <span title="list">list</span>[<span title="int">int</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3481,7 +3482,7 @@ cumulative-count arrays at a given step.</p>
                 <code>in_links</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span></code>
+                  <code><span title="dict">dict</span>[<span title="mesoltm.core.ids.NodeId">NodeId</span>, <span title="list">list</span>[<span title="int">int</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3497,7 +3498,7 @@ cumulative-count arrays at a given step.</p>
                 <code>origin_nodes</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span></code>
+                  <code><span title="dict">dict</span>[<span title="mesoltm.core.ids.NodeId">NodeId</span>, <a class="autorefs autorefs-internal" title="            OriginNode (mesoltm.core.nodes.origin_node.OriginNode)" href="../nodes/#mesoltm.core.nodes.origin_node.OriginNode">OriginNode</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3513,7 +3514,7 @@ cumulative-count arrays at a given step.</p>
                 <code>node_positions</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span></code>
+                  <code><span title="dict">dict</span>[<span title="mesoltm.core.ids.NodeId">NodeId</span>, <span title="tuple">tuple</span>[<span title="float">float</span>, <span title="float">float</span>] | None]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3529,7 +3530,7 @@ cumulative-count arrays at a given step.</p>
                 <code>endpoints</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span></code>
+                  <code><span title="dict">dict</span>[<span title="int">int</span>, <span title="tuple">tuple</span>[<span title="mesoltm.core.ids.NodeId">NodeId</span>, <span title="mesoltm.core.ids.NodeId">NodeId</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3572,7 +3573,7 @@ cumulative-count arrays at a given step.</p>
 
 
 <a href="#mesoltm.network.state.NetworkState.nodes" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">nodes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">nodes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3612,7 +3613,7 @@ cumulative-count arrays at a given step.</p>
 
 
 <a href="#mesoltm.network.state.NetworkState.out_links" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">out_links</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">out_links</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3632,7 +3633,7 @@ cumulative-count arrays at a given step.</p>
 
 
 <a href="#mesoltm.network.state.NetworkState.in_links" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">in_links</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">in_links</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3652,7 +3653,7 @@ cumulative-count arrays at a given step.</p>
 
 
 <a href="#mesoltm.network.state.NetworkState.links_between" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">links_between</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">links_between</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3672,7 +3673,7 @@ cumulative-count arrays at a given step.</p>
 
 
 <a href="#mesoltm.network.state.NetworkState.endpoints" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">endpoints</span><span class="p">(</span><span class="n">link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="tuple">tuple</span></span> <span class="o">|</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">endpoints</span><span class="p">(</span><span class="n">link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3692,7 +3693,7 @@ cumulative-count arrays at a given step.</p>
 
 
 <a href="#mesoltm.network.state.NetworkState.position" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">position</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="tuple">tuple</span></span> <span class="o">|</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">position</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3772,7 +3773,7 @@ cumulative-count arrays at a given step.</p>
 
 
 <a href="#mesoltm.network.state.NetworkState.vehicles_on" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">vehicles_on</span><span class="p">(</span><span class="n">link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">vehicles_on</span><span class="p">(</span><span class="n">link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3832,7 +3833,7 @@ cumulative-count arrays at a given step.</p>
 
 
 <a href="#mesoltm.network.state.NetworkState.entry_queue" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">entry_queue</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">entry_queue</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3852,7 +3853,7 @@ cumulative-count arrays at a given step.</p>
 
 
 <a href="#mesoltm.network.state.NetworkState.waiting_vehicles" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">waiting_vehicles</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">waiting_vehicles</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3877,7 +3878,7 @@ id, next link and category. Empty for non-origin nodes.</p>
 
 
 <a href="#mesoltm.network.state.NetworkState.inject" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">inject</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">vehicle</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">,</span> <span class="n">at_time</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">inject</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">vehicle</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">,</span> <span class="n">at_time</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">check_reentry_node</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3888,12 +3889,25 @@ origin/destination connector links are spliced on automatically (matching
 how static demand is compiled), so external callers only ever reason about
 real links. The vehicle then joins the origin's departure queue in
 departure-time order and is released like any other vehicle.</p>
-<p>If the number of injected vehicles exceeds the <code>injection_budget</code> the
-connectors were sized for (see
-:meth:<code>~mesoltm.network.network.Network.compile</code>), a :class:<code>RuntimeWarning</code>
-is emitted: the connector buffer may then be too small to admit the vehicle
-promptly, so it waits in the origin queue (and may not enter within the
-horizon) rather than being silently discarded.</p>
+<p>The <strong>same</strong> vehicle may be injected repeatedly to make several trips, each
+recorded as its own journey (see
+:attr:<code>~mesoltm.core.vehicle.Vehicle.journeys</code>). Two guardrails protect
+re-injection:</p>
+<ul>
+<li>The vehicle must not still be moving through, or waiting to enter, the
+  network — its previous journey must have completed (it was absorbed at a
+  destination). Otherwise a :class:<code>RuntimeError</code> is raised.</li>
+<li>By default the vehicle must re-enter at the <strong>same real node</strong> where it
+  last left the network (its previous journey's final real link's downstream
+  node — auxiliary O/D connector nodes are never considered). A mismatch
+  raises :class:<code>ValueError</code>; pass <code>check_reentry_node=False</code> to allow a
+  deliberate re-entry elsewhere.</li>
+</ul>
+<p>If the number of injections exceeds the <code>injection_budget</code> the connectors
+were sized for (see :meth:<code>~mesoltm.network.network.Network.compile</code>), a
+:class:<code>RuntimeWarning</code> is emitted: the connector buffer may then be too
+small to admit the vehicle promptly, so it waits in the origin queue (and
+may not enter within the horizon) rather than being silently discarded.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3912,7 +3926,7 @@ horizon) rather than being silently discarded.</p>
                 <code>node_id</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3933,7 +3947,7 @@ horizon) rather than being silently discarded.</p>
             <td>
               <div class="doc-md-description">
                 <p>The vehicle to inject; <code>start</code>, <code>route</code> and <code>position</code>
-are set here.</p>
+are set here (and the live journey state reset on re-injection).</p>
               </div>
             </td>
             <td>
@@ -3957,6 +3971,24 @@ time (<code>step * dt</code>) so it is considered in the next step.</p>
                   <code>None</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>check_reentry_node</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>When re-injecting an already-used vehicle, require
+it to re-enter at the real node it last left from. Defaults to
+<code>True</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -3976,7 +4008,20 @@ time (<code>step * dt</code>) so it is considered in the next step.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>node_id</code> is not a registered origin node.</p>
+                <p>If <code>node_id</code> is not a registered origin node, or (on
+re-injection with <code>check_reentry_node</code>) the vehicle last left the
+network at a different real node.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the vehicle is still active (its current journey has
+not completed).</p>
               </div>
             </td>
           </tr>
@@ -4255,7 +4300,7 @@ location).</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.network.state.VehicleView.destination">destination</span></code></td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4304,7 +4349,7 @@ location).</p>
 
 
 <a href="#mesoltm.network.builders.grid_network" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">grid_network</span><span class="p">(</span><span class="n">rows</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">cols</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">link_length</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">200.0</span><span class="p">,</span> <span class="n">spacing</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bidirectional</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">skip_nodes</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_edges</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">all_nodes_od</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Network (mesoltm.network.network.Network)" href="#mesoltm.network.network.Network">Network</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">grid_network</span><span class="p">(</span><span class="n">rows</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">cols</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">link_length</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">200.0</span><span class="p">,</span> <span class="n">spacing</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">fd</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bidirectional</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">skip_nodes</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="int">int</span></span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_edges</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="int">int</span></span><span class="p">],</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="int">int</span></span><span class="p">]]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">all_nodes_od</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Network (mesoltm.network.network.Network)" href="#mesoltm.network.network.Network">Network</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4396,7 +4441,7 @@ excluding nodes (<code>skip_nodes</code>) or individual directed edges (<code>sk
                 <code>fd</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span> | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="float">float</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4428,7 +4473,7 @@ excluding nodes (<code>skip_nodes</code>) or individual directed edges (<code>sk
                 <code>skip_nodes</code>
             </td>
             <td>
-                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>] | None</code>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="int">int</span>, <span title="int">int</span>]] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4444,7 +4489,7 @@ excluding nodes (<code>skip_nodes</code>) or individual directed edges (<code>sk
                 <code>skip_edges</code>
             </td>
             <td>
-                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>] | None</code>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="tuple">tuple</span>[<span title="int">int</span>, <span title="int">int</span>], <span title="tuple">tuple</span>[<span title="int">int</span>, <span title="int">int</span>]]] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4511,7 +4556,7 @@ destination.</p>
 
 
 <a href="#mesoltm.network.builders.corridor_network" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">corridor_network</span><span class="p">(</span><span class="n">lengths</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">],</span> <span class="n">fd</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">node_prefix</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;n&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Network (mesoltm.network.network.Network)" href="#mesoltm.network.network.Network">Network</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">corridor_network</span><span class="p">(</span><span class="n">lengths</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">],</span> <span class="n">fd</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">node_prefix</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s1">&#39;n&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Network (mesoltm.network.network.Network)" href="#mesoltm.network.network.Network">Network</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4552,7 +4597,7 @@ destination.</p>
                 <code>fd</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span> | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="float">float</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">

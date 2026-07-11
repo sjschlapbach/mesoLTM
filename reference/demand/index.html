@@ -1807,7 +1807,7 @@ an origin.</p>
 
 
 <a href="#mesoltm.demand.demand.vehicles_from_demand_profile" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">vehicles_from_demand_profile</span><span class="p">(</span><span class="n">demand_pattern</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">],</span> <span class="n">total_time</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">route_integer_share</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">random_route</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">origin</span><span class="p">:</span> <span class="n"><span title="object">object</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">destination</span><span class="p">:</span> <span class="n"><span title="object">object</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">vehicles_from_demand_profile</span><span class="p">(</span><span class="n">demand_pattern</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">],</span> <span class="n">total_time</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">route_integer_share</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">random_route</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">origin</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">destination</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Vehicle (mesoltm.core.vehicle.Vehicle)" href="../core/#mesoltm.core.vehicle.Vehicle">Vehicle</a></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -1884,7 +1884,7 @@ each slice. Routes may be a single fixed route or drawn from a share map.</p>
                 <code>route_integer_share</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span> | None</code>
+                  <code><span title="dict">dict</span>[<span title="tuple">tuple</span>[<span title="int">int</span>, ...], <span title="int">int</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1918,7 +1918,7 @@ split vehicles across several routes by integer share.</p>
                 <code>origin</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1934,7 +1934,7 @@ split vehicles across several routes by integer share.</p>
                 <code>destination</code>
             </td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">

@@ -1876,11 +1876,19 @@ records.</p>
 </tr>
 <tr>
 <td><code>trajectory</code></td>
-<td>Auto-populated per-link log (<code>entry_step</code>, <code>exit_step</code>, <code>is_connector</code>) that per-vehicle <a href="../../guide/metrics/">metrics</a> are derived from.</td>
+<td>Auto-populated per-link log (<code>entry_step</code>, <code>exit_step</code>, <code>is_connector</code>) for the <strong>current</strong> trip; per-journey <a href="../../guide/metrics/">metrics</a> are derived from it.</td>
 </tr>
 <tr>
 <td><code>end</code></td>
-<td>Arrival step, stamped by the destination node.</td>
+<td>Arrival step of the current trip, stamped by the destination node.</td>
+</tr>
+<tr>
+<td><code>journeys</code></td>
+<td>The completed-trip records (<strong>the single source of truth</strong> for this vehicle's finished trips). One entry per trip — a demand-profile vehicle has one; a <a href="../../guide/stepping-and-injection/#re-injecting-a-vehicle-for-another-trip">re-injected</a> one has several.</td>
+</tr>
+<tr>
+<td><code>active</code></td>
+<td><code>True</code> while the vehicle is queued or moving; <code>False</code> once it has been absorbed at a destination.</td>
 </tr>
 </tbody>
 </table>

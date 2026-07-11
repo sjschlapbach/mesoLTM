@@ -2388,7 +2388,7 @@ simulation.</p>
 
   
       dataclass
-   (mesoltm.recording.WaitingSnapshot)" href="#mesoltm.recording.WaitingSnapshot">WaitingSnapshot</a></span><span class="p">],</span> <span class="n">link_occupancy</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">)</span>
+   (mesoltm.recording.WaitingSnapshot)" href="#mesoltm.recording.WaitingSnapshot">WaitingSnapshot</a></span><span class="p">],</span> <span class="n">link_occupancy</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="int">int</span></span><span class="p">])</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2465,7 +2465,7 @@ simulation.</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.recording.Frame.link_occupancy">link_occupancy</span></code></td>
             <td>
-                  <code><span title="dict">dict</span></code>
+                  <code><span title="dict">dict</span>[<span title="int">int</span> | <span title="str">str</span>, <span title="int">int</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2518,7 +2518,7 @@ simulation.</p>
   </span>
 
 <a href="#mesoltm.recording.AgentSnapshot" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">AgentSnapshot</span><span class="p">(</span><span class="n">vehicle_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">link_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">queue_index</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">queue_len</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">,</span> <span class="n">next_link_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">next_node</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="n"><span title="mesoltm.recording.DEFAULT_CATEGORY">DEFAULT_CATEGORY</span></span><span class="p">,</span> <span class="n">props</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">=</span> <span class="n"><span title="dict">dict</span></span><span class="p">())</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">AgentSnapshot</span><span class="p">(</span><span class="n">vehicle_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n">queue_index</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">queue_len</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span><span class="p">],</span> <span class="n">next_link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">next_node</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="n"><span title="mesoltm.recording.DEFAULT_CATEGORY">DEFAULT_CATEGORY</span></span><span class="p">,</span> <span class="n">props</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">=</span> <span class="n"><span title="dict">dict</span></span><span class="p">())</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2556,7 +2556,7 @@ back from it.</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.recording.AgentSnapshot.link_id">link_id</span></code></td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="int">int</span> | <span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2590,7 +2590,7 @@ nearest the downstream node, next to leave).</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.recording.AgentSnapshot.route">route</span></code></td>
             <td>
-                  <code><span title="list">list</span></code>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<span title="int">int</span> | <span title="str">str</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2604,7 +2604,7 @@ policy routing, which stores no plan on the vehicle).</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.recording.AgentSnapshot.next_link_id">next_link_id</span></code></td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="int">int</span> | <span title="str">str</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2616,7 +2616,7 @@ policy routing, which stores no plan on the vehicle).</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.recording.AgentSnapshot.next_node">next_node</span></code></td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2696,7 +2696,7 @@ per-vehicle information.</p>
   </span>
 
 <a href="#mesoltm.recording.WaitingSnapshot" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">WaitingSnapshot</span><span class="p">(</span><span class="n">vehicle_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">,</span> <span class="n">next_link_id</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">next_node</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="n"><span title="mesoltm.recording.DEFAULT_CATEGORY">DEFAULT_CATEGORY</span></span><span class="p">,</span> <span class="n">props</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">=</span> <span class="n"><span title="dict">dict</span></span><span class="p">())</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">WaitingSnapshot</span><span class="p">(</span><span class="n">vehicle_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span><span class="p">],</span> <span class="n">next_link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">next_node</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="n"><span title="mesoltm.recording.DEFAULT_CATEGORY">DEFAULT_CATEGORY</span></span><span class="p">,</span> <span class="n">props</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">=</span> <span class="n"><span title="dict">dict</span></span><span class="p">())</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2733,7 +2733,7 @@ the node it is waiting to enter.</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.recording.WaitingSnapshot.node_id">node_id</span></code></td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2744,7 +2744,7 @@ the node it is waiting to enter.</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.recording.WaitingSnapshot.route">route</span></code></td>
             <td>
-                  <code><span title="list">list</span></code>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<span title="int">int</span> | <span title="str">str</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2756,7 +2756,7 @@ empty when it carries no explicit plan.</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.recording.WaitingSnapshot.next_link_id">next_link_id</span></code></td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="int">int</span> | <span title="str">str</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2768,7 +2768,7 @@ empty when it carries no explicit plan.</p>
           <tr class="doc-section-item">
             <td><code><span title="mesoltm.recording.WaitingSnapshot.next_node">next_node</span></code></td>
             <td>
-                  <code><span title="object">object</span></code>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2963,7 +2963,7 @@ current by the simulation loop).</p>
 
 
 <a href="#mesoltm.recording.record_run" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">record_run</span><span class="p">(</span><span class="n">sim</span><span class="p">,</span> <span class="n">classify</span><span class="p">:</span> <span class="n"><span title="mesoltm.recording.ClassifyFn">ClassifyFn</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            SimulationHistory
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">record_run</span><span class="p">(</span><span class="n">sim</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></span><span class="p">,</span> <span class="n">classify</span><span class="p">:</span> <span class="n"><span title="mesoltm.recording.ClassifyFn">ClassifyFn</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            SimulationHistory
 
 
   
@@ -2997,6 +2997,7 @@ injects vehicles), compile with <code>record_history=True</code> instead and rea
                 <code>sim</code>
             </td>
             <td>
+                  <code><a class="autorefs autorefs-internal" title="            Simulation (mesoltm.core.simulation.Simulation)" href="../core/#mesoltm.core.simulation.Simulation">Simulation</a></code>
             </td>
             <td>
               <div class="doc-md-description">
