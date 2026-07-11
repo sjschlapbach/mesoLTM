@@ -55,6 +55,11 @@ class Link(BaseLink):
         w: Backward shock-wave speed (m/s).
         rho_jam: Jam density (veh/m).
         capacity: Capacity (veh/s), derived in :meth:`start`.
+        critical_occupancy: Largest whole-vehicle count that is still free-flowing
+            (floored ``rho_crit * length``, ``rho_crit = rho_jam*w/(v_f+w)``),
+            derived in :meth:`start`.
+        jam_occupancy: Maximum whole-vehicle count that fits on the link (floored
+            ``rho_jam * length``), derived in :meth:`start`.
         cumulative_inflows: Cumulative vehicles entered by step index.
         cumulative_outflows: Cumulative vehicles exited by step index.
         vehicles: FIFO queue of vehicles currently on the link.
@@ -81,6 +86,8 @@ class Link(BaseLink):
         self.T1: int = 1
         self.T2: int = 1
         self.capacity: float = 0.0
+        self.critical_occupancy: int = 0
+        self.jam_occupancy: int = 0
         self.cumulative_inflows: list[float] = []
         self.cumulative_outflows: list[float] = []
         self.cap_disc_upstream: list[float] = []
@@ -138,6 +145,19 @@ class Link(BaseLink):
 
         # Capacity C_a = K_a*V_a*W_a / (V_a+W_a) from the triangular FD (Section 3.1).
         self.capacity = self.rho_jam * self.v_f * self.w / (self.v_f + self.w)
+
+        # Occupancy thresholds (whole vehicles) for auxiliary computations. On the
+        # triangular FD the free-flow and congested branches meet at the critical
+        # density rho_crit = K_a*W_a/(V_a+W_a) (where rho_crit*V_a == capacity); K_a
+        # is the jam density (maximum packing). Occupancy is the vehicle count on the
+        # link, so multiply each density by the length. Both are floored downward so
+        # the integer count is conservative: a link holding at most critical_occupancy
+        # vehicles has density <= rho_crit and is therefore still in free flow, and
+        # jam_occupancy is the most vehicles that physically fit (matching the
+        # rho_jam*length storage term used by the supply flow above).
+        rho_crit = self.rho_jam * self.w / (self.v_f + self.w)
+        self.critical_occupancy = math.floor(rho_crit * self.length)
+        self.jam_occupancy = math.floor(self.rho_jam * self.length)
         # Seed the capacity tokens q̂^u/q̂^d at their upper bound ceil(C*dt)+1, the
         # cap imposed by Eq. (6); a link therefore starts able to discharge/admit a
         # full step's worth of capacity.

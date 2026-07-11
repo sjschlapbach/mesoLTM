@@ -34,6 +34,19 @@ def test_link_start_derives_capacity_and_lags():
     assert len(link.cumulative_inflows) == 101
 
 
+def test_link_start_derives_occupancy_thresholds():
+    """start() must derive floored critical and jam occupancies from the FD."""
+    link = Link(link_id=1, length=300, v_f=30.0, w=6.0, rho_jam=0.2)
+    link.start(time_step=1.0, total_time=100.0)
+    # rho_crit = rho_jam*w/(v_f+w) = 0.2*6/36 = 1/30 veh/m -> 10.0 veh over 300 m.
+    assert link.critical_occupancy == 10
+    # rho_jam*length = 0.2*300 = 60 veh fit on the link.
+    assert link.jam_occupancy == 60
+    # Flooring keeps critical_occupancy free-flowing: its density stays <= rho_crit.
+    rho_crit = 0.2 * 6.0 / (30.0 + 6.0)
+    assert link.critical_occupancy / link.length <= rho_crit
+
+
 def test_cfl_condition_rejects_too_short_link():
     """start() raises when max(v_f, w) * dt exceeds the link length (paper §3.3)."""
     # v_f * dt = 30 m > length 20 m: the free-flow wave crosses in under one step.

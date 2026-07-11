@@ -16,6 +16,12 @@ traffic-engineering notation):
 
 Capacity is derived, not set: `capacity = rho_jam * v_f * w / (v_f + w)` (veh/s).
 
+`start()` also derives two floored whole-vehicle occupancy thresholds (occupancy =
+vehicle count on the link), stored on the link for auxiliary computations:
+- `critical_occupancy = floor(rho_crit * L)`, `rho_crit = rho_jam*w/(v_f+w)` — the
+  largest count that is still free-flowing (density stays `<= rho_crit`).
+- `jam_occupancy = floor(rho_jam * L)` — the most vehicles that physically fit.
+
 `v_f`, `w`, `rho_jam` live on `Link`/`ConnectorLink`, NOT on `Vehicle`.
 
 ## Wave lags (integer steps)

@@ -33,6 +33,31 @@ link = Link(link_id=1, length=300.0, v_f=30.0, w=6.0, rho_jam=0.2)
     `v_f`, `w`, and `rho_jam` are **link** properties. A `Vehicle` never carries
     them — see [Vehicles & routing](vehicles-and-routing.md).
 
+## Occupancy thresholds
+
+*Occupancy* is the number of vehicles on a link. `start()` also derives two
+whole-vehicle thresholds from the FD, stored on the link for auxiliary
+computations:
+
+$$ \texttt{critical\_occupancy} = \big\lfloor \rho_{\text{crit}}\, L \big\rfloor
+   \quad\text{with}\quad
+   \rho_{\text{crit}} = \frac{\rho_{\text{jam}}\, w}{v_f + w} $$
+
+$$ \texttt{jam\_occupancy} = \big\lfloor \rho_{\text{jam}}\, L \big\rfloor $$
+
+$\rho_{\text{crit}}$ is the **critical density**, where the free-flow and congested
+branches of the triangular FD meet ($\rho_{\text{crit}}\, v_f = \text{capacity}$).
+Both thresholds are **floored downward** so the integer count is conservative: a
+link holding at most `critical_occupancy` vehicles has density $\le
+\rho_{\text{crit}}$ and is therefore still free-flowing, and `jam_occupancy` is the
+most vehicles that physically fit (the same `rho_jam · length` storage that bounds
+the receiving flow).
+
+```python
+link = Link(link_id=1, length=300.0, v_f=30.0, w=6.0, rho_jam=0.2)
+# after start(): link.critical_occupancy == 10, link.jam_occupancy == 60
+```
+
 ## Wave travel times
 
 The FD's two wave speeds give two integer lags, in whole steps, that a link uses

@@ -14,6 +14,8 @@ ConnectorLink(link_id, time_step, vehicle_budget, **kwargs)   # auto O/D buffer 
 
 Key `Link` methods (mostly engine-internal): `start(time_step, total_time)`,
 `get_capacity() -> float`, `get_demand() -> int`, `get_supply() -> int`.
+`Link` attributes derived in `start()`: `capacity`, `critical_occupancy`,
+`jam_occupancy` (both floored whole-vehicle occupancy thresholds), `T1`, `T2`.
 
 ## Vehicle and Simulation (mesoltm.core)
 
