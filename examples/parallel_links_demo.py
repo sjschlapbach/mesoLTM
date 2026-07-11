@@ -118,7 +118,7 @@ def run_case(load_weight, close_time, n_vehicles, insert_span):
     def cost(link_id, state):
         congestion = load_weight * state.occupancy(link_id)
         blocked = 1e6 if link_id in closed else 0.0
-        return state.free_flow_time(link_id) + congestion + blocked
+        return state.continuous_free_flow_time(link_id) + congestion + blocked
 
     def close_fast_lane(t, state):
         if t == close_step:

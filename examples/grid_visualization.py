@@ -81,7 +81,7 @@ CLASS_COLORS = {"car": "#0072b2", "van": "#009e73", "truck": "#d55e00"}
 def cost(link_id: int, state: NetworkState) -> float:
     """Free-flow time plus a linear penalty in the link's current density."""
     density = state.occupancy(link_id) / state.length(link_id)  # veh/m
-    return state.free_flow_time(link_id) + DENSITY_PENALTY * density
+    return state.continuous_free_flow_time(link_id) + DENSITY_PENALTY * density
 
 
 class DensityRerouter(ReroutingPlugin):
