@@ -118,7 +118,10 @@ def _demonstrate_guardrails() -> None:
     try:
         sim.inject("A", vehicle)
     except RuntimeError as exc:
-        print("  still-active re-injection rejected:", str(exc).split(".")[0] + ".")
+        print(
+            "  still-active re-injection rejected:",
+            str(exc).split(".", maxsplit=1)[0] + ".",
+        )
 
     # Let it finish journey 1 (arrives at B).
     run_until_idle(sim, vehicle)
@@ -128,7 +131,10 @@ def _demonstrate_guardrails() -> None:
     try:
         sim.inject("A", vehicle)
     except ValueError as exc:
-        print("  wrong-node re-injection rejected:", str(exc).split(".")[0] + ".")
+        print(
+            "  wrong-node re-injection rejected:",
+            str(exc).split(".", maxsplit=1)[0] + ".",
+        )
 
 
 if __name__ == "__main__":
