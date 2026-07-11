@@ -198,7 +198,7 @@ disagree, the release workflow fails.
 
 ```bash
 git checkout master                     # safeguard: ensure you are on master
-git commit -am "chore(release): v0.1.0"  # replace v0.1.0 with the release version
+git commit -m "chore(release): v0.1.0"  # replace v0.1.0 with the release version
 git push origin master
 ```
 
