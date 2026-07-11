@@ -20,8 +20,11 @@ Key `Link` methods (mostly engine-internal): `start(time_step, total_time)`,
 ```python
 Vehicle(vehicle_id=0, origin=0, destination=0, start=0.0, route=None, props=None, **kwargs)
 #   attrs: route(list[int]), position(int), props(dict), trajectory(list[dict]), end(int|None)
+#          journeys(list[dict], single source of truth for completed trips), active(bool)
 Vehicle.next_link(current_link_id) -> int | None
 Vehicle.advance_to(link_id) -> None
+Vehicle.snapshot_journey() -> dict       # freeze current trip into a journey record
+Vehicle.reset_for_new_journey() -> None  # clear live state before re-injection
 
 Simulation(**kwargs)                 # links, nodes, time_step, total_time, plugins, ...
 Simulation.run(progress=False) -> Simulation   # progress=True shows a tqdm bar on stderr
@@ -29,7 +32,9 @@ Simulation.start() -> Simulation
 Simulation.step() -> int
 Simulation.current_step              # next step to run
 Simulation.total_steps               # int(total_time/time_step)
-Simulation.inject(node_id, vehicle, at_time=None) -> None
+Simulation.inject(node_id, vehicle, at_time=None, check_reentry_node=True) -> None
+#   re-inject the same vehicle for another trip once it has arrived; one journey per trip
+#   raises RuntimeError if still active; ValueError if re-entering at a different real node
 Simulation.save_history(path=None) -> str
 Simulation.network_state, .history, .nodes, .links
 ```
@@ -122,8 +127,8 @@ vehicles_from_demand_profile(demand_pattern, total_time, route=None,
 ## Metrics (mesoltm.metrics)
 
 ```python
-collect_trips(sim, include_connectors=False) -> list[dict]
-trip_record(vehicle, dt, include_connectors=False) -> dict
+collect_trips(sim, include_connectors=False) -> list[dict]   # one per journey; (vehicle_id, journey_index)
+trip_record(journey, dt, include_connectors=False) -> dict   # journey record, not a live Vehicle
 summarize_trips(trips) -> dict
 write_trips_csv(trips, path) -> str
 ```

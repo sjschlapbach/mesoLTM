@@ -6,18 +6,24 @@
 # implements the model of de Souza et al., Simulation Modelling Practice and
 # Theory 140 (2025) 103088 (https://doi.org/10.1016/j.simpat.2025.103088).
 
-"""Per-vehicle trip metrics derived from the recorded vehicle trajectories.
+"""Per-journey trip metrics derived from the recorded vehicle trajectories.
 
-Each :class:`~mesoltm.core.vehicle.Vehicle` logs, as it moves, which links it
-entered and when (``vehicle.trajectory``). After a run these functions turn that
-log into compact per-vehicle records — the route actually driven, the travel time
-(desired departure to arrival, less each connector's one-step free-flow lag but
-keeping any supply-limited connector wait), that access time on its own, and the
-travel time on each link traversed — keyed by
-``vehicle_id`` so the data stays associatable with the exact vehicle seen during
-routing (the basis for modelling heterogeneous drivers later). Only the most
-important metrics are included for now; more detailed ones can be layered on the
-same trajectory data.
+As a :class:`~mesoltm.core.vehicle.Vehicle` moves it logs which links it entered
+and when; when it is absorbed at a destination that finished trip is frozen into a
+**journey record** on ``vehicle.journeys`` (the single source of truth for a
+vehicle's completed trips). These functions turn each journey record into a compact
+trip record — the route actually driven, the travel time (desired departure to
+arrival, less each connector's one-step free-flow lag but keeping any supply-limited
+connector wait), that access time on its own, and the travel time on each link
+traversed.
+
+Because every completed trip — whether it came from a static demand profile (one
+vehicle, one journey) or from a hand-injected and re-injected vehicle (one vehicle,
+many journeys) — is recorded the same way, the metrics have a single, uniform
+accounting path. Records are keyed by ``(vehicle_id, journey_index)``: a vehicle
+that made one trip yields ``journey_index = 0``, a re-injected one yields ``0, 1,
+…`` in order. Only the most important metrics are included for now; more detailed
+ones can be layered on the same journey data.
 """
 
 from __future__ import annotations
@@ -29,11 +35,10 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..core.simulation import Simulation
-    from ..core.vehicle import Vehicle
 
 
-def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -> dict:
-    """Build the travel-time record for a single completed vehicle.
+def trip_record(journey: dict, dt: float, include_connectors: bool = False) -> dict:
+    """Build the travel-time record for a single completed journey.
 
     The reported ``travel_time`` is the time from the vehicle's desired departure
     to its arrival, **minus the artificial one-step free-flow lag that each
@@ -47,7 +52,9 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
     reflects only real links and is unaffected by connectors.
 
     Args:
-        vehicle: A vehicle that has finished its trip (``vehicle.end`` set).
+        journey: A completed journey record as produced by
+            :meth:`~mesoltm.core.vehicle.Vehicle.snapshot_journey` and stored on
+            ``vehicle.journeys`` / a destination's ``completed_journeys``.
         dt: Simulation step ``dt`` in seconds, used to convert steps to seconds.
         include_connectors: If ``True`` keep auto-inserted O/D connector links in
             ``link_travel_times`` and ``route``; by default only real links are
@@ -56,9 +63,9 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
     Returns:
         A dict with keys:
 
-        * ``vehicle_id``, ``origin``, ``destination``;
+        * ``vehicle_id``, ``journey_index``, ``origin``, ``destination``;
         * ``route`` — the ordered real link ids the vehicle actually drove;
-        * ``start_time`` — desired departure (``vehicle.start``);
+        * ``start_time`` — desired departure (the journey's ``start``);
         * ``network_entry_time`` — when it entered the first real link;
         * ``arrival_time`` — when it was absorbed at the destination;
         * ``travel_time`` — time in system from desired departure to arrival, with
@@ -73,29 +80,29 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
         Time fields are seconds; ``None`` where a value cannot be determined (e.g.
         the vehicle never entered the network).
     """
+    trajectory = journey["trajectory"]
+
     # Network entry = the first *real* link. Any leading connector holds the entry
     # queue for its origin (see ConnectorLink); together with the origin's vertical
     # queue this is the vehicle's "access" time before it reaches a real road.
     # Trajectories are chronological; without a connector the first segment is
     # already the first real link.
-    real_entry = next(
-        (seg for seg in vehicle.trajectory if not seg["is_connector"]), None
-    )
+    real_entry = next((seg for seg in trajectory if not seg["is_connector"]), None)
     network_entry_step = real_entry["entry_step"] if real_entry is not None else None
-    arrival_step = vehicle.end
+    arrival_step = journey["end"]
 
     # The route actually driven = the real links in the order they were traversed
     # (connectors are internal access stubs, dropped unless explicitly requested).
     route = [
         seg["link_id"]
-        for seg in vehicle.trajectory
+        for seg in trajectory
         if include_connectors or not seg["is_connector"]
     ]
 
     # Per-link travel time = (exit - entry) steps * dt, skipping connectors (unless
     # asked) and any segment still open at the end of the horizon.
     link_travel_times: dict[int, float] = {}
-    for seg in vehicle.trajectory:
+    for seg in trajectory:
         if seg["is_connector"] and not include_connectors:
             continue
         if seg["exit_step"] is None:
@@ -109,7 +116,7 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
     # the non-connector trajectory segments. Independent of ``include_connectors``,
     # which only controls what appears in ``route``/``link_travel_times``.
     network_time: float | None = None
-    for seg in vehicle.trajectory:
+    for seg in trajectory:
         if seg["is_connector"] or seg["exit_step"] is None:
             continue
         network_time = (network_time or 0.0) + (
@@ -124,7 +131,7 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
     # constraint), i.e. time the vehicle really would have waited to enter/leave the
     # network, so it stays part of travel_time (as access).
     connector_free_flow_lag = 0.0
-    for seg in vehicle.trajectory:
+    for seg in trajectory:
         if seg["is_connector"] and seg["exit_step"] is not None:
             crossing = (seg["exit_step"] - seg["entry_step"]) * dt
             connector_free_flow_lag += min(crossing, dt)
@@ -135,7 +142,9 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
     # ``travel_time == access_time + network_time`` always holds.
     travel_time = None
     if arrival_time is not None:
-        travel_time = max(0.0, arrival_time - vehicle.start - connector_free_flow_lag)
+        travel_time = max(
+            0.0, arrival_time - journey["start"] - connector_free_flow_lag
+        )
     access_time = None
     if travel_time is not None and network_time is not None:
         access_time = max(0.0, travel_time - network_time)
@@ -143,11 +152,12 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
         access_time = travel_time
 
     return {
-        "vehicle_id": vehicle.vehicle_id,
-        "origin": vehicle.origin,
-        "destination": vehicle.destination,
+        "vehicle_id": journey["vehicle_id"],
+        "journey_index": journey["journey_index"],
+        "origin": journey["origin"],
+        "destination": journey["destination"],
         "route": route,
-        "start_time": vehicle.start,
+        "start_time": journey["start"],
         "network_entry_time": network_entry_time,
         "arrival_time": arrival_time,
         "travel_time": travel_time,
@@ -161,26 +171,30 @@ def trip_record(vehicle: Vehicle, dt: float, include_connectors: bool = False) -
 def collect_trips(sim: Simulation, include_connectors: bool = False) -> list[dict]:
     """Collect travel-time records for every completed trip in a finished run.
 
-    Completed trips are gathered from the destination nodes' absorbed vehicles.
-    Vehicles still en route or waiting in an origin queue at the end of the horizon
-    are not included.
+    Completed trips are gathered from the destination nodes' recorded journeys —
+    one record per completed journey. A vehicle from a static demand profile
+    contributes one journey; a hand-injected vehicle that was re-injected
+    contributes one per trip. Vehicles still en route or waiting in an origin queue
+    at the end of the horizon have no completed journey and are not included.
 
     Args:
         sim: A run :class:`~mesoltm.core.simulation.Simulation`.
         include_connectors: Passed through to :func:`trip_record`.
 
     Returns:
-        A list of per-vehicle records (see :func:`trip_record`), sorted by
-        ``vehicle_id``.
+        A list of per-journey records (see :func:`trip_record`), sorted by
+        ``(vehicle_id, journey_index)``.
     """
     dt = sim.time_step
     records: list[dict] = []
     for node in sim.nodes:
-        # Only destination nodes carry ``arrived_vehicles``; the getattr default
-        # lets us scan every node without type-checking each one.
-        for vehicle in getattr(node, "arrived_vehicles", []):
-            records.append(trip_record(vehicle, dt, include_connectors))
-    records.sort(key=lambda r: r["vehicle_id"])
+        # Only destination nodes carry ``completed_journeys``; the getattr default
+        # lets us scan every node without type-checking each one. Each journey
+        # ended at exactly one destination, so no de-duplication is needed.
+        for journey in getattr(node, "completed_journeys", []):
+            records.append(trip_record(journey, dt, include_connectors))
+
+    records.sort(key=lambda r: (r["vehicle_id"], r["journey_index"]))
     return records
 
 
@@ -221,7 +235,7 @@ def summarize_trips(trips: list[dict]) -> dict:
 
 
 def write_trips_csv(trips: list[dict], path: str) -> str:
-    """Write trip records to a CSV file (one row per vehicle).
+    """Write trip records to a CSV file (one row per completed journey).
 
     The ``route`` and per-link travel times are flattened into single columns
     (``"l1;l2;..."`` and ``"link_id:seconds;..."``) so the file stays flat.
@@ -235,6 +249,7 @@ def write_trips_csv(trips: list[dict], path: str) -> str:
     """
     fields = [
         "vehicle_id",
+        "journey_index",
         "origin",
         "destination",
         "route",

@@ -106,7 +106,13 @@ class OriginNode(BaseNode):
         stops at the first not-yet-departing vehicle) stays valid. Typically called
         via :meth:`~mesoltm.network.state.NetworkState.inject`, which also splices
         on the origin/destination connector links.
+
+        The vehicle is flagged ``active`` here — the single point every vehicle
+        (static demand and dynamic injection alike) passes through on its way into
+        the network — so re-injection can tell a still-travelling vehicle from an
+        idle one.
         """
+        vehicle.active = True
         bisect.insort(self.demand_trips, vehicle, key=lambda v: v.start)
 
     def compute_flows(self, t: int) -> None:

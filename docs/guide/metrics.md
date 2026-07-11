@@ -1,27 +1,36 @@
 # Metrics & trip analysis
 
-After a run, `mesoltm.metrics` turns each vehicle's automatically-recorded
-`trajectory` into per-vehicle travel-time records and network-level summaries.
+After a run, `mesoltm.metrics` turns each completed **journey** into a travel-time
+record and network-level summaries. One journey = one completed trip.
 
 ```python
 from mesoltm import collect_trips, summarize_trips, write_trips_csv
 
 sim.run()
-trips = collect_trips(sim)             # one record per completed vehicle
+trips = collect_trips(sim)             # one record per completed journey
 summary = summarize_trips(trips)       # network-level aggregates
-write_trips_csv(trips, "trips.csv")    # flat CSV, one row per vehicle
+write_trips_csv(trips, "trips.csv")    # flat CSV, one row per journey
 ```
 
-Only vehicles that reached a destination are included; vehicles still en route or
+Only journeys that reached a destination are included; vehicles still en route or
 queued at the horizon's end are omitted.
+
+!!! note "One source of truth for all trips"
+    A completed trip is recorded the same way no matter how the vehicle came to
+    exist. A vehicle from a **static demand profile** makes one trip → one journey;
+    a **hand-injected** vehicle [re-injected](stepping-and-injection.md#re-injecting-a-vehicle-for-another-trip)
+    for several trips reuses one object → one journey per trip. Every journey lives
+    on `vehicle.journeys`, and `collect_trips` reports exactly one record per
+    journey — so metrics need no special-casing, and records are keyed by
+    `(vehicle_id, journey_index)` (`journey_index` is `0` for a single-trip vehicle).
 
 ## The trip record
 
-`collect_trips` (via `trip_record`) returns, per vehicle:
+`collect_trips` (via `trip_record`) returns, per journey:
 
 | Field | Meaning |
 |-------|---------|
-| `vehicle_id`, `origin`, `destination` | Identity |
+| `vehicle_id`, `journey_index`, `origin`, `destination` | Identity (which vehicle, which of its trips) |
 | `route` | The ordered real link ids actually driven |
 | `start_time` | Desired departure (`vehicle.start`) |
 | `network_entry_time` | When it entered the first real link |
@@ -59,7 +68,8 @@ print(summary["n_completed"], "trips,",
 
 ## CSV output
 
-`write_trips_csv` flattens `route` (`"l1;l2;..."`) and `link_travel_times`
+`write_trips_csv` writes one row per journey (columns begin `vehicle_id,
+journey_index, …`) and flattens `route` (`"l1;l2;..."`) and `link_travel_times`
 (`"id:seconds;..."`) into single columns so the file stays flat. The
 [CLI and JSON scenarios](../getting-started/running-a-scenario.md) can also write
 per-trip and per-link CSVs directly via `trip_output_file` / `link_output_file`.

@@ -34,7 +34,7 @@ sim.start() -> Simulation
 sim.step() -> int                          # runs current_step, returns it
 sim.current_step                           # next step to run
 sim.total_steps                            # int(total_time / time_step)
-sim.inject(node_id, vehicle, at_time=None) # add demand mid-run (real-link route)
+sim.inject(node_id, vehicle, at_time=None, check_reentry_node=True)  # add demand mid-run
 sim.network_state                          # NetworkState
 sim.history                                # SimulationHistory | None (if record_history)
 sim.save_history(path=None) -> str
@@ -58,11 +58,56 @@ from mesoltm import Vehicle
 sim.inject("a", Vehicle(vehicle_id=999, origin="a", destination="c", route=[l1, l2]))
 ```
 
-For injection, compile with `injection_budget=N` (N ≥ the number of vehicles you
-will inject); it sizes the O/D connectors to hold them. Defaults to `100`, but set
-it explicitly. Inject more than the budget and a `RuntimeWarning` is emitted — the
-over-budget vehicle is queued at its origin (waits for connector space, may not
-enter within the horizon), never silently dropped. Over-estimating N is safe.
+For injection, compile with `injection_budget=N` (N ≥ the number of injections you
+will make — count each re-injection); it sizes the O/D connectors to hold them.
+Defaults to `100`, but set it explicitly. Inject more than the budget and a
+`RuntimeWarning` is emitted — the over-budget vehicle is queued at its origin (waits
+for connector space, may not enter within the horizon), never silently dropped.
+Over-estimating N is safe.
+
+### Re-injecting a vehicle (multiple journeys)
+
+The **same** `Vehicle` may be injected again after it has completed a trip, to make
+another one. Each trip is recorded as a separate journey on `vehicle.journeys` (the
+single source of truth all metrics read — see
+[vehicles-and-routing.md](vehicles-and-routing.md#journeys-the-single-source-of-truth-for-completed-trips)),
+so a re-injected vehicle produces one trip record per journey, just as a static
+demand profile produces one vehicle per trip.
+
+```python
+v = Vehicle(vehicle_id=7, origin="A", destination="B", route=[l_ab])
+sim.inject("A", v)                                   # journey 0: A -> B
+while sim.current_step < sim.total_steps and v.active:
+    sim.step()                                       # v.active -> False when absorbed at B
+
+v.origin, v.destination, v.route = "B", "C", [l_bc]  # define the next trip's real links
+sim.inject("B", v)                                   # journey 1: re-enter at B, B -> C
+```
+
+Set `v.route` to the new trip before re-injecting: re-injection resets the live
+journey state but not `route` (which still holds the previous spliced route).
+
+#### Re-injection guardrails
+
+`inject` protects re-injection with two checks:
+
+- **Still-active check (mandatory):** if the vehicle has not completed its current
+  journey (`vehicle.active is True` — still queued or en route), `inject` raises
+  `RuntimeError`. Re-inject only after it has been absorbed at a destination.
+- **Re-entry-node check (default on):** the vehicle must re-enter at the **real**
+  node where it last left the network (the downstream node of its previous journey's
+  final real link — auxiliary O/D connector nodes are never considered). A mismatch
+  raises `ValueError`. Pass `check_reentry_node=False` to allow a deliberate re-entry
+  elsewhere.
+
+```python
+sim.inject("A", v)                          # RuntimeError if v is still active
+sim.inject("X", v)                          # ValueError if v last left at some other node
+sim.inject("X", v, check_reentry_node=False)  # allowed: skip the node check
+```
+
+See `examples/multi_trip_injection.py` for a full runnable demo (A→B→C with B both a
+destination and an origin) that prints per-journey metrics and both guardrails.
 
 ## NetworkState API
 
@@ -98,7 +143,7 @@ state.cumulative_outflow(link_id, t=None) -> float
 state.vehicles_in_network() -> list[VehicleView]
 state.remaining_real_route(vehicle, current_link_id=None) -> list[int]
 state.set_route(vehicle, real_route)       # must start at current link
-state.inject(node_id, vehicle, at_time=None)
+state.inject(node_id, vehicle, at_time=None, check_reentry_node=True)
 
 state.step                                 # current step (engine-maintained)
 ```

@@ -70,7 +70,34 @@ strongly recommended. If more vehicles are injected than the budget, a
 `RuntimeWarning` is emitted: the over-budget vehicle is added to its origin's queue
 but the connector buffer may be full, so it waits there and enters only once space
 frees up (and may not enter within the horizon) — it is never silently discarded.
-Over-estimating `N` is safe; purely static runs are unaffected.
+Over-estimating `N` is safe; purely static runs are unaffected. **Count each
+re-injection** toward `N` (a vehicle injected for three trips uses three).
+
+## Re-injecting a vehicle: set `route`, mind the guardrails
+
+The same `Vehicle` can be injected again after it has arrived, to make another trip
+(each recorded as a journey on `vehicle.journeys` — the single source of truth for
+completed trips; metrics read those, so demand-profile and injected runs account
+identically). Two easy mistakes:
+
+- **Forgetting to set `route`.** Re-injection resets the vehicle's live journey
+  state (`trajectory`/`end`/`position`) but **not** `route`, which still holds the
+  previous connector-spliced route. Set `vehicle.route = [<new real links>]` before
+  re-injecting, or the splice will treat the old spliced route as "real" and corrupt
+  the trip.
+- **Ignoring the guardrails.** `inject` raises `RuntimeError` if the vehicle is still
+  active (its current journey hasn't finished — wait until `vehicle.active is False`),
+  and `ValueError` if it re-enters at a different **real** node than it last left
+  (auxiliary O/D connector nodes are never counted). Pass `check_reentry_node=False`
+  to allow a deliberate re-entry elsewhere.
+
+## Trip records are per-journey, keyed `(vehicle_id, journey_index)`
+
+`collect_trips` / `write_trips_csv` emit **one row per completed journey**, not per
+vehicle, and `trip_record` takes a **journey record** (from `vehicle.journeys`), not
+a live `Vehicle`. A demand-profile vehicle has one journey (`journey_index == 0`); a
+re-injected one has several. If you index trips by `vehicle_id` alone you will
+collide re-injected vehicles' journeys — key by `(vehicle_id, journey_index)`.
 
 ## Imports are always module-top-level
 

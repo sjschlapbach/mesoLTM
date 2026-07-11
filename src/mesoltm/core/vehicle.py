@@ -55,6 +55,26 @@ class Vehicle:
             ``exit_step`` is ``None`` while the vehicle is still on that link.
             Populated automatically as the vehicle moves; the per-link and overall
             travel times are derived from it (see :mod:`mesoltm.metrics`).
+        journeys: The **single source of truth** for the trips this vehicle has
+            completed. Every time the vehicle is absorbed at a destination its
+            just-finished trip is snapshotted (see :meth:`snapshot_journey`) and
+            appended here — a self-contained record of that journey's ``start``,
+            ``end``, ``route`` (via its ``trajectory``) and endpoints. This works
+            uniformly no matter how the vehicle came to exist: a vehicle from a
+            static demand profile completes exactly one journey (``journeys`` has
+            one entry), while a vehicle injected — and re-injected — by hand records
+            one entry per trip. All trip metrics (:mod:`mesoltm.metrics`) are
+            derived from these journey records, so demand-profile and hand-injected
+            runs share one consistent accounting path. The **live** fields above
+            (``route``/``position``/``trajectory``/``start``/``end``) always
+            describe the *current* journey and are reset when the vehicle is
+            re-injected (see :meth:`reset_for_new_journey`); the completed journeys
+            live on in ``journeys``.
+        active: ``True`` from the moment the vehicle is queued at an origin (static
+            demand or dynamic injection) until it is absorbed at a destination —
+            i.e. while it is still moving through, or waiting to enter, the network.
+            :meth:`~mesoltm.network.state.NetworkState.inject` refuses to
+            (re-)inject a vehicle that is still ``active``.
     """
 
     def __init__(
@@ -89,6 +109,10 @@ class Vehicle:
         self.end: int | None = None
         self.trajectory: list[dict] = []
         self.props: dict = dict(props) if props else {}
+        # Completed-journey archive (single source of truth for finished trips) and
+        # the live/idle flag used to guard (re-)injection. See the class docstring.
+        self.journeys: list[dict] = []
+        self.active: bool = False
         # Destination node cached by the network compiler for connector splicing.
         self._dest_node: NodeId | None = None
 
@@ -181,6 +205,46 @@ class Vehicle:
                 self.position = self.route.index(link_id)
             except ValueError:
                 pass
+
+    def snapshot_journey(self) -> dict:
+        """Freeze the current (just-completed) journey into an immutable record.
+
+        Called by the destination node the moment the vehicle is absorbed. The
+        returned dict is self-contained — it carries the journey's endpoints, its
+        desired departure (``start``) and arrival (``end``) steps, its position in
+        the vehicle's ``journeys`` list (``journey_index``), and a copy of the
+        per-link ``trajectory`` — so it survives unchanged even if the vehicle is
+        later re-injected and its live fields are reset. It is the atomic unit all
+        trip metrics are computed from (see :mod:`mesoltm.metrics`).
+
+        Returns:
+            A journey record: ``{"vehicle_id", "origin", "destination", "start",
+            "end", "journey_index", "trajectory"}``. The ``trajectory`` is a shallow
+            copy of the segment list (its segment dicts are never mutated once the
+            journey has ended), so the snapshot is decoupled from later journeys.
+        """
+        return {
+            "vehicle_id": self.vehicle_id,
+            "origin": self.origin,
+            "destination": self.destination,
+            "start": self.start,
+            "end": self.end,
+            "journey_index": len(self.journeys),
+            "trajectory": list(self.trajectory),
+        }
+
+    def reset_for_new_journey(self) -> None:
+        """Clear the live journey state so the vehicle can start a fresh trip.
+
+        Wipes the current-journey working fields (``trajectory``, ``end``,
+        ``position``) while leaving the completed :attr:`journeys` untouched. Called
+        by :meth:`~mesoltm.network.state.NetworkState.inject` when an already-used
+        vehicle is re-injected; the new ``route`` is set by the injection splice
+        immediately afterwards.
+        """
+        self.trajectory = []
+        self.end = None
+        self.position = 0
 
     def __repr__(self) -> str:
         return (

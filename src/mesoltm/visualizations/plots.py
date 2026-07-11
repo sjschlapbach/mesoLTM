@@ -293,13 +293,15 @@ def plot_link_time_series(
     names = list(labels) if labels is not None else [f"link {lid}" for lid in ids]
     dt = sim.time_step
 
-    # Gather (entry_time_s, crossing_time_s) per link from every completed vehicle's
-    # trajectory. Only closed segments (a recorded exit) on a wanted link count.
+    # Gather (entry_time_s, crossing_time_s) per link from every completed journey's
+    # trajectory (the single source of truth for finished trips, so re-injected
+    # vehicles contribute each of their journeys). Only closed segments (a recorded
+    # exit) on a wanted link count.
     wanted = set(ids)
     samples: dict[int, list[tuple[float, float]]] = {lid: [] for lid in ids}
     for node in sim.nodes:
-        for vehicle in getattr(node, "arrived_vehicles", []):
-            for seg in vehicle.trajectory:
+        for journey in getattr(node, "completed_journeys", []):
+            for seg in journey["trajectory"]:
                 lid = seg["link_id"]
                 if lid in wanted and seg["exit_step"] is not None:
                     entry_s = seg["entry_step"] * dt

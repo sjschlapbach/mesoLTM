@@ -246,7 +246,11 @@ class Simulation:
         return self
 
     def inject(
-        self, node_id: NodeId, vehicle: Vehicle, at_time: float | None = None
+        self,
+        node_id: NodeId,
+        vehicle: Vehicle,
+        at_time: float | None = None,
+        check_reentry_node: bool = True,
     ) -> None:
         """Inject a vehicle into the network to depart from ``node_id``.
 
@@ -256,24 +260,40 @@ class Simulation:
         origin's departure queue and are released once their departure time is
         reached and the first link has supply.
 
-        Compile with ``injection_budget`` set to at least the number of vehicles you
-        intend to inject: the origin/destination connectors are sized for it. If more
-        vehicles are injected than that budget, a :class:`RuntimeWarning` is emitted
-        because the connector buffer may be too small — the affected vehicle then
-        waits in the origin queue (possibly not entering within the horizon) instead
-        of being silently discarded.
+        The **same** vehicle can be injected more than once to make several trips.
+        Each trip is recorded as a separate journey on
+        :attr:`~mesoltm.core.vehicle.Vehicle.journeys` (the single source of truth
+        that all metrics read), so a re-injected vehicle produces one trip record
+        per journey — consistent with how a static demand profile produces one
+        vehicle, one journey. Re-injection is only allowed once the vehicle's
+        previous journey has completed (it was absorbed at a destination); otherwise
+        a :class:`RuntimeError` is raised. By default it must also re-enter at the
+        same real node where it last left the network (``check_reentry_node``).
+
+        Compile with ``injection_budget`` set to at least the number of injections
+        (counting each re-injection) you intend: the origin/destination connectors
+        are sized for it. If more vehicles are injected than that budget, a
+        :class:`RuntimeWarning` is emitted because the connector buffer may be too
+        small — the affected vehicle then waits in the origin queue (possibly not
+        entering within the horizon) instead of being silently discarded.
 
         Args:
             node_id: An origin node (must have been marked via
                 ``Network.set_origin``) to release the vehicle from.
             vehicle: The vehicle to inject; its ``start`` is overwritten with the
-                effective departure time.
+                effective departure time, and its live journey state is reset when
+                it is being re-injected.
             at_time: Departure time in seconds. Defaults to the current step's time
                 (``current_step * dt``), so the vehicle is considered for release
                 in the very next :meth:`step`.
+            check_reentry_node: When re-injecting an already-used vehicle, require it
+                to re-enter at the real node it last left from. Defaults to ``True``.
 
         Raises:
-            RuntimeError: If no compiled network state is attached.
+            RuntimeError: If no compiled network state is attached, or the vehicle is
+                still active (its current journey has not completed).
+            ValueError: If ``node_id`` is not an origin, or (on re-injection with
+                ``check_reentry_node``) the vehicle last left at a different node.
         """
         if self.network_state is None:
             raise RuntimeError(
@@ -283,7 +303,9 @@ class Simulation:
         if at_time is None:
             at_time = self.current_step * self.time_step
 
-        self.network_state.inject(node_id, vehicle, at_time=at_time)
+        self.network_state.inject(
+            node_id, vehicle, at_time=at_time, check_reentry_node=check_reentry_node
+        )
 
     def get_times(self, added_step: int = 0) -> list[float]:
         """Return the sequence of simulated times in seconds.

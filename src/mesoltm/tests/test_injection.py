@@ -19,7 +19,7 @@ import warnings
 import pytest
 
 from ..core.vehicle import Vehicle
-from ..metrics.trips import collect_trips
+from ..metrics.trips import collect_trips, write_trips_csv
 from ..network.network import Network
 
 
@@ -32,6 +32,29 @@ def _corridor() -> tuple[Network, int, int]:
     net.set_origin("M")  # no static demand; used for dynamic injection
     net.set_destination("D")
     return net, l1, l2
+
+
+def _relay() -> tuple[Network, int, int]:
+    """A -> B -> C where B is BOTH a destination and an origin.
+
+    This is the topology a vehicle needs to make two consecutive journeys and
+    re-enter at the same real node: it arrives at B (journey 1), then is re-injected
+    at B for B -> C (journey 2).
+    """
+    net = Network()
+    l_ab = net.add_link("A", "B", length=300.0, v_f=15.0, w=5.0, rho_jam=0.15)
+    l_bc = net.add_link("B", "C", length=300.0, v_f=15.0, w=5.0, rho_jam=0.15)
+    net.set_origin("A")
+    net.set_origin("B")
+    net.set_destination("B")
+    net.set_destination("C")
+    return net, l_ab, l_bc
+
+
+def _run_to_arrival(sim, vehicle) -> None:
+    """Step until ``vehicle`` completes its current journey (becomes idle)."""
+    while sim.current_step < sim.total_steps and vehicle.active:
+        sim.step()
 
 
 def test_stepping_to_end_matches_run():
@@ -129,3 +152,71 @@ def test_step_before_start_and_past_horizon_raise():
         sim.step()
     with pytest.raises(RuntimeError):
         sim.step()  # horizon exhausted
+
+
+def test_reinject_same_vehicle_records_two_journeys(tmp_path):
+    """The same vehicle injected twice makes two trips, tracked as two journeys."""
+    net, l_ab, l_bc = _relay()
+    sim = net.compile(time_step=1.0, total_time=200.0, injection_budget=5)
+    sim.start()
+
+    v = Vehicle(vehicle_id=7, origin="A", destination="B", route=[l_ab])
+    sim.inject("A", v)  # journey 1: A -> B
+    _run_to_arrival(sim, v)
+    assert len(v.journeys) == 1  # arrived at B, one completed journey
+
+    # journey 2: re-enter at B (where it left) and drive B -> C. The new trip's real
+    # links are set on the vehicle before re-injection.
+    v.origin, v.destination, v.route = "B", "C", [l_bc]
+    sim.inject("B", v)
+    while sim.current_step < sim.total_steps:
+        sim.step()
+
+    assert len(v.journeys) == 2  # both trips recorded on the single source of truth
+
+    # collect_trips yields one record per journey, keyed by (vehicle_id, journey_index).
+    recs = [t for t in collect_trips(sim) if t["vehicle_id"] == 7]
+    assert [r["journey_index"] for r in recs] == [0, 1]
+    assert recs[0]["route"] == [l_ab]
+    assert recs[1]["route"] == [l_bc]
+    for r in recs:
+        assert r["travel_time"] == pytest.approx(r["access_time"] + r["network_time"])
+
+    # The CSV carries the journey_index column so the two trips stay distinguishable.
+    path = write_trips_csv(collect_trips(sim), str(tmp_path / "trips.csv"))
+    with open(path, encoding="utf-8") as f:
+        header = f.readline().strip().split(",")
+    assert header[:2] == ["vehicle_id", "journey_index"]
+
+
+def test_reinject_while_still_active_raises():
+    """Re-injecting a vehicle that has not yet completed its journey is rejected."""
+    net, l_ab, _l_bc = _relay()
+    sim = net.compile(time_step=1.0, total_time=200.0, injection_budget=5)
+    sim.start()
+
+    v = Vehicle(vehicle_id=1, origin="A", destination="B", route=[l_ab])
+    sim.inject("A", v)  # v is now active (queued/en route)
+    sim.step()
+    with pytest.raises(RuntimeError, match="still active"):
+        sim.inject("A", v)
+
+
+def test_reinject_at_wrong_node_raises_and_can_be_bypassed():
+    """The re-entry node must match where the vehicle last left — unless bypassed."""
+    net, l_ab, _l_bc = _relay()
+    sim = net.compile(time_step=1.0, total_time=300.0, injection_budget=5)
+    sim.start()
+
+    v = Vehicle(vehicle_id=2, origin="A", destination="B", route=[l_ab])
+    sim.inject("A", v)  # journey 1: A -> B
+    _run_to_arrival(sim, v)
+
+    # It left the network at B, so re-entering at A is rejected by default.
+    v.route = [l_ab]
+    with pytest.raises(ValueError, match="last left the network at node 'B'"):
+        sim.inject("A", v)
+
+    # The check can be bypassed for a deliberate re-entry elsewhere.
+    sim.inject("A", v, check_reentry_node=False)
+    assert v.active  # accepted and queued again
