@@ -99,7 +99,9 @@ def main() -> None:
     def cost(link_id: int, state: NetworkState) -> float:
         # Length term (free-flow time) + congestion term (current vehicle count).
         # The typed ``state`` gives fully-typed access to live link quantities.
-        return state.free_flow_time(link_id) + LOAD_WEIGHT * state.occupancy(link_id)
+        return state.continuous_free_flow_time(link_id) + LOAD_WEIGHT * state.occupancy(
+            link_id
+        )
 
     # Plan shortest paths on the load-aware cost, recomputed live (dynamic=True).
     planner = ShortestPathPolicy(cost=cost, dynamic=True)

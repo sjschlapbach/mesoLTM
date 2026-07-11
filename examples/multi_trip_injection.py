@@ -71,7 +71,7 @@ def main() -> None:
     vehicle = Vehicle(vehicle_id=0, origin="A", destination="B", route=[l_ab])
     sim.inject("A", vehicle)
     run_until_idle(sim, vehicle)
-    print(f"Journey 1 done: vehicle arrived at B at step {vehicle.end}.")
+    print(f"Journey 1 done: vehicle arrived at B at t={vehicle.arrival_time:.0f}s.")
 
     # Journey 2: the vehicle is idle and sitting (conceptually) at B, so re-inject it
     # there for B -> C. Set the new trip's real links on the vehicle first; the
@@ -80,7 +80,7 @@ def main() -> None:
     sim.inject("B", vehicle)
     while sim.current_step < sim.total_steps:
         sim.step()
-    print(f"Journey 2 done: vehicle arrived at C at step {vehicle.end}.")
+    print(f"Journey 2 done: vehicle arrived at C at t={vehicle.arrival_time:.0f}s.")
 
     # One vehicle, two journeys — all tracked on the single source of truth.
     print(f"\nvehicle.journeys holds {len(vehicle.journeys)} completed journeys.")

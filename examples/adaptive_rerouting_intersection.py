@@ -69,7 +69,9 @@ def link_cost(state, link_id: int) -> float:
     link = state.links_by_id[link_id]
     jam_storage = link.rho_jam * link.length
     saturation = state.occupancy(link_id) / jam_storage if jam_storage else 0.0
-    return state.free_flow_time(link_id) * (1.0 + BPR_ALPHA * saturation**BPR_BETA)
+    return state.continuous_free_flow_time(link_id) * (
+        1.0 + BPR_ALPHA * saturation**BPR_BETA
+    )
 
 
 def cost_graph(state) -> nx.DiGraph:
