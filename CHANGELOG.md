@@ -1,3 +1,22 @@
+## [0.2.0] - 2026-07-11
+
+### Features
+
+- Add possibility for vehicle to be re-injected and complete multiple trips within single simulation run (#10)
+
+### Enhancements
+
+- Improve plotting of complex networks with multiple links between pairs of nodes
+
+### Refactor
+
+- Enhance quality of typing throughout library (#9)
+
+### Miscellaneous Tasks
+
+- *(release)* Update changelog for version 0.1.1
+- Simplify implementation for static and dynamic visualizations through shared logic
+- *(release)* V0.2.0
 ## [0.1.1] - 2026-07-09
 
 ### Miscellaneous Tasks
