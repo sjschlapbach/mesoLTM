@@ -13,4 +13,16 @@ To avoid duplicating the same facts in two places, project knowledge is split:
 
 - **`CLAUDE.md`** = the working protocol (auto-loaded each session): what to read before a task and update after. It points here; it does not duplicate the content.
 
-A `Stop` hook (`.claude/hooks/ai-tracking-reminder.sh`) nudges to update tracking when work changes aren't reflected in either `.ai/` or `.serena/memories/`.
+A `Stop` hook (`.claude/hooks/ai-tracking-reminder.sh`) enforces a tracking update
+when **source code** changes. Its behaviour (reworked 2026-07-11):
+
+- **Scope:** it only enforces for changes to code (`*.py`, outside `.ai/`/`.serena/`).
+  When code changes, a tracking update is *always* required. Changes confined to
+  non-code files (docs, CI, config, ...) should still be reflected in tracking per
+  CLAUDE.md, but are **not** enforced by the hook.
+- **Detection by mtime, not `git status`:** `.ai/` is git-ignored (`.gitignore:227`;
+  `git ls-files .ai/` is empty), so git never lists `.ai/` edits. The hook therefore
+  compares file mtimes — tracking counts as current when some tracking file
+  (`.ai/DECISIONS.md`, `.ai/PROGRESS.md`, or a `.serena/memories/*.md`) was modified
+  at least as recently as the newest changed code file. So editing `.ai/PROGRESS.md`
+  now *does* satisfy the hook (no commit or `.serena/` edit required).

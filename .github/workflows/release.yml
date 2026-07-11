@@ -70,7 +70,7 @@ jobs:
 
           # Extract the release notes for the bumped version from CHANGELOG.md.
           # Match headers like: '## [0.1.3]', '## v0.1.3', or '## 0.1.3'
-          CHANGELOG_CONTENT=$(awk -v ver="$CHANGELOG_VERSION" 'BEGIN{p="^## .*\\[?v?" ver "\\]?"} $0 ~ p {found=1; next} found && /^## / {exit} found {print}' CHANGELOG.md | sed -e '1,/[^[:space:]]/d' -e ':a;N;$!ba;s/\n\s*$//')
+          CHANGELOG_CONTENT=$(awk -v ver="$CHANGELOG_VERSION" 'BEGIN{p="^## .*\\[?v?" ver "\\]?"} $0 ~ p {found=1; next} found && /^## / {exit} found {print}' CHANGELOG.md | sed -e '/./,$!d' -e ':a;N;$!ba;s/\n\s*$//')
 
           # Emit multiline output safely
           echo "changelog_content<<EOF" >> $GITHUB_OUTPUT
