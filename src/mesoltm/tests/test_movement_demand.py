@@ -303,7 +303,8 @@ def test_shown_only_while_on_link_and_after_free_flow_traversal():
 
     assert on_l2_steps, "vehicle never reached link l2"
     entry = on_l2_steps[0]
-    # The vehicle only enters the second link after it has fully traversed the first link at free flow.
+    # The vehicle only enters the second link after it has fully traversed the
+    # first link at free flow.
     assert entry == 4
     # It sits on L2 for exactly its free-flow traversal time (T1 consecutive steps)...
     assert on_l2_steps == list(range(entry, entry + t1_l2))
