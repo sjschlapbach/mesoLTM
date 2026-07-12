@@ -93,8 +93,10 @@ network_from_dict(data) -> Network
 
 `NetworkState` (see [simulation.md](simulation.md) for the full method list):
 `out_links/in_links/endpoints/length/capacity/continuous_free_flow_time/occupancy/density/
-entry_queue/waiting_vehicles/vehicles_in_network/remaining_real_route/set_route/
-inject/cumulative_inflow/cumulative_outflow`; attr `step`.
+entry_queue/waiting_vehicles/vehicles_in_network/movement_demand/remaining_real_route/
+set_route/inject/cumulative_inflow/cumulative_outflow`; attr `step`.
+`movement_demand(node_id, out_link_id) -> list[VehicleView]`: vehicles demanding one
+outbound link this step (pure query; honours the node's routing policy).
 
 `VehicleView` = NamedTuple `(vehicle, link_id, route, destination)`.
 

@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, NamedTuple
 if TYPE_CHECKING:
     from ..core.ids import NodeId
     from ..core.link import Link
+    from ..core.nodes.base_node import BaseNode
     from ..core.nodes.origin_node import OriginNode
     from ..core.vehicle import Vehicle
 
@@ -61,6 +62,7 @@ class NetworkState:  # pylint: disable=too-many-public-methods
         origin_nodes: dict[NodeId, OriginNode],
         node_positions: dict[NodeId, tuple[float, float] | None],
         endpoints: dict[int, tuple[NodeId, NodeId]],
+        nodes_by_id: dict[NodeId, BaseNode] | None = None,
     ) -> None:
         """Create a network state view.
 
@@ -71,6 +73,8 @@ class NetworkState:  # pylint: disable=too-many-public-methods
             origin_nodes: ``node_id -> OriginNode`` for nodes that inject demand.
             node_positions: ``node_id -> (x, y)`` (may be empty).
             endpoints: ``link_id -> (u, v)`` node endpoints for each real link.
+            nodes_by_id: ``node_id -> junction node model`` for every through
+                junction (used by :meth:`movement_demand`); may be empty.
         """
         self.links_by_id = links_by_id
         self._out_links = out_links
@@ -78,6 +82,7 @@ class NetworkState:  # pylint: disable=too-many-public-methods
         self._origin_nodes = origin_nodes
         self._node_positions = node_positions
         self._endpoints = endpoints
+        self._nodes_by_id = nodes_by_id or {}
         self.step = 0
 
         # Simulation step dt (s), set by Network.compile; used to default the
@@ -366,6 +371,49 @@ class NetworkState:  # pylint: disable=too-many-public-methods
                     )
                 )
         return views
+
+    def movement_demand(self, node_id: NodeId, out_link_id: int) -> list[VehicleView]:
+        """Return the vehicles demanding to cross onto one outbound link this step.
+
+        For the movement at ``node_id`` toward ``out_link_id``, returns one
+        :class:`VehicleView` per vehicle whose next link resolves to ``out_link_id``,
+        taken from the current sending flow of the node's inbound links — real
+        approaches *and* any origin connector, whose queued vehicles also carry
+        routes that may load this movement — in FIFO order (``len(...)`` is the
+        count). Each view carries the vehicle and the inbound link it is on, so a
+        caller can ration the movement and reroute the rest with :meth:`set_route`.
+
+        Next-link resolution matches the node model (an attached routing policy, else
+        the vehicle's own route). It is a **pure query**: it refreshes the inbound
+        links' demand for ``self.step`` so it works from a plugin (which runs before
+        the demand phase) without changing any flow result. Returns ``[]`` if the
+        node has no through-junction model.
+
+        Args:
+            node_id: The junction the movement is at.
+            out_link_id: The outbound (downstream) link id of the movement.
+        """
+        node = self._nodes_by_id.get(node_id)
+        if node is None:
+            warnings.warn(
+                f"movement_demand: node {node_id!r} has no through-junction model; "
+                f"returning no demand.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            return []
+
+        return [
+            VehicleView(
+                vehicle=vehicle,
+                link_id=inbound_link_id,
+                route=self.remaining_real_route(vehicle, inbound_link_id),
+                destination=vehicle.destination,
+            )
+            for vehicle, inbound_link_id in node.demand_for_outbound(
+                out_link_id, self.step
+            )
+        ]
 
     def remaining_real_route(
         self, vehicle: Vehicle, current_link_id: int | None = None

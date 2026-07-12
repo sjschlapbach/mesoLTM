@@ -108,3 +108,54 @@ class BaseNode:
                 return idx
 
         return None
+
+    def _inbound_links(self) -> list[BaseLink]:
+        """Return this node's inbound links as a list (single or many)."""
+        many: Sequence[BaseLink] | None = getattr(self, "inbound_links", None)
+        if many is not None:
+            return list(many)
+
+        single: BaseLink | None = getattr(self, "inbound_link", None)
+        return [single] if single is not None else []
+
+    def _outbound_links(self) -> list[BaseLink]:
+        """Return this node's outbound links as a list (single or many)."""
+        many: Sequence[BaseLink] | None = getattr(self, "outbound_links", None)
+        if many is not None:
+            return list(many)
+
+        single: BaseLink | None = getattr(self, "outbound_link", None)
+        return [single] if single is not None else []
+
+    def demand_for_outbound(
+        self, out_link_id: int, step: int
+    ) -> list[tuple[Vehicle, int]]:
+        """Return the vehicles demanding to cross onto one outbound link this step.
+
+        For every inbound link (real approaches *and* any origin connector — its
+        queued vehicles carry routes that may point at ``out_link_id`` too), the
+        current sending flow (the first ``get_demand()`` vehicles, FIFO) is scanned
+        and those whose next link resolves to ``out_link_id`` are kept. Resolution
+        uses :meth:`_resolve_outbound_index`, so an attached routing policy is
+        honoured exactly as in :meth:`compute_flows` (else the vehicle's own route).
+
+        ``compute_demand_and_supplies(step)`` is called on each inbound link first:
+        that is what makes ``get_demand()`` reflect this step's sending flow when the
+        query runs before the simulation's demand phase (e.g. from a plugin). It only
+        refreshes the transient demand/supply scalars, so the query stays a pure read.
+
+        Returns ``(vehicle, inbound_link_id)`` pairs, in inbound-link then FIFO order.
+        """
+        demand: list[tuple[Vehicle, int]] = []
+        outbound = self._outbound_links()
+
+        for link in self._inbound_links():
+            link.compute_demand_and_supplies(step)
+
+            for i in range(link.get_demand()):
+                vehicle = link.get_vehicle_from_index(i)
+                idx = self._resolve_outbound_index(vehicle, link.link_id, outbound)
+                if idx is not None and outbound[idx].link_id == out_link_id:
+                    demand.append((vehicle, link.link_id))
+
+        return demand
