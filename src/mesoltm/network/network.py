@@ -350,6 +350,7 @@ class Network:
         for conn_node, conn_id in source_connectors.items():
             downstream_node[conn_id] = conn_node  # source connector feeds its junction
 
+        nodes_by_id: dict[NodeId, BaseNode] = {}
         for node_id in self._positions:
             inbound = [links_by_id[lid] for lid in self._real_in(node_id)]
             outbound = [links_by_id[lid] for lid in self._real_out(node_id)]
@@ -361,6 +362,7 @@ class Network:
             junction = self._build_junction(node_id, inbound, outbound)
             if junction is not None:
                 nodes.append(junction)
+                nodes_by_id[node_id] = junction
 
         # 5. Wire routing policy and shared network state into branching nodes.
         state = NetworkState(
@@ -370,6 +372,7 @@ class Network:
             origin_node_objs,
             self._positions,
             endpoints,
+            nodes_by_id,
         )
         state.downstream_node = downstream_node
         state.sink_connectors = sink_connectors

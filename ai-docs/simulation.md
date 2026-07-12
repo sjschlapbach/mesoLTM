@@ -141,6 +141,7 @@ state.cumulative_outflow(link_id, t=None) -> float
 
 # rerouting / dynamic demand
 state.vehicles_in_network() -> list[VehicleView]
+state.movement_demand(node_id, out_link_id) -> list[VehicleView]  # demand for one movement
 state.remaining_real_route(vehicle, current_link_id=None) -> list[int]
 state.set_route(vehicle, real_route)       # must start at current link
 state.inject(node_id, vehicle, at_time=None, check_reentry_node=True)
@@ -150,3 +151,14 @@ state.step                                 # current step (engine-maintained)
 
 `VehicleView` is a NamedTuple: `(vehicle, link_id, route, destination)` where
 `route` is the remaining real-link route from the current link onward.
+
+`movement_demand(node_id, out_link_id)` returns the vehicles demanding to cross onto
+one outbound link at a node this step (the node's per-movement diverge demand): for
+each inbound link — real approaches and any origin connector — the current LTM sending
+flow whose resolved next link is `out_link_id`, as `VehicleView`s (each carrying the
+inbound `link_id`). Connector-queued vehicles are included because their route may
+load this movement next step. It honours an attached routing policy (else the
+vehicle's own route), and is a pure query — it refreshes the inbound links' demand for
+`state.step` so it can be called from a plugin (which runs before the demand phase)
+without changing any flow result. Ideal for rationing access to a movement: admit
+`demand[:cap]`, reroute the rest with `set_route`.

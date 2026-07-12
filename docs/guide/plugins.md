@@ -81,9 +81,38 @@ which is all any of the interfaces above ultimately do. This is the same loop sl
 the reference used for signal controllers; the four-phase ordering is unchanged.
 See [Deviations §B3](../model/deviations-from-the-paper.md).
 
+## Reading the demand for one movement
+
+An access-control plugin often needs the vehicles that want to enter **one specific
+outbound link** at a node this step — to admit some and reroute the rest.
+`NetworkState.movement_demand(node_id, out_link_id)` returns exactly that: a list of
+`VehicleView`s, one per vehicle whose resolved next link at `node_id` is
+`out_link_id`, taken from the current LTM sending flow of the node's inbound links in
+FIFO order. This covers the real approaches **and** any origin connector — vehicles
+still queued on a source connector already carry a route that may load this movement,
+so they count too. The number of demanding vehicles is just `len(...)`.
+
+```python
+def ration(t, state, plugin):
+    demand = state.movement_demand(node_id, out_link)   # list[VehicleView]
+    for view in demand[capacity:]:                       # over the cap → divert
+        state.set_route(view.vehicle, [view.link_id, *alt_tail])
+```
+
+Each `VehicleView` carries the vehicle **and** the inbound link it is on
+(`view.link_id`) — the link `set_route` needs to reroute it. Next-link resolution
+matches what the node model itself does: it honours an attached
+[routing policy](routing.md), otherwise the vehicle's own route. The call is a
+**pure query** — it refreshes the inbound links' demand for the current step (so it
+works from a plugin, which runs *before* the demand phase) but never changes any
+flow result or model state. It is available on `NetworkState`, so any plugin form
+can call it.
+
 ## What plugins can do
 
 - **Reroute** vehicles (rewrite routes, as above).
+- **Ration a movement** — read `movement_demand` for one outbound link and admit /
+  divert vehicles (access control).
 - **Gate/close links** — e.g. drive a routing cost so the router avoids a link.
 - **Access control / dispatch** — admit or divert vehicles, often combined with
   [step-driven injection](stepping-and-injection.md).

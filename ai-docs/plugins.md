@@ -64,9 +64,35 @@ sim = net.compile(time_step=1.0, total_time=600.0, plugins=[ReroutingPlugin(dive
 `NetworkState.set_route`, which validates the route starts at the current link
 (rejects strands) and re-attaches the destination connector.
 
+## Demand for one movement (access control)
+
+`NetworkState.movement_demand(node_id, out_link_id) -> list[VehicleView]` returns
+the vehicles demanding to cross onto ONE outbound link at a node this step: for each
+inbound link, the current LTM sending flow (first `get_demand()` vehicles, FIFO) whose
+resolved next link is `out_link_id`. `len(...)` is the count. Each `VehicleView`
+carries the vehicle and its inbound `link_id`, so you can reroute the overflow with
+`set_route(vehicle, [link_id, *alt_tail])`.
+
+```python
+def ration(t, state, plugin):
+    demand = state.movement_demand(node_id, out_link)     # list[VehicleView]
+    for view in demand[cap:]:                              # over capacity → divert
+        state.set_route(view.vehicle, [view.link_id, *alt_tail])
+```
+
+- Next-link resolution matches the node model: an attached routing policy if any,
+  otherwise the vehicle's own route.
+- Pure query: it refreshes the inbound links' demand for `state.step` (so it works
+  from a plugin, which runs BEFORE the demand phase) via the idempotent
+  `Link.compute_demand_and_supplies`, and never changes flow results or model state.
+- Inbound links include any origin connector — vehicles queued on a source connector
+  carry routes that may load this movement, so they are counted (their `link_id` is
+  the connector). Only real approaches have topology `endpoints`.
+
 ## What plugins can do
 
 - Reroute vehicles (rewrite routes / return updates).
+- Ration a movement — `movement_demand` for one outbound link, then admit/divert.
 - Gate or close links (e.g. drive a routing cost the router reads).
 - Access control / dispatch, often with step-driven injection (see
   [simulation.md](simulation.md)).
