@@ -127,6 +127,58 @@ class BaseNode:
         single: BaseLink | None = getattr(self, "outbound_link", None)
         return [single] if single is not None else []
 
+    def peek_flows(
+        self, step: int, supply_overrides: dict[int, int] | None = None
+    ) -> dict[int, list[tuple[Vehicle, int]]]:
+        """Predict this step's crossings per outbound link, without moving anything.
+
+        A read-only replay of this node's own flow algorithm (same priorities,
+        FIFO order, per-outbound supply bookkeeping), so — unlike
+        :meth:`demand_for_outbound`, which lists everyone *wanting* a movement —
+        it returns only the vehicles the node would actually transfer this step.
+
+        Args:
+            step: The current simulation step index.
+            supply_overrides: Optional ``out_link_id -> supply`` replacing the
+                matching outbound links' receiving flow in the replay.
+
+        Returns:
+            ``out_link_id -> [(vehicle, inbound_link_id), ...]`` in predicted
+            crossing order; every outbound link id is present (possibly empty).
+        """
+        # The base node moves nothing in compute_flows, so it predicts nothing;
+        # every junction model overrides this with a replay of its own algorithm.
+        del step, supply_overrides
+        return {link.link_id: [] for link in self._outbound_links()}
+
+    def _peek_supplies(
+        self, step: int, supply_overrides: dict[int, int] | None
+    ) -> list[int]:
+        """Refresh demand/supply for ``step`` and return the per-outbound supplies.
+
+        Shared by the :meth:`peek_flows` implementations. Refreshing
+        ``compute_demand_and_supplies`` first is what makes the replay see this
+        step's sending and receiving flows even before the simulation's demand
+        phase (the same pure trick as :meth:`demand_for_outbound`), here applied
+        to the outbound links too because the replay consumes their supply.
+
+        Args:
+            step: The current simulation step index.
+            supply_overrides: Optional ``out_link_id -> supply`` replacing
+                ``get_supply()`` for the matching outbound links.
+
+        Returns:
+            One supply value per outbound link, in ``_outbound_links()`` order.
+        """
+        for link in [*self._inbound_links(), *self._outbound_links()]:
+            link.compute_demand_and_supplies(step)
+
+        overrides = supply_overrides or {}
+        return [
+            overrides.get(link.link_id, link.get_supply())
+            for link in self._outbound_links()
+        ]
+
     def demand_for_outbound(
         self, out_link_id: int, step: int
     ) -> list[tuple[Vehicle, int]]:

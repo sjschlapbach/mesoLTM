@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from ..base_link import BaseLink
 from ..ids import NodeId
+from ..vehicle import Vehicle
 from .base_node import BaseNode
 
 
@@ -61,3 +62,22 @@ class OneToOneNode(BaseNode):
         flow = min(self.inbound_link.get_demand(), self.outbound_link.get_supply())
         vehicles = self.inbound_link.set_outflow(flow, step)
         self.outbound_link.set_inflow(vehicles, step)
+
+    def peek_flows(
+        self, step: int, supply_overrides: dict[int, int] | None = None
+    ) -> dict[int, list[tuple[Vehicle, int]]]:
+        """Predict this step's crossings onto the outbound link, moving nothing.
+
+        Applies Eq. (11) to freshly refreshed demand/supply and peeks the first
+        ``min(demand, supply)`` vehicles of the inbound queue instead of moving
+        them, so it is a pure query. See :meth:`BaseNode.peek_flows` for the
+        contract.
+        """
+        supply = self._peek_supplies(step, supply_overrides)[0]
+        flow = min(self.inbound_link.get_demand(), supply)
+        return {
+            self.outbound_link.link_id: [
+                (self.inbound_link.get_vehicle_from_index(i), self.inbound_link.link_id)
+                for i in range(flow)
+            ]
+        }

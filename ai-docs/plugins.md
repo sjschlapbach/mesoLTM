@@ -89,10 +89,38 @@ def ration(t, state, plugin):
   carry routes that may load this movement, so they are counted (their `link_id` is
   the connector). Only real approaches have topology `endpoints`.
 
+## Predicted crossings (realized flows, not demand)
+
+Under congestion `movement_demand` includes the whole standing queue, but only a few
+vehicles actually cross per step. `NetworkState.peek_flows(node_id,
+supply_overrides=None) -> dict[int, list[VehicleView]]` replays the junction's OWN
+flow algorithm read-only (same priorities, FIFO, per-outbound supply bookkeeping and
+locking) and returns, per outbound link id, exactly the vehicles that will cross this
+step, in crossing order. Every outbound link id of the junction is a key (possibly
+`[]`).
+
+```python
+crossing = state.peek_flows(node_id)                     # dict[int, list[VehicleView]]
+batch = crossing[out_link]                               # will actually cross now
+crossing = state.peek_flows(node_id, supply_overrides={out_link: cap})
+```
+
+- `supply_overrides` (`out_link_id -> supply`) replaces the matching links' receiving
+  flow in the replay only — e.g. a cap the plugin itself will enforce, or extra room
+  on a parallel link it will divert the overflow onto.
+- Pure query like `movement_demand`: refreshes the junction's adjacent links'
+  demand/supply for `state.step`; never moves a vehicle or advances the node's
+  persistent priority cursor.
+- Exact as long as routes do not change between the query and the flow phase (the
+  plugin's own reroutes are the intended deviation).
+- Unknown node / no through-junction model: `RuntimeWarning` + `{}` (like
+  `movement_demand`).
+
 ## What plugins can do
 
 - Reroute vehicles (rewrite routes / return updates).
-- Ration a movement — `movement_demand` for one outbound link, then admit/divert.
+- Ration a movement — `movement_demand` (everyone wanting it) or `peek_flows` (only
+  this step's actual crossers), then admit/divert.
 - Gate or close links (e.g. drive a routing cost the router reads).
 - Access control / dispatch, often with step-driven injection (see
   [simulation.md](simulation.md)).

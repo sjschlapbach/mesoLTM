@@ -415,6 +415,60 @@ class NetworkState:  # pylint: disable=too-many-public-methods
             )
         ]
 
+    def peek_flows(
+        self, node_id: NodeId, supply_overrides: dict[int, int] | None = None
+    ) -> dict[int, list[VehicleView]]:
+        """Predict the vehicles that will cross ``node_id`` this step, per movement.
+
+        A read-only replay of the junction's own flow algorithm — same
+        priorities, FIFO order, per-outbound supply bookkeeping and locking —
+        keyed by outbound link id, each value the predicted crossing vehicles in
+        order (every outbound link id of the junction is present, possibly with
+        an empty list). Unlike :meth:`movement_demand`, which lists every vehicle
+        *wanting* a movement, this returns only those the node model would
+        actually transfer, so under congestion it is the realistic per-step
+        crossing set.
+
+        ``supply_overrides`` maps ``out_link_id -> supply`` and replaces the
+        matching links' receiving flow in the replay only — e.g. to model a cap
+        an access-control plugin will itself enforce. The prediction assumes
+        routes stay as they are between the query and the flow phase.
+
+        Like :meth:`movement_demand` it is a **pure query**: it refreshes the
+        junction's adjacent links' demand/supply for ``self.step`` (so it works
+        from a plugin, before the demand phase) and never touches vehicles,
+        flows, or the node's persistent priority state. Returns ``{}`` if the
+        node has no through-junction model.
+
+        Args:
+            node_id: The junction to replay.
+            supply_overrides: Optional per-outbound-link supply replacements.
+        """
+        node = self._nodes_by_id.get(node_id)
+        if node is None:
+            warnings.warn(
+                f"peek_flows: node {node_id!r} has no through-junction model; "
+                f"returning no flows.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            return {}
+
+        return {
+            out_link_id: [
+                VehicleView(
+                    vehicle=vehicle,
+                    link_id=inbound_link_id,
+                    route=self.remaining_real_route(vehicle, inbound_link_id),
+                    destination=vehicle.destination,
+                )
+                for vehicle, inbound_link_id in pairs
+            ]
+            for out_link_id, pairs in node.peek_flows(
+                self.step, supply_overrides
+            ).items()
+        }
+
     def remaining_real_route(
         self, vehicle: Vehicle, current_link_id: int | None = None
     ) -> list[int]:

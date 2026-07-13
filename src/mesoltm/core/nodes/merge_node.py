@@ -106,8 +106,56 @@ class MergeNode(BaseNode):
         the current inbound link into the shared downstream link while its supply
         Ŝ_d >= 1. This keeps every merge flow integer and honours the priorities on
         average without ever splitting a vehicle.
+
+        The walk itself lives in :meth:`_plan_flows` (shared with the read-only
+        :meth:`peek_flows`); this method applies the resulting plan.
         """
-        downstream_supply = self.outbound_link.get_supply()
+        inflow_pairs, flow_by_inbound_link, self.priority_index = self._plan_flows(
+            downstream_supply=self.outbound_link.get_supply()
+        )
+
+        vehicles = [vehicle for vehicle, _ in inflow_pairs]
+        for vehicle in vehicles:
+            vehicle.advance_to(self.outbound_link.link_id)
+        self.outbound_link.set_inflow(vehicles, step)
+
+        for idx_inb, flow in enumerate(flow_by_inbound_link):
+            self.inbound_links[idx_inb].set_outflow(flow, step)
+
+    def peek_flows(
+        self, step: int, supply_overrides: dict[int, int] | None = None
+    ) -> dict[int, list[tuple[Vehicle, int]]]:
+        """Predict this step's crossings onto the outbound link, moving nothing.
+
+        Replays the Algorithm 2 walk of :meth:`compute_flows` (shared via
+        :meth:`_plan_flows`) against freshly refreshed demands/supplies and
+        discards the plan instead of applying it, so it is a pure query. See
+        :meth:`BaseNode.peek_flows` for the contract.
+        """
+        inflow_pairs, _, _ = self._plan_flows(
+            downstream_supply=self._peek_supplies(step, supply_overrides)[0]
+        )
+        return {self.outbound_link.link_id: inflow_pairs}
+
+    def _plan_flows(
+        self, downstream_supply: int
+    ) -> tuple[list[tuple[Vehicle, int]], list[int], int]:
+        """Walk Algorithm 2 and plan this step's transfers, mutating nothing.
+
+        The priority walk of :meth:`compute_flows`, factored out so that
+        :meth:`peek_flows` can replay it read-only: demands, cumulative terms and
+        the persistent ``priority_index`` are read but never written, and no
+        vehicle is moved. The reference arithmetic is unchanged.
+
+        Args:
+            downstream_supply: The outbound supply the walk may consume.
+
+        Returns:
+            ``(inflow_pairs, flow_by_inbound_link, priority_index)``: the planned
+            ``(vehicle, inbound_link_id)`` transfers in crossing order, the
+            per-inbound-link flow counts, and the cursor value the node persists
+            once the plan is applied.
+        """
         remaining_demands = [link.get_demand() for link in self.inbound_links]
         cumulative_terms = [
             link.get_cumulative_demand_term() for link in self.inbound_links
@@ -116,13 +164,14 @@ class MergeNode(BaseNode):
         flow_by_inbound_link = [0 for _ in self.inbound_links]
         total_flow = 0
 
-        initial_index = self.priority_index
-        inflow_order: list[Vehicle] = []
+        priority_index = self.priority_index
+        initial_index = priority_index
+        inflow_pairs: list[tuple[Vehicle, int]] = []
 
         while True:
-            idx = self.priority_vector[self.priority_index]
+            idx = self.priority_vector[priority_index]
             approach_with_priority = self.inbound_links[
-                self.priority_vector[self.priority_index]
+                self.priority_vector[priority_index]
             ]
             if (
                 remaining_demands[idx] == 0
@@ -132,32 +181,24 @@ class MergeNode(BaseNode):
                 # slot for this approach rather than yielding it.
                 break
             elif remaining_demands[idx] < 1:
-                self.priority_index = (self.priority_index + 1) % len(
-                    self.priority_vector
-                )
-                if self.priority_index == initial_index:
+                priority_index = (priority_index + 1) % len(self.priority_vector)
+                if priority_index == initial_index:
                     break
                 continue
 
             if downstream_supply >= 1:
                 downstream_supply -= 1
                 total_flow += 1
-                remaining_demands[self.priority_vector[self.priority_index]] -= 1
+                remaining_demands[self.priority_vector[priority_index]] -= 1
                 vehicle = approach_with_priority.get_vehicle_from_index(
-                    flow_by_inbound_link[self.priority_vector[self.priority_index]]
+                    flow_by_inbound_link[self.priority_vector[priority_index]]
                 )
-                vehicle.advance_to(self.outbound_link.link_id)
-                inflow_order.append(vehicle)
-                flow_by_inbound_link[self.priority_vector[self.priority_index]] += 1
-                self.priority_index = (self.priority_index + 1) % len(
-                    self.priority_vector
-                )
-                if self.priority_index == initial_index:
+                inflow_pairs.append((vehicle, approach_with_priority.link_id))
+                flow_by_inbound_link[self.priority_vector[priority_index]] += 1
+                priority_index = (priority_index + 1) % len(self.priority_vector)
+                if priority_index == initial_index:
                     break
             else:
                 break
 
-        self.outbound_link.set_inflow(inflow_order, step)
-
-        for idx_inb, flow in enumerate(flow_by_inbound_link):
-            self.inbound_links[idx_inb].set_outflow(flow, step)
+        return inflow_pairs, flow_by_inbound_link, priority_index
