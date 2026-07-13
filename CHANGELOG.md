@@ -1,3 +1,13 @@
+## [0.3.1] - 2026-07-13
+
+### Bug Fixes
+
+- Add py.typed file to package directory root for typing availability in package
+
+### Miscellaneous Tasks
+
+- *(release)* Update changelog for version 0.3.0
+- *(release)* V0.3.1
 ## [0.3.0] - 2026-07-13
 
 ### Features
