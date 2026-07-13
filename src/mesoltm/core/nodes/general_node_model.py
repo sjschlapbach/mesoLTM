@@ -109,8 +109,61 @@ class GeneralNodeModel(BaseNode):
         outbound-locking rule: once an outbound link is saturated (or an inbound
         link has a fractional-but-not-whole vehicle pending) it is locked so a
         blocked movement cannot starve the others. All flows stay integer.
+
+        The walk itself lives in :meth:`_plan_flows` (shared with the read-only
+        :meth:`peek_flows`); this method applies the resulting plan.
         """
-        remaining_supplies = [link.get_supply() for link in self.outbound_links]
+        pairs_by_outbound_link, flow_by_inbound_link, self.priority_index = (
+            self._plan_flows([link.get_supply() for link in self.outbound_links])
+        )
+
+        for idx_outb, pairs in enumerate(pairs_by_outbound_link):
+            vehicles = [vehicle for vehicle, _ in pairs]
+            for vehicle in vehicles:
+                vehicle.advance_to(self.outbound_links[idx_outb].link_id)
+            self.outbound_links[idx_outb].set_inflow(vehicles, step)
+
+        for idx_inb, count in enumerate(flow_by_inbound_link):
+            self.inbound_links[idx_inb].set_outflow(count, step)
+
+    def peek_flows(
+        self, step: int, supply_overrides: dict[int, int] | None = None
+    ) -> dict[int, list[tuple[Vehicle, int]]]:
+        """Predict this step's crossings per outbound link, without moving anything.
+
+        Replays the Algorithm 3 walk of :meth:`compute_flows` (shared via
+        :meth:`_plan_flows`) against freshly refreshed demands/supplies and
+        discards the plan instead of applying it, so it is a pure query. See
+        :meth:`BaseNode.peek_flows` for the contract.
+        """
+        pairs_by_outbound_link, _, _ = self._plan_flows(
+            self._peek_supplies(step, supply_overrides)
+        )
+        return {
+            link.link_id: pairs_by_outbound_link[idx]
+            for idx, link in enumerate(self.outbound_links)
+        }
+
+    def _plan_flows(
+        self, remaining_supplies: list[int]
+    ) -> tuple[list[list[tuple[Vehicle, int]]], list[int], int]:
+        """Walk Algorithm 3 and plan this step's transfers, mutating nothing.
+
+        The priority walk of :meth:`compute_flows`, factored out so that
+        :meth:`peek_flows` can replay it read-only: demands, cumulative terms and
+        the persistent ``priority_index`` are read but never written, and no
+        vehicle is moved. The reference arithmetic is unchanged.
+
+        Args:
+            remaining_supplies: Per-outbound-link supply the walk may consume
+                (consumed in place; pass a fresh list).
+
+        Returns:
+            ``(pairs_by_outbound_link, flow_by_inbound_link, priority_index)``:
+            the planned ``(vehicle, inbound_link_id)`` transfers per outbound
+            link in crossing order, the per-inbound-link flow counts, and the
+            cursor value the node persists once the plan is applied.
+        """
         remaining_demands = [link.get_demand() for link in self.inbound_links]
         cumulative_terms = [
             link.get_cumulative_demand_term() for link in self.inbound_links
@@ -119,9 +172,10 @@ class GeneralNodeModel(BaseNode):
         flow_by_inbound_link = [0 for _ in self.inbound_links]
         total_flow = 0
 
-        initial_index = self.priority_index
+        priority_index = self.priority_index
+        initial_index = priority_index
 
-        flow_order_by_outbound_link: list[list[Vehicle]] = [
+        pairs_by_outbound_link: list[list[tuple[Vehicle, int]]] = [
             [] for _ in self.outbound_links
         ]
         priority_base = True
@@ -130,10 +184,10 @@ class GeneralNodeModel(BaseNode):
         # Seed the round-robin cursor before the loop so it is always bound; the
         # first pass re-sets it to the same value (priority_base starts True), so
         # this is identical to the reference abmmeso algorithm.
-        iteration_index = self.priority_index
+        iteration_index = priority_index
         while True:
             if priority_base:
-                iteration_index = self.priority_index
+                iteration_index = priority_index
             idx = self.priority_vector[iteration_index]
 
             approach_with_priority = self.inbound_links[idx]
@@ -148,10 +202,8 @@ class GeneralNodeModel(BaseNode):
                     continue
 
                 elif remaining_demands[idx] < 1:
-                    self.priority_index = (self.priority_index + 1) % len(
-                        self.priority_vector
-                    )
-                    if self.priority_index == initial_index:
+                    priority_index = (priority_index + 1) % len(self.priority_vector)
+                    if priority_index == initial_index:
                         break
                     continue
             else:
@@ -184,15 +236,14 @@ class GeneralNodeModel(BaseNode):
 
                 total_flow += 1
                 remaining_demands[idx] -= 1
-                vehicle.advance_to(self.outbound_links[outbound_index].link_id)
-                flow_order_by_outbound_link[outbound_index].append(vehicle)
+                pairs_by_outbound_link[outbound_index].append(
+                    (vehicle, approach_with_priority.link_id)
+                )
                 flow_by_inbound_link[idx] += 1
 
                 if priority_base:
-                    self.priority_index = (self.priority_index + 1) % len(
-                        self.priority_vector
-                    )
-                    if self.priority_index == initial_index:
+                    priority_index = (priority_index + 1) % len(self.priority_vector)
+                    if priority_index == initial_index:
                         break
                 else:
                     iteration_index = (iteration_index + 1) % len(self.priority_vector)
@@ -206,8 +257,4 @@ class GeneralNodeModel(BaseNode):
                     break
                 priority_base = False
 
-        for idx_outb, flow in enumerate(flow_order_by_outbound_link):
-            self.outbound_links[idx_outb].set_inflow(flow, step)
-
-        for idx_inb, count in enumerate(flow_by_inbound_link):
-            self.inbound_links[idx_inb].set_outflow(count, step)
+        return pairs_by_outbound_link, flow_by_inbound_link, priority_index

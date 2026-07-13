@@ -108,11 +108,49 @@ works from a plugin, which runs *before* the demand phase) but never changes any
 flow result or model state. It is available on `NetworkState`, so any plugin form
 can call it.
 
+## Peeking the realized flows
+
+Under congestion the movement demand can far exceed what the node will actually
+transfer this step: queued vehicles keep demanding a movement for many steps while
+outbound supply, competing movements and the merge priorities let only a few cross.
+A plugin that rations, auctions or tolls a movement usually wants only the vehicles
+that **will actually cross now** — not the whole queue.
+
+`NetworkState.peek_flows(node_id)` returns exactly that: a read-only replay of the
+junction's own flow algorithm (same priorities, FIFO order, per-outbound supply
+bookkeeping and locking), keyed by outbound link id, each value the predicted
+crossing vehicles as `VehicleView`s in crossing order. Every outbound link id of the
+junction is present, possibly with an empty list.
+
+```python
+def ration(t, state, plugin):
+    crossing = state.peek_flows(node_id)                # dict[int, list[VehicleView]]
+    for view in crossing[out_link][capacity:]:          # over the cap → divert
+        state.set_route(view.vehicle, [view.link_id, *alt_tail])
+```
+
+`supply_overrides` (a `dict[out_link_id, supply]`) replaces the matching outbound
+links' receiving flow *in the replay only* — useful when the plugin itself will cap
+an entry below the physical supply, or will divert the overflow onto a parallel
+link whose room it wants credited to the movement:
+
+```python
+crossing = state.peek_flows(node_id, supply_overrides={fast: budget + spare})
+```
+
+Like `movement_demand` the call is a **pure query**: it refreshes the junction's
+adjacent links' demand/supply for the current step (so it works from a plugin,
+before the demand phase) and never moves a vehicle, changes a flow result, or
+advances the node's persistent priority cursor. The prediction is exact as long as
+routes do not change between the query and the flow phase — the plugin's own
+reroutes are, of course, the intended way to deviate from it.
+
 ## What plugins can do
 
 - **Reroute** vehicles (rewrite routes, as above).
-- **Ration a movement** — read `movement_demand` for one outbound link and admit /
-  divert vehicles (access control).
+- **Ration a movement** — read `movement_demand` (everyone wanting the movement) or
+  `peek_flows` (only those crossing this step) and admit / divert vehicles (access
+  control).
 - **Gate/close links** — e.g. drive a routing cost so the router avoids a link.
 - **Access control / dispatch** — admit or divert vehicles, often combined with
   [step-driven injection](stepping-and-injection.md).

@@ -68,10 +68,63 @@ class DivergeNode(BaseNode):
         entry order and push each to its next link while that link still has supply
         Ŝ >= 1. The FIFO discipline means the first vehicle that cannot proceed
         (its target link is full) blocks all vehicles behind it — the loop stops.
+
+        The walk itself lives in :meth:`_plan_flows` (shared with the read-only
+        :meth:`peek_flows`); this method applies the resulting plan.
+        """
+        pairs_by_outbound_link = self._plan_flows(
+            remaining_supplies=[link.get_supply() for link in self.outbound_links]
+        )
+        total_flow = sum(len(pairs) for pairs in pairs_by_outbound_link)
+
+        for idx_outb, pairs in enumerate(pairs_by_outbound_link):
+            for vehicle, _ in pairs:
+                vehicle.advance_to(self.outbound_links[idx_outb].link_id)
+
+        ret_val = self.inbound_link.set_outflow(total_flow, step)
+        for idx_outb, pairs in enumerate(pairs_by_outbound_link):
+            self.outbound_links[idx_outb].set_inflow([v for v, _ in pairs], step)
+
+        assert len(ret_val) == total_flow
+
+    def peek_flows(
+        self, step: int, supply_overrides: dict[int, int] | None = None
+    ) -> dict[int, list[tuple[Vehicle, int]]]:
+        """Predict this step's crossings per outbound link, without moving anything.
+
+        Replays the Algorithm 1 FIFO walk of :meth:`compute_flows` (shared via
+        :meth:`_plan_flows`) — including its front-blocking discipline — against
+        freshly refreshed demands/supplies and discards the plan instead of
+        applying it, so it is a pure query. See :meth:`BaseNode.peek_flows` for
+        the contract.
+        """
+        pairs_by_outbound_link = self._plan_flows(
+            remaining_supplies=self._peek_supplies(step, supply_overrides)
+        )
+        return {
+            link.link_id: pairs_by_outbound_link[idx]
+            for idx, link in enumerate(self.outbound_links)
+        }
+
+    def _plan_flows(
+        self, remaining_supplies: list[int]
+    ) -> list[list[tuple[Vehicle, int]]]:
+        """Walk Algorithm 1 and plan this step's transfers, mutating nothing.
+
+        The FIFO walk of :meth:`compute_flows`, factored out so that
+        :meth:`peek_flows` can replay it read-only: demands are read but never
+        written, and no vehicle is moved. The reference arithmetic is unchanged.
+
+        Args:
+            remaining_supplies: Per-outbound-link supply the walk may consume
+                (consumed in place; pass a fresh list).
+
+        Returns:
+            The planned ``(vehicle, inbound_link_id)`` transfers per outbound
+            link, in crossing order.
         """
         upstream_demand = self.inbound_link.get_demand()
-        remaining_supplies = [link.get_supply() for link in self.outbound_links]
-        vehicles_by_outbound_link: list[list[Vehicle]] = [
+        pairs_by_outbound_link: list[list[tuple[Vehicle, int]]] = [
             [] for _ in self.outbound_links
         ]
         total_flow = 0
@@ -95,13 +148,10 @@ class DivergeNode(BaseNode):
                 remaining_supplies[idx_outb] -= 1
                 total_flow += 1
                 upstream_demand -= 1
-                front_vehicle.advance_to(self.outbound_links[idx_outb].link_id)
-                vehicles_by_outbound_link[idx_outb].append(front_vehicle)
+                pairs_by_outbound_link[idx_outb].append(
+                    (front_vehicle, self.inbound_link.link_id)
+                )
             else:
                 break
 
-        ret_val = self.inbound_link.set_outflow(total_flow, step)
-        for idx_outb, vehicles in enumerate(vehicles_by_outbound_link):
-            self.outbound_links[idx_outb].set_inflow(vehicles, step)
-
-        assert len(ret_val) == sum(len(vs) for vs in vehicles_by_outbound_link)
+        return pairs_by_outbound_link

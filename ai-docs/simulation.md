@@ -142,6 +142,7 @@ state.cumulative_outflow(link_id, t=None) -> float
 # rerouting / dynamic demand
 state.vehicles_in_network() -> list[VehicleView]
 state.movement_demand(node_id, out_link_id) -> list[VehicleView]  # demand for one movement
+state.peek_flows(node_id, supply_overrides=None) -> dict[int, list[VehicleView]]  # predicted crossings
 state.remaining_real_route(vehicle, current_link_id=None) -> list[int]
 state.set_route(vehicle, real_route)       # must start at current link
 state.inject(node_id, vehicle, at_time=None, check_reentry_node=True)
@@ -162,3 +163,11 @@ vehicle's own route), and is a pure query — it refreshes the inbound links' de
 `state.step` so it can be called from a plugin (which runs before the demand phase)
 without changing any flow result. Ideal for rationing access to a movement: admit
 `demand[:cap]`, reroute the rest with `set_route`.
+
+`peek_flows(node_id, supply_overrides=None)` predicts the vehicles that will
+ACTUALLY cross the junction this step, per outbound link id — a read-only replay of
+the node's own flow algorithm (priorities, FIFO, supply bookkeeping, locking), so
+under congestion it is the realistic subset of `movement_demand`. `supply_overrides`
+(`out_link_id -> supply`) replaces receiving flows in the replay only. Pure query
+like `movement_demand`; exact while routes stay unchanged until the flow phase. See
+[plugins.md](plugins.md).
