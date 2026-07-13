@@ -1111,6 +1111,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#fastest-achievable-time-free_flow_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fastest achievable time (free_flow_time)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#network-summary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1795,6 +1806,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#fastest-achievable-time-free_flow_time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fastest achievable time (free_flow_time)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#network-summary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1877,8 +1899,12 @@ journey — so metrics need no special-casing, and records are keyed by
 <td>The ordered real link ids actually driven</td>
 </tr>
 <tr>
-<td><code>start_time</code></td>
-<td>Desired departure (<code>vehicle.start</code>)</td>
+<td><code>scheduled_departure_time</code></td>
+<td>Requested departure (<code>vehicle.scheduled_departure</code>); may fall between steps</td>
+</tr>
+<tr>
+<td><code>departure_time</code></td>
+<td>The <strong>actual</strong> departure — when the vehicle entered the origin queue (normally <code>ceil(scheduled_departure / dt) * dt</code>, later if injected with a past departure time)</td>
 </tr>
 <tr>
 <td><code>network_entry_time</code></td>
@@ -1890,7 +1916,7 @@ journey — so metrics need no special-casing, and records are keyed by
 </tr>
 <tr>
 <td><code>travel_time</code></td>
-<td>Time in system, desired departure → arrival, <strong>less each connector's one-step free-flow lag</strong></td>
+<td>Time in system, <strong>discrete <code>departure_time</code> → arrival</strong>, <strong>less each connector's one-step free-flow lag</strong> (a clean multiple of <code>dt</code>)</td>
 </tr>
 <tr>
 <td><code>access_time</code></td>
@@ -1920,13 +1946,42 @@ and an empty, unrestricted connector adds nothing — see
 </div>
 <p>By default connector links are excluded from <code>route</code> and <code>link_travel_times</code>; pass
 <code>include_connectors=True</code> to keep them.</p>
+<div class="admonition note">
+<p class="admonition-title">Travel time runs from the <em>actual</em> departure, not the scheduled time</p>
+<p><code>departure_time</code> is the moment the vehicle actually entered the origin queue —
+the first simulation step <strong>at or after</strong> its <code>scheduled_departure</code>, i.e.
+<code>ceil(scheduled_departure / dt) * dt</code>. <code>travel_time</code> is measured from there, so
+the sub-step wait for the next step (a discretisation artifact, not real travel)
+is excluded and <code>travel_time</code> is always a multiple of <code>dt</code>. If a vehicle is
+injected with a departure time already in the <strong>past</strong> (it cannot depart before
+it exists), <code>departure_time</code> is the step it was actually enqueued — not the stale
+schedule — so <code>travel_time</code> isn't inflated by that gap. When <code>scheduled_departure</code>
+already lands on a step boundary and isn't in the past, <code>departure_time ==
+scheduled_departure_time</code>.</p>
+</div>
+<h2 id="fastest-achievable-time-free_flow_time">Fastest achievable time (<code>free_flow_time</code>)<a class="headerlink" href="#fastest-achievable-time-free_flow_time" title="Permanent link">&para;</a></h2>
+<p>Because vehicles advance in whole steps, each link's free-flow crossing takes exactly
+its integer wave lag <code>T1</code> steps, so the fastest a vehicle can traverse a route is
+<code>sum(T1) * dt</code>. <code>free_flow_time(route, free_flow_steps, dt)</code> returns this discrete
+lower bound — directly comparable to a trip's connector-free <code>travel_time</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mesoltm</span><span class="w"> </span><span class="kn">import</span> <span class="n">free_flow_time</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">steps</span> <span class="o">=</span> <span class="p">{</span><span class="n">l</span><span class="o">.</span><span class="n">link_id</span><span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">T1</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">sim</span><span class="o">.</span><span class="n">links</span><span class="p">}</span>   <span class="c1"># each link&#39;s free-flow step lag</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">collect_trips</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">fastest</span> <span class="o">=</span> <span class="n">free_flow_time</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s2">&quot;route&quot;</span><span class="p">],</span> <span class="n">steps</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">time_step</span><span class="p">)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">delay</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s2">&quot;travel_time&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">fastest</span>         <span class="c1"># congestion + access delay</span>
+</code></pre></div>
+<p>This is the discrete counterpart of the continuous per-link value <code>length / v_f</code>,
+exposed on the live network state as <code>state.continuous_free_flow_time(link_id)</code> (used
+by default as the shortest-path routing weight); the latter ignores <code>dt</code>, the former
+rounds to it.</p>
 <h2 id="network-summary">Network summary<a class="headerlink" href="#network-summary" title="Permanent link">&para;</a></h2>
 <p><code>summarize_trips(trips)</code> returns headline metrics: <code>n_trips</code>, <code>n_completed</code>,
 mean/median/min/max <code>travel_time</code>, <code>mean_access_time</code>, <code>total_vehicle_hours</code>, and
 <code>mean_link_travel_time</code> (per link).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s2">&quot;n_completed&quot;</span><span class="p">],</span> <span class="s2">&quot;trips,&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>      <span class="nb">round</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s2">&quot;mean_travel_time&quot;</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;s mean,&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>      <span class="nb">round</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s2">&quot;total_vehicle_hours&quot;</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;veh-h&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s2">&quot;n_completed&quot;</span><span class="p">],</span> <span class="s2">&quot;trips,&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>      <span class="nb">round</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s2">&quot;mean_travel_time&quot;</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;s mean,&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>      <span class="nb">round</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s2">&quot;total_vehicle_hours&quot;</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;veh-h&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="csv-output">CSV output<a class="headerlink" href="#csv-output" title="Permanent link">&para;</a></h2>
 <p><code>write_trips_csv</code> writes one row per journey (columns begin <code>vehicle_id,

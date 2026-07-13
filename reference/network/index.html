@@ -1589,10 +1589,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#mesoltm.network.state.NetworkState.free_flow_time" class="md-nav__link">
+  <a href="#mesoltm.network.state.NetworkState.continuous_free_flow_time" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;free_flow_time
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;continuous_free_flow_time
       
     </span>
   </a>
@@ -1670,6 +1670,28 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;vehicles_in_network
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mesoltm.network.state.NetworkState.movement_demand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;movement_demand
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mesoltm.network.state.NetworkState.peek_flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;peek_flows
       
     </span>
   </a>
@@ -2408,10 +2430,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#mesoltm.network.state.NetworkState.free_flow_time" class="md-nav__link">
+  <a href="#mesoltm.network.state.NetworkState.continuous_free_flow_time" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;free_flow_time
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;continuous_free_flow_time
       
     </span>
   </a>
@@ -2489,6 +2511,28 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;vehicles_in_network
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mesoltm.network.state.NetworkState.movement_demand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;movement_demand
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mesoltm.network.state.NetworkState.peek_flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;peek_flows
       
     </span>
   </a>
@@ -3382,7 +3426,7 @@ rerouting (<code>set_route</code>) and dynamic demand (<code>inject</code>).</p>
 
 
 <a href="#mesoltm.network.state.NetworkState" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">NetworkState</span><span class="p">(</span><span class="n">links_by_id</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            Link (mesoltm.core.link.Link)" href="../core/#mesoltm.core.link.Link">Link</a></span><span class="p">],</span> <span class="n">out_links</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]],</span> <span class="n">in_links</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]],</span> <span class="n">origin_nodes</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            OriginNode (mesoltm.core.nodes.origin_node.OriginNode)" href="../nodes/#mesoltm.core.nodes.origin_node.OriginNode">OriginNode</a></span><span class="p">],</span> <span class="n">node_positions</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span> <span class="n">endpoints</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">]])</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">NetworkState</span><span class="p">(</span><span class="n">links_by_id</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            Link (mesoltm.core.link.Link)" href="../core/#mesoltm.core.link.Link">Link</a></span><span class="p">],</span> <span class="n">out_links</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]],</span> <span class="n">in_links</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]],</span> <span class="n">origin_nodes</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            OriginNode (mesoltm.core.nodes.origin_node.OriginNode)" href="../nodes/#mesoltm.core.nodes.origin_node.OriginNode">OriginNode</a></span><span class="p">],</span> <span class="n">node_positions</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span> <span class="n">endpoints</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">]],</span> <span class="n">nodes_by_id</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseNode (mesoltm.core.nodes.base_node.BaseNode)" href="../nodes/#mesoltm.core.nodes.base_node.BaseNode">BaseNode</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3539,6 +3583,23 @@ cumulative-count arrays at a given step.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>nodes_by_id</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span>[<span title="mesoltm.core.ids.NodeId">NodeId</span>, <a class="autorefs autorefs-internal" title="            BaseNode (mesoltm.core.nodes.base_node.BaseNode)" href="../nodes/#mesoltm.core.nodes.base_node.BaseNode">BaseNode</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>node_id -&gt; junction node model</code> for every through
+junction (used by :meth:<code>movement_demand</code>); may be empty.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -3748,17 +3809,24 @@ cumulative-count arrays at a given step.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="mesoltm.network.state.NetworkState.free_flow_time" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">free_flow_time</span>
+<h3 id="mesoltm.network.state.NetworkState.continuous_free_flow_time" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">continuous_free_flow_time</span>
 
 
-<a href="#mesoltm.network.state.NetworkState.free_flow_time" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">free_flow_time</span><span class="p">(</span><span class="n">link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="float">float</span></span>
+<a href="#mesoltm.network.state.NetworkState.continuous_free_flow_time" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">continuous_free_flow_time</span><span class="p">(</span><span class="n">link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="float">float</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Return the free-flow travel time (s) of a link.</p>
+        <p>Return the continuous-time free-flow travel time (s) of a link.</p>
+<p>This is the continuous LTM value <code>length / v_f</code> — the exact time a vehicle
+would need to traverse the link at free-flow speed, <strong>independent of the
+simulation time step</strong>. The discrete model advances vehicles in whole steps,
+so the <em>achievable</em> free-flow time is instead the link's integer wave lag
+<code>T1 * dt</code> (see :func:<code>mesoltm.metrics.free_flow_time</code> for the route-level
+discrete value). Use this continuous value where a fine-grained, dt-agnostic
+cost is wanted (e.g. as a routing edge weight).</p>
 
 
     </div>
@@ -3946,8 +4014,9 @@ may not enter within the horizon) rather than being silently discarded.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The vehicle to inject; <code>start</code>, <code>route</code> and <code>position</code>
-are set here (and the live journey state reset on re-injection).</p>
+                <p>The vehicle to inject; <code>scheduled_departure</code>, <code>route</code> and
+<code>position</code> are set here (and the live journey state reset on
+re-injection).</p>
               </div>
             </td>
             <td>
@@ -4052,6 +4121,169 @@ carries the vehicle, the link it is on, its remaining real-link route and
 its destination. Connector links are skipped — a vehicle on an access
 connector has no downstream choice to reroute yet. Called at the start of a
 step (before flows), when every vehicle is on exactly one link.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="mesoltm.network.state.NetworkState.movement_demand" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">movement_demand</span>
+
+
+<a href="#mesoltm.network.state.NetworkState.movement_demand" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">movement_demand</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">out_link_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            VehicleView (mesoltm.network.state.VehicleView)" href="#mesoltm.network.state.VehicleView">VehicleView</a></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the vehicles demanding to cross onto one outbound link this step.</p>
+<p>For the movement at <code>node_id</code> toward <code>out_link_id</code>, returns one
+:class:<code>VehicleView</code> per vehicle whose next link resolves to <code>out_link_id</code>,
+taken from the current sending flow of the node's inbound links — real
+approaches <em>and</em> any origin connector, whose queued vehicles also carry
+routes that may load this movement — in FIFO order (<code>len(...)</code> is the
+count). Each view carries the vehicle and the inbound link it is on, so a
+caller can ration the movement and reroute the rest with :meth:<code>set_route</code>.</p>
+<p>Next-link resolution matches the node model (an attached routing policy, else
+the vehicle's own route). It is a <strong>pure query</strong>: it refreshes the inbound
+links' demand for <code>self.step</code> so it works from a plugin (which runs before
+the demand phase) without changing any flow result. Returns <code>[]</code> if the
+node has no through-junction model.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>node_id</code>
+            </td>
+            <td>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The junction the movement is at.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>out_link_id</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The outbound (downstream) link id of the movement.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="mesoltm.network.state.NetworkState.peek_flows" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">peek_flows</span>
+
+
+<a href="#mesoltm.network.state.NetworkState.peek_flows" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">peek_flows</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span><span class="p">,</span> <span class="n">supply_overrides</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            VehicleView (mesoltm.network.state.VehicleView)" href="#mesoltm.network.state.VehicleView">VehicleView</a></span><span class="p">]]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Predict the vehicles that will cross <code>node_id</code> this step, per movement.</p>
+<p>A read-only replay of the junction's own flow algorithm — same
+priorities, FIFO order, per-outbound supply bookkeeping and locking —
+keyed by outbound link id, each value the predicted crossing vehicles in
+order (every outbound link id of the junction is present, possibly with
+an empty list). Unlike :meth:<code>movement_demand</code>, which lists every vehicle
+<em>wanting</em> a movement, this returns only those the node model would
+actually transfer, so under congestion it is the realistic per-step
+crossing set.</p>
+<p><code>supply_overrides</code> maps <code>out_link_id -&gt; supply</code> and replaces the
+matching links' receiving flow in the replay only — e.g. to model a cap
+an access-control plugin will itself enforce. The prediction assumes
+routes stay as they are between the query and the flow phase.</p>
+<p>Like :meth:<code>movement_demand</code> it is a <strong>pure query</strong>: it refreshes the
+junction's adjacent links' demand/supply for <code>self.step</code> (so it works
+from a plugin, before the demand phase) and never touches vehicles,
+flows, or the node's persistent priority state. Returns <code>{}</code> if the
+node has no through-junction model.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>node_id</code>
+            </td>
+            <td>
+                  <code><span title="mesoltm.core.ids.NodeId">NodeId</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The junction to replay.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>supply_overrides</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span>[<span title="int">int</span>, <span title="int">int</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional per-outbound-link supply replacements.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>

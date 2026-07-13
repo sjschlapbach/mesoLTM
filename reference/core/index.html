@@ -3001,6 +3001,31 @@ LTM identities and demand/supply are Section 3.1 (Eqs. 1-2).</p>
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code><span title="mesoltm.core.link.Link.critical_occupancy">critical_occupancy</span></code></td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Largest whole-vehicle count that is still free-flowing
+(floored <code>rho_crit * length</code>, <code>rho_crit = rho_jam*w/(v_f+w)</code>),
+derived in :meth:<code>start</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="mesoltm.core.link.Link.jam_occupancy">jam_occupancy</span></code></td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum whole-vehicle count that fits on the link (floored
+<code>rho_jam * length</code>), derived in :meth:<code>start</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="mesoltm.core.link.Link.cumulative_inflows">cumulative_inflows</span></code></td>
             <td>
                   <code><span title="list">list</span>[<span title="float">float</span>]</code>
@@ -4155,7 +4180,7 @@ populated <code>trajectory</code>.</p>
 
 
 <a href="#mesoltm.core.vehicle.Vehicle" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Vehicle</span><span class="p">(</span><span class="n">vehicle_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">origin</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">destination</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">props</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Vehicle</span><span class="p">(</span><span class="n">vehicle_id</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">origin</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">destination</span><span class="p">:</span> <span class="n"><span title="mesoltm.core.ids.NodeId">NodeId</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">scheduled_departure</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">route</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">props</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="object">object</span></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4210,12 +4235,33 @@ the reference <code>abmmeso</code> implementation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="mesoltm.core.vehicle.Vehicle.start">start</span></code></td>
+            <td><code><span title="mesoltm.core.vehicle.Vehicle.scheduled_departure">scheduled_departure</span></code></td>
             <td>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Departure time in seconds.</p>
+                <p>The <em>requested</em> departure time in seconds (an input).
+The vehicle is only released at the first discrete step at or after this
+time (see
+:meth:<code>~mesoltm.core.nodes.origin_node.OriginNode.prepare_step</code>);
+:attr:<code>departure_time</code> records when that release actually happened.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="mesoltm.core.vehicle.Vehicle.departure_time">departure_time</span></code></td>
+            <td>
+                  <code><span title="float">float</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <strong>actual</strong> departure time in seconds — the moment the
+vehicle is put into the origin queue / onto its first (connector) link,
+stamped by :meth:<code>~mesoltm.core.nodes.origin_node.OriginNode.prepare_step</code>
+(<code>None</code> until then). This is normally
+<code>ceil(scheduled_departure / dt) * dt</code>, but is later if the vehicle was
+injected with a departure time already in the past (it cannot depart
+before it exists). Travel time is measured from here.</p>
               </div>
             </td>
           </tr>
@@ -4264,14 +4310,16 @@ history round-trip.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="mesoltm.core.vehicle.Vehicle.end">end</span></code></td>
+            <td><code><span title="mesoltm.core.vehicle.Vehicle.arrival_time">arrival_time</span></code></td>
             <td>
-                  <code><span title="int">int</span> | None</code>
+                  <code><span title="float">float</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Arrival time step, set by the destination node when the vehicle
-exits the network (<code>None</code> while still travelling).</p>
+                <p>Arrival time in seconds, stamped by the destination node when
+the vehicle exits the network (<code>None</code> while still travelling). Tracked
+as a time (like :attr:<code>departure_time</code>) so downstream processing needs no
+step→seconds conversion.</p>
               </div>
             </td>
           </tr>
@@ -4300,16 +4348,18 @@ travel times are derived from it (see :mod:<code>mesoltm.metrics</code>).</p>
                 <p>The <strong>single source of truth</strong> for the trips this vehicle has
 completed. Every time the vehicle is absorbed at a destination its
 just-finished trip is snapshotted (see :meth:<code>snapshot_journey</code>) and
-appended here — a self-contained record of that journey's <code>start</code>,
-<code>end</code>, <code>route</code> (via its <code>trajectory</code>) and endpoints. This works
+appended here — a self-contained record of that journey's
+<code>scheduled_departure</code>, <code>departure_time</code>, <code>arrival_time</code>, <code>route</code>
+(via its <code>trajectory</code>) and endpoints. This works
 uniformly no matter how the vehicle came to exist: a vehicle from a
 static demand profile completes exactly one journey (<code>journeys</code> has
 one entry), while a vehicle injected — and re-injected — by hand records
 one entry per trip. All trip metrics (:mod:<code>mesoltm.metrics</code>) are
 derived from these journey records, so demand-profile and hand-injected
 runs share one consistent accounting path. The <strong>live</strong> fields above
-(<code>route</code>/<code>position</code>/<code>trajectory</code>/<code>start</code>/<code>end</code>) always
-describe the <em>current</em> journey and are reset when the vehicle is
+(<code>route</code>/<code>position</code>/<code>trajectory</code>/<code>departure_time</code>/
+<code>arrival_time</code>) always describe the <em>current</em> journey and are reset
+when the vehicle is
 re-injected (see :meth:<code>reset_for_new_journey</code>); the completed journeys
 live on in <code>journeys</code>.</p>
               </div>
@@ -4397,14 +4447,16 @@ i.e. while it is still moving through, or waiting to enter, the network.
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>start</code>
+                <code>scheduled_departure</code>
             </td>
             <td>
                   <code><span title="float">float</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Departure time in seconds.</p>
+                <p>Scheduled departure time in seconds (see the class
+attribute; the vehicle is released at the first discrete step at or
+after this time).</p>
               </div>
             </td>
             <td>
@@ -4800,8 +4852,9 @@ matching the reference implementation's behaviour.</p>
         <p>Freeze the current (just-completed) journey into an immutable record.</p>
 <p>Called by the destination node the moment the vehicle is absorbed. The
 returned dict is self-contained — it carries the journey's endpoints, its
-desired departure (<code>start</code>) and arrival (<code>end</code>) steps, its position in
-the vehicle's <code>journeys</code> list (<code>journey_index</code>), and a copy of the
+<code>scheduled_departure</code> (requested), <code>departure_time</code> (actual) and
+<code>arrival_time</code> (all seconds), its position in the vehicle's <code>journeys</code>
+list (<code>journey_index</code>), and a copy of the
 per-link <code>trajectory</code> — so it survives unchanged even if the vehicle is
 later re-injected and its live fields are reset. It is the atomic unit all
 trip metrics are computed from (see :mod:<code>mesoltm.metrics</code>).</p>
@@ -4822,7 +4875,7 @@ trip metrics are computed from (see :mod:<code>mesoltm.metrics</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A journey record: ``{"vehicle_id", "origin", "destination", "start",</p>
+                <p>A journey record: ``{"vehicle_id", "origin", "destination",</p>
               </div>
             </td>
           </tr>
@@ -4832,7 +4885,17 @@ trip metrics are computed from (see :mod:<code>mesoltm.metrics</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>"end", "journey_index", "trajectory"}<code>. The</code>trajectory`` is a shallow</p>
+                <p>"scheduled_departure", "departure_time", "arrival_time",</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>"journey_index", "trajectory"}<code>. The</code>trajectory`` is a shallow</p>
               </div>
             </td>
           </tr>
@@ -4878,11 +4941,13 @@ trip metrics are computed from (see :mod:<code>mesoltm.metrics</code>).</p>
     <div class="doc doc-contents ">
 
         <p>Clear the live journey state so the vehicle can start a fresh trip.</p>
-<p>Wipes the current-journey working fields (<code>trajectory</code>, <code>end</code>,
-<code>position</code>) while leaving the completed :attr:<code>journeys</code> untouched. Called
-by :meth:<code>~mesoltm.network.state.NetworkState.inject</code> when an already-used
+<p>Wipes the current-journey working fields (<code>trajectory</code>,
+<code>departure_time</code>, <code>arrival_time</code>, <code>position</code>) while leaving the
+completed :attr:<code>journeys</code> untouched. Called by
+:meth:<code>~mesoltm.network.state.NetworkState.inject</code> when an already-used
 vehicle is re-injected; the new <code>route</code> is set by the injection splice
-immediately afterwards.</p>
+immediately afterwards, and <code>departure_time</code> is re-stamped when the vehicle
+next enters the origin queue.</p>
 
 
     </div>
@@ -5355,9 +5420,9 @@ entering within the horizon) instead of being silently discarded.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The vehicle to inject; its <code>start</code> is overwritten with the
-effective departure time, and its live journey state is reset when
-it is being re-injected.</p>
+                <p>The vehicle to inject; its <code>scheduled_departure</code> is overwritten
+with the given departure time, and its live journey state is reset
+when it is being re-injected.</p>
               </div>
             </td>
             <td>

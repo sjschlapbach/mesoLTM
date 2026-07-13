@@ -1848,7 +1848,7 @@ records.</p>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">vehicle_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;n0&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;n3&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">start</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>               <span class="c1"># departure time in seconds</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">scheduled_departure</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="c1"># scheduled departure time in seconds</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">route</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>         <span class="c1"># ordered link ids to traverse (optional)</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">props</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vclass&quot;</span><span class="p">:</span> <span class="s2">&quot;car&quot;</span><span class="p">},</span> <span class="c1"># free-form metadata (optional)</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span>
@@ -1879,8 +1879,16 @@ records.</p>
 <td>Auto-populated per-link log (<code>entry_step</code>, <code>exit_step</code>, <code>is_connector</code>) for the <strong>current</strong> trip; per-journey <a href="../../guide/metrics/">metrics</a> are derived from it.</td>
 </tr>
 <tr>
-<td><code>end</code></td>
-<td>Arrival step of the current trip, stamped by the destination node.</td>
+<td><code>scheduled_departure</code></td>
+<td>Requested departure time in seconds. The vehicle is released at the first step at/after it (step <code>ceil(scheduled_departure / dt)</code>).</td>
+</tr>
+<tr>
+<td><code>departure_time</code></td>
+<td><strong>Actual</strong> departure time in seconds (<code>None</code> until then), stamped when the vehicle enters the origin queue.</td>
+</tr>
+<tr>
+<td><code>arrival_time</code></td>
+<td>Arrival time in seconds of the current trip (<code>None</code> while travelling), stamped by the destination node.</td>
 </tr>
 <tr>
 <td><code>journeys</code></td>

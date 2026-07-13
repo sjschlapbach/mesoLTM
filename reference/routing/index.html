@@ -2308,7 +2308,8 @@ routing cost, where <code>state</code> is the live
 :class:<code>~mesoltm.network.state.NetworkState</code> (exported as
 <code>mesoltm.NetworkState</code>) — so a congestion-aware cost can read
 <code>state.occupancy(link_id)</code>, <code>state.density(link_id)</code> etc. with
-full typing. Defaults to the link's free-flow travel time.</p>
+full typing. Defaults to the link's continuous free-flow travel time
+(<code>state.continuous_free_flow_time(link_id)</code>, i.e. <code>length / v_f</code>).</p>
               </div>
             </td>
             <td>

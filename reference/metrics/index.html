@@ -1984,16 +1984,25 @@ at the end of the horizon have no completed journey and are not included.</p>
     <div class="doc doc-contents first">
 
         <p>Build the travel-time record for a single completed journey.</p>
-<p>The reported <code>travel_time</code> is the time from the vehicle's desired departure
+<p>The reported <code>travel_time</code> is the time from the vehicle's <strong>actual departure</strong>
 to its arrival, <strong>minus the artificial one-step free-flow lag that each
 auto-inserted O/D connector imposes</strong> (a one-cell connector always costs one
-free-flow step to cross, even when empty and unrestricted). Time a vehicle
-spends on a connector <em>beyond</em> that one step is <strong>kept</strong>: it is a genuine
-supply-limited wait to enter or leave the network (downstream space was the
-binding constraint). <code>travel_time</code> splits into <code>access_time</code> (origin-queue
-wait plus any supply-limited connector wait) and <code>network_time</code> (time on real
-links only), so <code>travel_time == access_time + network_time</code>; <code>network_time</code>
-reflects only real links and is unaffected by connectors.</p>
+free-flow step to cross, even when empty and unrestricted). The actual departure
+(<code>departure_time</code>) is the instant the vehicle entered the origin queue —
+stamped by
+:meth:<code>~mesoltm.core.nodes.origin_node.OriginNode.prepare_step</code> at the first
+step at or after its <code>scheduled_departure</code> — and the arrival (<code>arrival_time</code>)
+is stamped at absorption; both are read straight off the journey record (already
+in seconds). Measuring from the actual departure (rather than the sub-step
+<code>scheduled_departure</code>) keeps <code>travel_time</code> a clean multiple of <code>dt</code> and, for
+a vehicle injected with a past departure time, avoids charging travel for time
+before the vehicle could exist.</p>
+<p>Time a vehicle spends on a connector <em>beyond</em> its one free-flow step is <strong>kept</strong>:
+it is a genuine supply-limited wait to enter or leave the network (downstream
+space was the binding constraint). <code>travel_time</code> splits into <code>access_time</code>
+(origin-queue wait plus any supply-limited connector wait) and <code>network_time</code>
+(time on real links only), so <code>travel_time == access_time + network_time</code>;
+<code>network_time</code> reflects only real links and is unaffected by connectors.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2113,7 +2122,22 @@ reported (connectors are internal access stubs).</p>
             <td>
               <div class="doc-md-description">
                 <ul>
-<li><code>start_time</code> — desired departure (the journey's <code>start</code>);</li>
+<li><code>scheduled_departure_time</code> — the journey's requested departure
+(<code>scheduled_departure</code>), which may fall between steps;</li>
+</ul>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <ul>
+<li><code>departure_time</code> — the actual departure: when the vehicle entered the
+origin queue (normally <code>ceil(scheduled_departure / dt) * dt</code>, later if it
+was injected with a past departure time);</li>
 </ul>
               </div>
             </td>
@@ -2149,9 +2173,9 @@ reported (connectors are internal access stubs).</p>
             <td>
               <div class="doc-md-description">
                 <ul>
-<li><code>travel_time</code> — time in system from desired departure to arrival, with
-each connector's one-step free-flow lag removed (supply-limited connector
-waiting is kept);</li>
+<li><code>travel_time</code> — time in system from the actual <code>departure_time</code> to
+arrival, with each connector's one-step free-flow lag removed
+(supply-limited connector waiting is kept);</li>
 </ul>
               </div>
             </td>

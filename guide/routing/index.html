@@ -1966,13 +1966,14 @@ takes effect immediately (rerouting happens automatically).</p>
 a single <code>next_link(vehicle, current_link_id, node, state) -&gt; int | None</code> — can be
 used.</p>
 <h2 id="congestion-aware-cost">Congestion-aware cost<a class="headerlink" href="#congestion-aware-cost" title="Permanent link">&para;</a></h2>
-<p>By default <code>ShortestPathPolicy</code> minimises free-flow travel time. Supply a <code>cost</code>
+<p>By default <code>ShortestPathPolicy</code> minimises continuous free-flow travel time
+(<code>state.continuous_free_flow_time(link_id)</code>, i.e. <code>length / v_f</code>). Supply a <code>cost</code>
 callback <code>cost(link_id, state) -&gt; float</code> to route on live conditions — the <code>state</code>
 is the <a href="../../reference/network/#network-state"><code>NetworkState</code></a>, so you can read
 <code>occupancy</code>, <code>density</code>, or cumulative flows:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">congestion_cost</span><span class="p">(</span><span class="n">link_id</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="c1"># free-flow time plus a penalty that grows with the link&#39;s current load</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="k">return</span> <span class="n">state</span><span class="o">.</span><span class="n">free_flow_time</span><span class="p">(</span><span class="n">link_id</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">state</span><span class="o">.</span><span class="n">occupancy</span><span class="p">(</span><span class="n">link_id</span><span class="p">)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="k">return</span> <span class="n">state</span><span class="o">.</span><span class="n">continuous_free_flow_time</span><span class="p">(</span><span class="n">link_id</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">state</span><span class="o">.</span><span class="n">occupancy</span><span class="p">(</span><span class="n">link_id</span><span class="p">)</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">policy</span> <span class="o">=</span> <span class="n">ShortestPathPolicy</span><span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="n">congestion_cost</span><span class="p">,</span> <span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>

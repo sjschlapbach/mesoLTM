@@ -1105,6 +1105,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#reading-the-demand-for-one-movement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading the demand for one movement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#peeking-the-realized-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Peeking the realized flows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-plugins-can-do" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1884,6 +1906,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#reading-the-demand-for-one-movement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading the demand for one movement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#peeking-the-realized-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Peeking the realized flows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-plugins-can-do" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1977,9 +2021,62 @@ rewriting <code>vehicle.route</code> reroutes that one vehicle from its next nod
 which is all any of the interfaces above ultimately do. This is the same loop slot
 the reference used for signal controllers; the four-phase ordering is unchanged.
 See <a href="../../model/deviations-from-the-paper/">Deviations §B3</a>.</p>
+<h2 id="reading-the-demand-for-one-movement">Reading the demand for one movement<a class="headerlink" href="#reading-the-demand-for-one-movement" title="Permanent link">&para;</a></h2>
+<p>An access-control plugin often needs the vehicles that want to enter <strong>one specific
+outbound link</strong> at a node this step — to admit some and reroute the rest.
+<code>NetworkState.movement_demand(node_id, out_link_id)</code> returns exactly that: a list of
+<code>VehicleView</code>s, one per vehicle whose resolved next link at <code>node_id</code> is
+<code>out_link_id</code>, taken from the current LTM sending flow of the node's inbound links in
+FIFO order. This covers the real approaches <strong>and</strong> any origin connector — vehicles
+still queued on a source connector already carry a route that may load this movement,
+so they count too. The number of demanding vehicles is just <code>len(...)</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">ration</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">plugin</span><span class="p">):</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">demand</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">movement_demand</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">out_link</span><span class="p">)</span>   <span class="c1"># list[VehicleView]</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">demand</span><span class="p">[</span><span class="n">capacity</span><span class="p">:]:</span>                       <span class="c1"># over the cap → divert</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="n">state</span><span class="o">.</span><span class="n">set_route</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">vehicle</span><span class="p">,</span> <span class="p">[</span><span class="n">view</span><span class="o">.</span><span class="n">link_id</span><span class="p">,</span> <span class="o">*</span><span class="n">alt_tail</span><span class="p">])</span>
+</code></pre></div>
+<p>Each <code>VehicleView</code> carries the vehicle <strong>and</strong> the inbound link it is on
+(<code>view.link_id</code>) — the link <code>set_route</code> needs to reroute it. Next-link resolution
+matches what the node model itself does: it honours an attached
+<a href="../routing/">routing policy</a>, otherwise the vehicle's own route. The call is a
+<strong>pure query</strong> — it refreshes the inbound links' demand for the current step (so it
+works from a plugin, which runs <em>before</em> the demand phase) but never changes any
+flow result or model state. It is available on <code>NetworkState</code>, so any plugin form
+can call it.</p>
+<h2 id="peeking-the-realized-flows">Peeking the realized flows<a class="headerlink" href="#peeking-the-realized-flows" title="Permanent link">&para;</a></h2>
+<p>Under congestion the movement demand can far exceed what the node will actually
+transfer this step: queued vehicles keep demanding a movement for many steps while
+outbound supply, competing movements and the merge priorities let only a few cross.
+A plugin that rations, auctions or tolls a movement usually wants only the vehicles
+that <strong>will actually cross now</strong> — not the whole queue.</p>
+<p><code>NetworkState.peek_flows(node_id)</code> returns exactly that: a read-only replay of the
+junction's own flow algorithm (same priorities, FIFO order, per-outbound supply
+bookkeeping and locking), keyed by outbound link id, each value the predicted
+crossing vehicles as <code>VehicleView</code>s in crossing order. Every outbound link id of the
+junction is present, possibly with an empty list.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">ration</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">plugin</span><span class="p">):</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">crossing</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">peek_flows</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>                <span class="c1"># dict[int, list[VehicleView]]</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="k">for</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">crossing</span><span class="p">[</span><span class="n">out_link</span><span class="p">][</span><span class="n">capacity</span><span class="p">:]:</span>          <span class="c1"># over the cap → divert</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="n">state</span><span class="o">.</span><span class="n">set_route</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">vehicle</span><span class="p">,</span> <span class="p">[</span><span class="n">view</span><span class="o">.</span><span class="n">link_id</span><span class="p">,</span> <span class="o">*</span><span class="n">alt_tail</span><span class="p">])</span>
+</code></pre></div>
+<p><code>supply_overrides</code> (a <code>dict[out_link_id, supply]</code>) replaces the matching outbound
+links' receiving flow <em>in the replay only</em> — useful when the plugin itself will cap
+an entry below the physical supply, or will divert the overflow onto a parallel
+link whose room it wants credited to the movement:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">crossing</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">peek_flows</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">supply_overrides</span><span class="o">=</span><span class="p">{</span><span class="n">fast</span><span class="p">:</span> <span class="n">budget</span> <span class="o">+</span> <span class="n">spare</span><span class="p">})</span>
+</code></pre></div>
+<p>Like <code>movement_demand</code> the call is a <strong>pure query</strong>: it refreshes the junction's
+adjacent links' demand/supply for the current step (so it works from a plugin,
+before the demand phase) and never moves a vehicle, changes a flow result, or
+advances the node's persistent priority cursor. The prediction is exact as long as
+routes do not change between the query and the flow phase — the plugin's own
+reroutes are, of course, the intended way to deviate from it.</p>
 <h2 id="what-plugins-can-do">What plugins can do<a class="headerlink" href="#what-plugins-can-do" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Reroute</strong> vehicles (rewrite routes, as above).</li>
+<li><strong>Ration a movement</strong> — read <code>movement_demand</code> (everyone wanting the movement) or
+  <code>peek_flows</code> (only those crossing this step) and admit / divert vehicles (access
+  control).</li>
 <li><strong>Gate/close links</strong> — e.g. drive a routing cost so the router avoids a link.</li>
 <li><strong>Access control / dispatch</strong> — admit or divert vehicles, often combined with
   <a href="../stepping-and-injection/">step-driven injection</a>.</li>
