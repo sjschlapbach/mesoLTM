@@ -1,3 +1,24 @@
+## [0.3.0] - 2026-07-13
+
+### Features
+
+- Add possibility to peek at flows across node in upcoming step (#13)
+
+### Enhancements
+
+- Store critical and jam occupancy as additional auxiliary link attributes
+- Directly implement demand extraction with movement key (#12)
+
+### Bug Fixes
+
+- Update departure time to actual departure time instead of scheduled departure time
+- Resolve linting errors and example script failures (#11)
+
+### Miscellaneous Tasks
+
+- *(release)* Update changelog for version 0.2.0
+- Update changelog generation for github release text content
+- *(release)* V0.3.0
 ## [0.2.0] - 2026-07-11
 
 ### Features
