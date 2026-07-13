@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mesoltm"
-version = "0.3.0"
+version = "0.3.1"
 description = "Mesoscopic (individual-vehicle) Link Transmission Model for traffic flow on general networks"
 readme = "README.md"
 requires-python = ">=3.11"
