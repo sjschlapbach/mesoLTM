@@ -1,3 +1,9 @@
+## [1.0.0] - 2026-07-19
+
+### Miscellaneous Tasks
+
+- *(release)* Update changelog for version 0.3.1
+- *(release)* [**breaking**] V1.0.0
 ## [0.3.1] - 2026-07-13
 
 ### Bug Fixes
