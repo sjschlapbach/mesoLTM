@@ -101,5 +101,5 @@ recurse_submodules = false
 
 [bump]
 # Configure the initial version used when no tags are found.
-initial_tag = "0.1.0"
+initial_tag = "1.0.0"
 breaking_always_bump_major = true

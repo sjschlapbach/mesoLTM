@@ -65,7 +65,7 @@ from .recording import (
 )
 from .routing import RoutingPolicy, ShortestPathPolicy, StaticRoutePolicy
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 __all__ = [
     "__version__",
