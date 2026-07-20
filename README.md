@@ -1,6 +1,6 @@
 # mesoLTM
 
-[![DOI](https://zenodo.org/badge/1288132632.svg)](https://doi.org/10.5281/zenodo.21443220)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21443220.svg)](https://doi.org/10.5281/zenodo.21443220)
 [![PyPI Version](https://img.shields.io/pypi/v/mesoltm)](https://pypi.org/project/mesoltm/)
 [![Package Build](https://github.com/sjschlapbach/mesoLTM/actions/workflows/build.yml/badge.svg)](https://github.com/sjschlapbach/mesoLTM/actions/workflows/build.yml)
 [![Python Types](https://github.com/sjschlapbach/mesoLTM/actions/workflows/typecheck.yml/badge.svg)](https://github.com/sjschlapbach/mesoLTM/actions/workflows/typecheck.yml)
