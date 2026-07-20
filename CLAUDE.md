@@ -55,10 +55,6 @@ Project knowledge is split to avoid duplication, and keeping it current is part 
 
 **A stale tracking file is a bug** — fix it in the same task. A `Stop` hook reminds you if work changed but tracking (`.ai/` **or** `.serena/memories/`) wasn't updated.
 
-## Pending follow-ups (do not forget)
-
-- **Zenodo DOI** — a DOI is **not yet registered** for `mesoltm`. When one is minted for a release, update **every** placeholder location. The authoritative, enumerated checklist of those locations lives in the **`pending_zenodo_doi` serena memory** — read and follow it at DOI-registration time, then delete the memory once done.
-
 ## Environment (quick reference — full commands in the `suggested_commands` memory)
 
 - Local dev: Python **3.11** venv (currently 3.11.15 via Homebrew). The package targets **3.11+**, so dev and floor match.

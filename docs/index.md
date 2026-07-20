@@ -70,9 +70,9 @@ scenario straight from the command line — see
 </div>
 
 !!! note "Citing mesoLTM"
-    If you use `mesoltm` in academic or other work, please cite this repository.
-    A DOI is **not yet registered** — see [Citation](about/citation.md) for the
-    current placeholder entry.
+    If you use `mesoltm` in academic or other work, please cite this repository
+    (DOI: [10.5281/zenodo.21443219](https://doi.org/10.5281/zenodo.21443219)) —
+    see [Citation](about/citation.md) for ready-made entries.
 
 [^paper]: F. de Souza, O. Verbas, J. Auld, C. M. J. Tampère, *"A mesoscopic
     link-transmission-model able to track individual vehicles"*, Simulation

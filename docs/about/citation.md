@@ -4,25 +4,22 @@
 A machine-readable entry is provided in
 [`CITATION.cff`](https://github.com/sjschlapbach/mesoLTM/blob/master/CITATION.cff).
 
-!!! warning "DOI pending — placeholder citation"
-    A DOI has **not yet been registered** for `mesoltm`. The entries below are
-    placeholders. Once a DOI is minted (e.g. via [Zenodo](https://zenodo.org/), by
-    enabling the GitHub–Zenodo integration and cutting a release), it will be added
-    to `CITATION.cff`, this page, and the `README`.
+[![DOI](https://zenodo.org/badge/1288132632.svg)](https://doi.org/10.5281/zenodo.21443219)
 
 ## Repository (primary)
 
-> J. Schlapbach, *mesoLTM: a mesoscopic (individual-vehicle) Link Transmission
-> Model*. Software, version 0.1.0.
+> J. Schlapbach, *mesoLTM: A Mesoscopic Individual-Vehicle Link Transmission
+> Model*. Software, version 1.0.0.
 > <https://github.com/sjschlapbach/mesoLTM>
+> DOI: [10.5281/zenodo.21443219](https://doi.org/10.5281/zenodo.21443219)
 
 ```bibtex
 @software{mesoltm,
   author  = {Schlapbach, Julius},
-  title   = {{mesoLTM}: a mesoscopic (individual-vehicle) Link Transmission Model},
-  version = {0.1.0},
+  title   = {{mesoLTM}: A Mesoscopic Individual-Vehicle Link Transmission Model},
+  version = {1.0.0},
   url     = {https://github.com/sjschlapbach/mesoLTM},
-  note    = {TODO: DOI pending registration (e.g. via Zenodo)},
+  doi     = {10.5281/zenodo.21443219},
   year    = {2026}
 }
 ```

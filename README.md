@@ -1,5 +1,6 @@
 # mesoLTM
 
+[![DOI](https://zenodo.org/badge/1288132632.svg)](https://doi.org/10.5281/zenodo.21443220)
 [![PyPI Version](https://img.shields.io/pypi/v/mesoltm)](https://pypi.org/project/mesoltm/)
 [![Package Build](https://github.com/sjschlapbach/mesoLTM/actions/workflows/build.yml/badge.svg)](https://github.com/sjschlapbach/mesoLTM/actions/workflows/build.yml)
 [![Python Types](https://github.com/sjschlapbach/mesoLTM/actions/workflows/typecheck.yml/badge.svg)](https://github.com/sjschlapbach/mesoLTM/actions/workflows/typecheck.yml)
@@ -223,8 +224,9 @@ git push origin v0.1.0                                # push the tag to trigger 
 **If you use `mesoltm` in academic or other work, please cite this repository.**
 A machine-readable entry is provided in [`CITATION.cff`](CITATION.cff):
 
-> J. Schlapbach, _mesoLTM: a mesoscopic (individual-vehicle) Link Transmission Model_.
+> J. Schlapbach, _mesoLTM: A Mesoscopic Individual-Vehicle Link Transmission Model_.
 > Software, https://github.com/sjschlapbach/mesoLTM
+> DOI: [10.5281/zenodo.21443220](https://doi.org/10.5281/zenodo.21443220)
 
 As a **secondary reference**, please also cite the paper whose model `mesoltm`
 implements, and whose `abmmeso` package (by Felipe de Souza, AGPL-3.0) it adapts

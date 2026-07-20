@@ -85,15 +85,13 @@ Plotting/animation helpers are **not** in the top-level package; import them fro
 
 ## Citation
 
-TODO: a DOI has **not** yet been registered for this repository. Placeholder:
-
 ```bibtex
 @software{mesoltm,
   author  = {Schlapbach, Julius},
-  title   = {{mesoLTM}: a mesoscopic (individual-vehicle) Link Transmission Model},
-  version = {0.1.0},
+  title   = {{mesoLTM}: A Mesoscopic Individual-Vehicle Link Transmission Model},
+  version = {1.0.0},
   url     = {https://github.com/sjschlapbach/mesoLTM},
-  note    = {TODO: DOI pending registration (e.g. via Zenodo)},
+  doi     = {10.5281/zenodo.21443219},
   year    = {2026}
 }
 ```
